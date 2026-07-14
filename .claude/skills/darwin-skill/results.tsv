@@ -1,0 +1,13 @@
+timestamp	commit	skill	old_score	new_score	status	dimension	note	eval_mode
+2026-06-02T10:00	baseline	pyrojewel-beamer-academic	-	68.2	baseline	-	v1→v2学术化改造+图片校验	dry_run
+2026-06-02T10:30	round1	pyrojewel-beamer-academic	68.2	74.2	keep	dim3+4+9	添加CHECKPOINT+失败模式fallback+LaTeX反例黑名单	dry_run
+2026-06-02T11:00	baseline2	pyrojewel-beamer-academic	-	69.8	baseline	-	独立子agent重新评估基线	dry_run
+2026-06-02T11:15	round2	pyrojewel-beamer-academic	69.8	75.4	keep	dim2+3+4	三段式fallback+触发词扩充+修复ctex矛盾+节号修正	dry_run
+2026-06-02T11:30	round3	pyrojewel-beamer-academic	75.4	76.3	keep	dim5	编排算法+扩充策略+消除谨慎措辞	dry_run
+2026-06-02T11:45	round4	pyrojewel-beamer-academic	76.3	77.0	keep	dim6	资源路径引用	dry_run
+2026-06-10T17:30	baseline3	pyrojewel-beamer-academic	-	71.7	baseline	-	v4.1重新基线：步骤5/7顺序矛盾+append判断模糊	dry_run
+2026-06-10T17:45	round5	pyrojewel-beamer-academic	71.7	82.7	keep	dim2+4+5+7	修复步骤顺序+量化append规则+删封面残留+精简页面节奏	dry_run
+2026-06-11T00:00	baseline	pyrojewel-paper-to-beamer	-	84.9	baseline	-	v2.0初始基线：river驱动的双层PPT结构	dry_run
+2026-06-11T00:30	round1	pyrojewel-paper-to-beamer	84.9	87.3	keep	dim4	新增论文列表CHECKPOINT：用户可在精读前调整范围	dry_run
+2026-06-11T18:00	baseline2	pyrojewel-paper-to-beamer	-	66.6	baseline	-	v2.0重新基线：完全缺失图片处理功能	dry_run
+2026-06-11T18:30	round2	pyrojewel-paper-to-beamer	66.6	85.5	keep	dim2+3+5+6+7+8+9	图片全链路：提取Key Figures+路径转换+选图策略+布局决策+fallback	dry_run

@@ -1,0 +1,658 @@
+% ============================================================
+% Academic Beamer Theme — Defense Mode Only
+% 答辩专用主题（博士/硕士答辩），不适用组会/研讨会/学术会议
+% 深藏蓝+金色双色调，校徽支持，高信息密度
+% v3.1：新增 infobox/quoteline/stepline/callout/threecard/sectionbar
+%       多样性排版命令；修复 gridfourcap/gridtwocap 的 figcap+\\ 报错
+% ============================================================
+\ProvidesPackage{beamerthemeAcademic}[2026/07/02 Academic Beamer Theme v3.1 — Defense Only]
+
+% ---------- 依赖包 ----------
+\RequirePackage{tikz}
+\RequirePackage{graphicx}
+\RequirePackage{etoolbox}
+\RequirePackage{xkeyval}
+\RequirePackage{array}
+\RequirePackage{colortbl}
+\RequirePackage{adjustbox}
+\RequirePackage{varwidth}
+\usetikzlibrary{shadows}
+
+% ============================================================
+% 功能色
+% ============================================================
+\definecolor{textgray}{RGB}{90, 90, 90}             % 辅助文字灰
+\definecolor{lightline}{RGB}{200, 200, 205}         % 细分隔线
+\definecolor{lightbg}{RGB}{248, 248, 250}           % 浅灰背景
+\definecolor{inkcolor}{RGB}{35, 35, 42}             % 主文字色
+
+% ============================================================
+% Defense Mode Colors（深藏蓝+金色双色调）
+% ============================================================
+\definecolor{defense-navy}{RGB}{17, 43, 82}           % 深藏蓝主色
+\definecolor{defense-gold}{RGB}{197, 179, 88}          % 金色辅助
+\definecolor{defense-banner}{RGB}{30, 60, 114}         % banner蓝（比主色稍亮）
+\definecolor{defense-summary-bg}{RGB}{220, 232, 248}   % 底部总结条浅蓝底
+\definecolor{defense-frame-border}{RGB}{180, 195, 220} % 内容框浅灰蓝边框
+\definecolor{defense-kwd-red}{RGB}{200, 30, 30}        % 关键词红色
+
+% 默认即为 defense 配色
+\colorlet{accentcolor}{defense-navy}
+\colorlet{accentdark}{defense-navy}
+\colorlet{accentlight}{defense-summary-bg}
+\colorlet{highlightcolor}{defense-gold}
+
+% Defense mode toggle
+\newif\ifdefensemode
+\defensemodetrue
+
+% ============================================================
+% 校徽支持
+% ============================================================
+\newcommand{\sealimage}{}
+\newcommand{\setseal}[1]{\renewcommand{\sealimage}{#1}}
+\newcommand{\horizsealimage}{}
+\newcommand{\sethorizseal}[1]{\renewcommand{\horizsealimage}{#1}}
+
+\newcommand{\printseal}{%
+  \ifdefempty{\sealimage}{}{%
+    \includegraphics[height=2cm]{\sealimage}%
+  }%
+}
+\newcommand{\printsealsmall}{%
+  \ifdefempty{\sealimage}{}{%
+    \includegraphics[height=0.7cm]{\sealimage}%
+  }%
+}
+\newcommand{\printsealtiny}{%
+  \ifdefempty{\sealimage}{}{%
+    \includegraphics[height=0.5cm]{\sealimage}%
+  }%
+}
+\newcommand{\printhorizsealtiny}{%
+  \ifdefempty{\horizsealimage}{}{%
+    \includegraphics[height=0.55cm]{\horizsealimage}%
+  }%
+}
+
+% ============================================================
+% Beamer 颜色设置（Defense Mode）
+% ============================================================
+\setbeamercolor{structure}{fg=defense-navy}
+\setbeamercolor{title}{fg=defense-navy}
+\setbeamercolor{headline}{fg=white, bg=defense-navy}
+\setbeamercolor{frametitle}{fg=white, bg=defense-navy}
+\setbeamercolor{section in head/foot}{fg=white, bg=defense-navy}
+\setbeamercolor{alerted text}{fg=defense-kwd-red}
+\setbeamercolor{block title}{fg=white, bg=defense-banner}
+\setbeamercolor{item}{fg=defense-navy}
+\setbeamercolor{subitem}{fg=defense-navy}
+\setbeamercolor{enumerate item}{fg=defense-navy}
+\setbeamercolor{normal text}{fg=inkcolor}
+\setbeamercolor{footline}{fg=textgray, bg=white}
+\setbeamercolor{author in head/foot}{fg=textgray, bg=white}
+\setbeamercolor{title in head/foot}{fg=defense-navy, bg=white}
+\setbeamercolor{date in head/foot}{fg=textgray, bg=white}
+\setbeamercolor{block body}{fg=black, bg=lightbg}
+\setbeamercolor{caption name}{fg=defense-navy}
+\setbeamercolor{subsection in head/foot}{fg=defense-navy, bg=defense-summary-bg}
+
+% ============================================================
+% Beamer 字体设置
+% ============================================================
+\setbeamerfont{title}{size=\fontsize{20pt}{26pt}\selectfont, series=\mdseries}
+\setbeamerfont{frametitle}{size=\fontsize{14pt}{18pt}\selectfont, series=\mdseries, family=\sffamily}
+\setbeamerfont{framesubtitle}{size=\normalsize}
+\setbeamerfont{headline}{size=\fontsize{14pt}{18pt}\selectfont, series=\bfseries}
+\setbeamerfont{footline}{size=\fontsize{9pt}{11pt}\selectfont}
+\setbeamerfont{block title}{size=\normalsize, series=\bfseries}
+\setbeamerfont{section in toc}{series=\bfseries}
+
+% ============================================================
+% Itemize 样式
+% ============================================================
+\setbeamertemplate{itemize item}{\color{defense-navy}\raisebox{0.18ex}{\small\textbullet}}
+\setbeamertemplate{itemize subitem}{\color{defense-navy}\raisebox{0.18ex}{\scriptsize\textbullet}}
+\setbeamertemplate{itemize subsubitem}{\color{defense-navy!60}\raisebox{0.18ex}{\tiny\textbullet}}
+
+% 去掉导航符号
+\setbeamertemplate{navigation symbols}{}
+
+% ============================================================
+% Headline 模板（Defense Mode：校徽 + 居中的 section 标题）
+% ============================================================
+\setbeamertemplate{headline}{%
+  \leavevmode%
+  \begin{beamercolorbox}[wd=\paperwidth, ht=0.8cm, dp=0.15cm, leftskip=0.4cm, rightskip=0.4cm]{section in head/foot}%
+    \ifdefempty{\horizsealimage}{%
+      \ifdefempty{\sealimage}{}{%
+        \raisebox{-0.1cm}{\printsealtiny}\hspace{0.3cm}%
+      }%
+    }{%
+      \raisebox{-0.12cm}{\printhorizsealtiny}%
+    }%
+    \hfill
+    {\usebeamerfont{headline}\insertsectionhead}%
+    \hfill\null
+  \end{beamercolorbox}%
+  \vskip0pt%
+}
+
+% ============================================================
+% Frametitle 模板（Defense Mode：隐藏，标题在 contentcard banner 中）
+% ============================================================
+\setbeamertemplate{frametitle}{}
+
+% ============================================================
+% Footline 模板（Defense Mode：极简，仅页码）
+% ============================================================
+\setbeamertemplate{footline}{%
+  \vskip3pt%
+  \hbox to \paperwidth{%
+    \hfill{\color{textgray}\fontsize{9pt}{11pt}\selectfont\insertframenumber}\hspace{0.5cm}%
+  }%
+  \vskip5pt%
+}
+
+% ============================================================
+% Title Page 模板（Defense Mode：使用 \defensecover 代替）
+% ============================================================
+\setbeamertemplate{title page}{%
+  \vskip1cm%
+  \begin{center}
+    {\color{defense-navy}\rule{0.85\textwidth}{0.8pt}}\\[0.5cm]
+    {\usebeamerfont{title}\usebeamercolor[fg]{title}\inserttitle}\\[0.3cm]
+    {\color{defense-navy}\rule{0.85\textwidth}{0.8pt}}
+  \end{center}
+  \vskip0.6cm%
+  \begin{center}
+    \begin{tabular}{r@{\;:\;}l}
+      \textbf{答辩学生} & \insertauthor \\[4pt]
+      \textbf{导\quad\quad 师} & \supervisor \\[4pt]
+      \textbf{专\quad\quad 业} & \major \\
+    \end{tabular}
+  \end{center}
+  \vskip0.8cm%
+  \begin{center}
+    \insertdate
+  \end{center}
+  \vfill%
+}
+
+% 关闭默认 AtBeginSection
+\AtBeginSection[]{}
+
+% ============================================================
+% 封面命令
+% ============================================================
+
+% 导师、专业
+\newcommand{\supervisor}{}
+\newcommand{\setsupervisor}[1]{\renewcommand{\supervisor}{#1}}
+\newcommand{\major}{}
+\newcommand{\setmajor}[1]{\renewcommand{\major}{#1}}
+
+% 答辩封面：深蓝横幅 + 金色校名 + 校徽 + 导师信息
+% 用法: \defensecover{校名}{导师姓名 职称}
+\newcommand{\defensecover}[2]{%
+  \begin{frame}[plain]
+    \vspace*{-0.4cm}
+    \begin{tikzpicture}[remember picture, overlay]
+      % 顶部深蓝横幅
+      \fill[defense-navy] (current page.north west) rectangle
+        ([yshift=-4.5cm]current page.north east);
+      % 底部金色细线
+      \draw[defense-gold, line width=1.2pt] ([yshift=-4.5cm]current page.north west)
+        -- ([yshift=-4.5cm]current page.north east);
+      % 校徽（横幅内居中）
+      \node at ([yshift=-1.7cm]current page.north) {\printseal};
+      % 校名（金色，横幅内）
+      \node[text=defense-gold, font=\fontsize{24pt}{30pt}\selectfont\bfseries]
+        at ([yshift=-3.0cm]current page.north) {#1};
+      % 学位论文答辩（白色，横幅下方）
+      \node[text=white, font=\fontsize{16pt}{20pt}\selectfont\mdseries]
+        at ([yshift=-3.9cm]current page.north) {学位论文答辩};
+    \end{tikzpicture}
+    \vspace{3.0cm}
+    \begin{center}
+      {\usebeamerfont{title}\usebeamercolor[fg]{title}\inserttitle}\\[0.3cm]
+      \ifx\insertsubtitle\empty\else
+        {\small\color{textgray}\insertsubtitle}\\[0.3cm]
+      \fi
+      \vskip0.8cm
+      \begin{tabular}{r@{\;:\;}l}
+        \textbf{答辩学生} & \insertauthor \\[6pt]
+        \textbf{导\quad\quad 师} & #2 \\[6pt]
+        \textbf{专\quad\quad 业} & \major \\
+      \end{tabular}
+      \vskip0.6cm
+      {\color{textgray}\insertdate}
+    \end{center}
+  \end{frame}
+}
+
+% ============================================================
+% 章节分隔页
+% ============================================================
+% 用法: \sectiondivider{编号}{标题}
+% 全屏 accent 色 + 金色编号 + 白字标题
+\newcommand{\sectiondivider}[2]{%
+  \begin{frame}[plain]
+    \begin{tikzpicture}[remember picture, overlay]
+      \fill[defense-navy] (current page.north west) rectangle (current page.south east);
+      % 金色圆形编号
+      \node[draw=defense-gold, fill=defense-gold, circle, minimum size=1.6cm,
+            font=\fontsize{28pt}{32pt}\selectfont\bfseries\color{white}]
+            at ([xshift=2.5cm, yshift=-0.5cm]current page.north west) {#1};
+      % 白色标题
+      \node[anchor=west, text=white,
+            font=\fontsize{22pt}{28pt}\selectfont\mdseries]
+            at ([xshift=4.0cm, yshift=-0.5cm]current page.north west) {#2};
+      % 上下分隔线
+      \draw[white, line width=0.3pt] ([xshift=2cm, yshift=-3.0cm]current page.north west)
+        -- ([xshift=-2cm, yshift=-3.0cm]current page.north east);
+      \draw[white, line width=0.3pt] ([xshift=2cm, yshift=3.0cm]current page.south west)
+        -- ([xshift=-2cm, yshift=3.0cm]current page.south east);
+    \end{tikzpicture}
+  \end{frame}
+}
+
+% ============================================================
+% Defense Mode 专用命令
+% ============================================================
+
+% 红色粗体关键词
+\newcommand{\kwd}[1]{%
+  {\bfseries\textcolor{defense-kwd-red}{#1}}%
+}
+
+% 金色短横线（标题下方）
+\newcommand{\goldline}{%
+  {\color{defense-gold}\rule{2cm}{1.5pt}}%
+}
+
+% 金色满宽发丝线
+\newcommand{\goldhairline}{%
+  \vskip4pt{\color{defense-gold}\rule{\textwidth}{0.5pt}}\vskip4pt%
+}
+
+% 金色边框框（金色边框 + 浅金填充）
+\newcommand{\goldbox}[1]{%
+  \begin{center}
+  \begin{tikzpicture}
+    \node[draw=defense-gold, line width=0.8pt, fill=defense-gold!8,
+          rounded corners=4pt, inner sep=9pt,
+          text width=0.88\linewidth, align=left, font=\small]{#1};
+  \end{tikzpicture}
+  \end{center}
+}
+
+% 金色方形 bullet
+\newcommand{\golditem}{%
+  \tikz[baseline=-0.5ex]{\fill[defense-gold] (0,0) rectangle (6pt,6pt);}%
+}
+
+% 内容卡片：答辩PPT标题条 + 内容框
+% #1 = banner 标题（白字蓝底加粗）
+% #2 = body 内容
+\newcommand{\contentcard}[2]{%
+  \begin{center}
+  \begin{tikzpicture}
+    \pgfmathsetlength{\pgf@xa}{0.94\columnwidth}%
+    \node[draw=none, fill=defense-banner,
+          rounded corners=1.5pt, inner xsep=14pt, inner ysep=4.5pt,
+          font=\fontsize{10.5pt}{12.5pt}\selectfont\bfseries\color{white}, anchor=south,
+          drop shadow={opacity=0.18, shadow xshift=0.7pt, shadow yshift=-0.7pt}] (banner)
+          at (0, 0) {\begin{varwidth}{0.78\columnwidth}\centering #1\end{varwidth}};
+    \node[draw=defense-frame-border, line width=1.0pt, fill=white,
+          rounded corners=7pt, inner sep=8pt,
+          text width=\pgf@xa, align=left, anchor=north] (body)
+          at ([yshift=-4pt]banner.south) {#2};
+  \end{tikzpicture}
+  \end{center}
+}
+
+% 内容卡片内嵌表格
+% 用法: \cardtable{\begin{tabular}{lcc} ... \end{tabular}}
+\newcommand{\cardtable}[1]{%
+  \begingroup
+  \small
+  \renewcommand{\arraystretch}{1.12}%
+  \setlength{\tabcolsep}{3.2pt}%
+  \begin{center}
+    \begin{adjustbox}{max width=0.96\linewidth}
+      #1%
+    \end{adjustbox}%
+  \end{center}%
+  \endgroup
+}
+
+% 双卡片并排
+% #1/#2 = 左卡片 banner + body, #3/#4 = 右卡片 banner + body
+\newcommand{\contentcardpair}[4]{%
+  \begin{columns}[T]
+    \begin{column}{0.47\textwidth}
+      \contentcard{#1}{#2}
+    \end{column}
+    \begin{column}{0.47\textwidth}
+      \contentcard{#3}{#4}
+    \end{column}
+  \end{columns}
+}
+
+% 总结条：浅蓝底 + 深蓝粗体文字
+\newcommand{\summarybar}[1]{%
+  \vskip6pt
+  \begin{center}
+  \begin{tikzpicture}
+    \node[draw=none, fill=defense-summary-bg,
+          rounded corners=5pt, inner sep=8pt,
+          text width=0.86\columnwidth, align=left,
+          font=\bfseries\color{defense-navy}] (bar) {#1};
+  \end{tikzpicture}
+  \end{center}
+}
+
+% 平坦 defense 页标题（用于非 contentcard 包裹的 frame）
+\newcommand{\defenseframetitle}[1]{%
+  \vskip0.18cm%
+  {\color{defense-navy}\sffamily\fontsize{15pt}{18pt}\selectfont\bfseries #1\par}%
+  \vskip3pt%
+  {\color{defense-frame-border}\rule{\textwidth}{0.6pt}}%
+  \vskip8pt%
+}
+
+% Defense 紧凑子标题
+\newcommand{\defensesubhead}[1]{%
+  {\color{defense-navy}\sffamily\fontsize{10pt}{12pt}\selectfont\bfseries #1\par}%
+  \vskip3pt%
+}
+
+% 发现页标题（accent 色 + 加粗）
+\newcommand{\findingtitle}[1]{%
+  {\color{defense-navy}\bfseries #1}%
+}
+
+% ============================================================
+% 通用排版命令
+% ============================================================
+
+% 论文章节小注
+\newcommand{\chapnote}[1]{%
+  {\fontsize{7pt}{9pt}\selectfont\color{textgray}\itshape #1\par}\vskip6pt%
+}
+
+% 图说
+\newcommand{\figcap}[1]{%
+  \vskip-2pt{\centering\fontsize{8pt}{10pt}\selectfont\itshape\color{textgray}#1\par}%
+}
+
+% 结论高亮框（灰色边框，浅灰底）
+\newcommand{\keybox}[1]{%
+  \begin{center}
+  \begin{tikzpicture}
+    \node[draw=lightline, line width=0.5pt, fill=lightbg,
+          rounded corners=0pt, inner sep=12pt,
+          text width=0.92\linewidth, align=left, font=\small]{#1};
+  \end{tikzpicture}
+  \end{center}
+}
+
+% 灰色分隔线
+\newcommand{\hairline}{%
+  \vskip9pt{\color{lightline}\rule{\textwidth}{0.4pt}}\vskip9pt%
+}
+
+% accent 色短分隔线
+\newcommand{\accentline}{%
+  \vskip9pt{\color{defense-navy}\rule{2cm}{1.2pt}}\vskip9pt%
+}
+
+% ============================================================
+% 多样性排版命令（v3.1 新增 — 丰富页面节奏）
+% ============================================================
+% 目的：打破"每页都是 contentcard"的单调，提供轻量、嵌入式、
+% 流程式、警示式等多种页面类型，供同一份 PPT 内交替轮换使用。
+
+% 信息条：左侧金色竖条 + 浅灰底，比 contentcard 更轻，适合段落页穿插
+% 用法: \infobox{可选小标题}{内容}  （标题可空）
+\newcommand{\infobox}[2]{%
+  \begin{center}
+  \begin{tikzpicture}
+    \node[draw=none, fill=lightbg, rounded corners=3pt, inner sep=10pt,
+          text width=0.90\linewidth, align=left, font=\small] (box) {%
+      \begingroup\setbox0=\hbox{#1}\ifdim\wd0>0pt
+        {\color{defense-navy}\bfseries #1\par}\vskip3pt
+      \fi\endgroup #2};
+    \draw[defense-gold, line width=2.5pt] (box.north west) -- (box.south west);
+  \end{tikzpicture}
+  \end{center}
+}
+
+% 引言/动机条：左金色粗竖线 + 斜体引文，适合研究动机、问题陈述页
+% 用法: \quoteline{引言文字}
+\newcommand{\quoteline}[1]{%
+  \vskip6pt
+  \begin{center}
+  \begin{tikzpicture}
+    \node[draw=none, fill=white, inner sep=10pt,
+          text width=0.88\linewidth, align=left, font=\itshape\small] (q) {#1};
+    \draw[defense-gold, line width=3pt] (q.north west) -- (q.south west);
+  \end{tikzpicture}
+  \end{center}
+  \vskip4pt%
+}
+
+% 流程步骤条：金色编号圆 + 文字，适合方法流程、实验步骤页
+% 用法: \stepline{步骤编号}{步骤文字}
+\newcommand{\stepline}[2]{%
+  \vskip4pt
+  \begin{tikzpicture}
+    \node[draw=defense-gold, fill=defense-gold, circle, minimum size=0.62cm,
+          inner sep=0pt, font=\small\bfseries\color{white}] (n) at (0,0) {#1};
+    \node[anchor=west, text width=0.84\linewidth, align=left, font=\small]
+          at ([xshift=8pt]n.east) {#2};
+  \end{tikzpicture}
+  \vskip2pt%
+}
+
+% 警示/提示框：note/tip/warn 三类，不同色边框，适合结论局限页
+% 用法: \callout{note|tip|warn}{内容}
+\definecolor{co-note}{RGB}{30, 60, 114}   % note 深蓝
+\definecolor{co-tip}{RGB}{40, 120, 70}    % tip 绿
+\definecolor{co-warn}{RGB}{180, 90, 20}   % warn 橙
+\newcommand{\calloutbordername}{co-note}
+\newcommand{\callout}[2]{%
+  \renewcommand{\calloutbordername}{co-note}%
+  \ifdefstring{#1}{tip}{\renewcommand{\calloutbordername}{co-tip}}{}%
+  \ifdefstring{#1}{warn}{\renewcommand{\calloutbordername}{co-warn}}{}%
+  \begin{center}
+  \begin{tikzpicture}
+    \node[draw={\calloutbordername}, line width=1.0pt,
+          fill={\calloutbordername!6},
+          rounded corners=4pt, inner sep=9pt,
+          text width=0.88\linewidth, align=left, font=\small]{#2};
+  \end{tikzpicture}
+  \end{center}
+}
+
+% 三卡片并排：对比三种方法/方案
+% 用法: \threecard{t1}{c1}{t2}{c2}{t3}{c3}
+\newcommand{\threecard}[6]{%
+  \begin{columns}[T,onlytextwidth]
+    \begin{column}{0.30\textwidth}
+      \contentcard{#1}{#2}
+    \end{column}
+    \begin{column}{0.30\textwidth}
+      \contentcard{#3}{#4}
+    \end{column}
+    \begin{column}{0.30\textwidth}
+      \contentcard{#5}{#6}
+    \end{column}
+  \end{columns}
+}
+
+% 嵌入式章节横条：不占整页的轻量 section divider
+% 解决"禁止过渡页但需要视觉分隔"的矛盾——放在内容页顶部
+% 用法: \sectionbar{章节标题}
+\newcommand{\sectionbar}[1]{%
+  \vskip2pt
+  \begin{tikzpicture}
+    \node[draw=none, fill=defense-navy, rounded corners=2pt,
+          inner xsep=12pt, inner ysep=5pt, text=white,
+          font=\sffamily\fontsize{11pt}{14pt}\selectfont\bfseries] (bar) {#1};
+    \draw[defense-gold, line width=1.5pt] (bar.south west) -- (bar.south east);
+  \end{tikzpicture}
+  \vskip8pt%
+}
+
+% ============================================================
+% 图片命令
+% ============================================================
+
+% 双栏文字+图（左文右图）
+\newcommand{\colimg}[1]{%
+  \includegraphics[width=\linewidth, height=5.5cm, keepaspectratio]{#1}%
+}
+
+% 单栏满宽图
+\newcommand{\fullimg}[1]{%
+  \includegraphics[width=\textwidth, height=6.5cm, keepaspectratio]{#1}%
+}
+
+% 自定义高度图
+\newcommand{\safeimg}[2][5.5cm]{%
+  \includegraphics[width=\linewidth, height=#1, keepaspectratio]{#2}%
+}
+
+% ============================================================
+% 多图网格排版
+% ============================================================
+
+% 2×1 并排
+\newcommand{\gridtwo}[2]{%
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \centering\includegraphics[width=\linewidth, height=4.5cm, keepaspectratio]{#1}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \centering\includegraphics[width=\linewidth, height=4.5cm, keepaspectratio]{#2}
+    \end{column}
+  \end{columns}
+}
+
+% 2×1 并排 + 图注
+% 注意：图注后用 \par\vspace 而非 \\，避免 \figcap 末尾 \par 后紧跟 \\ 触发
+% "There's no line here to end" 报错（frame 末尾尤甚）。
+\newcommand{\gridtwocap}[4]{%
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \centering\includegraphics[width=\linewidth, height=4.0cm, keepaspectratio]{#1}\par
+      \vspace{2pt}\figcap{#2}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \centering\includegraphics[width=\linewidth, height=4.0cm, keepaspectratio]{#3}\par
+      \vspace{2pt}\figcap{#4}
+    \end{column}
+  \end{columns}
+}
+
+% 2×2 网格
+\newcommand{\gridfour}[4]{%
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \centering\includegraphics[width=\linewidth, height=3.6cm, keepaspectratio]{#1}\par
+      \vspace{4pt}\includegraphics[width=\linewidth, height=3.6cm, keepaspectratio]{#3}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \centering\includegraphics[width=\linewidth, height=3.6cm, keepaspectratio]{#2}\par
+      \vspace{4pt}\includegraphics[width=\linewidth, height=3.6cm, keepaspectratio]{#4}
+    \end{column}
+  \end{columns}
+}
+
+% 2×2 网格 + 图注
+\newcommand{\gridfourcap}[8]{%
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \centering\includegraphics[width=\linewidth, height=3.2cm, keepaspectratio]{#1}\par
+      \vspace{2pt}\figcap{#2}\par
+      \vspace{6pt}\includegraphics[width=\linewidth, height=3.2cm, keepaspectratio]{#5}\par
+      \vspace{2pt}\figcap{#6}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \centering\includegraphics[width=\linewidth, height=3.2cm, keepaspectratio]{#3}\par
+      \vspace{2pt}\figcap{#4}\par
+      \vspace{6pt}\includegraphics[width=\linewidth, height=3.2cm, keepaspectratio]{#7}\par
+      \vspace{2pt}\figcap{#8}
+    \end{column}
+  \end{columns}
+}
+
+% 1大 + 2小
+\newcommand{\gridonextwo}[3]{%
+  \begin{columns}[T]
+    \begin{column}{0.52\textwidth}
+      \centering\includegraphics[width=\linewidth, height=6.0cm, keepaspectratio]{#1}
+    \end{column}
+    \begin{column}{0.44\textwidth}
+      \centering\includegraphics[width=\linewidth, height=2.8cm, keepaspectratio]{#2}\par
+      \vspace{6pt}\includegraphics[width=\linewidth, height=2.8cm, keepaspectratio]{#3}
+    \end{column}
+  \end{columns}
+}
+
+% 上图下文
+\newcommand{\topfig}[2]{%
+  \centering\includegraphics[width=0.9\linewidth, height=4.5cm, keepaspectratio]{#1}\\[8pt]
+  #2
+}
+
+% ============================================================
+% 致谢页
+% ============================================================
+% 用法: \thanksframe{致谢语}{联系方式}
+% 示例: \thanksframe{恳请各位老师批评指正}{email@example.com}
+\newcommand{\thanksframe}[2]{%
+  \begin{frame}[plain]
+    \begin{tikzpicture}[remember picture, overlay]
+      \fill[defense-navy] (current page.north west) rectangle
+        ([yshift=-0.12cm]current page.north east);
+      \fill[defense-navy] ([yshift=0.12cm]current page.south west) rectangle
+        (current page.south east);
+    \end{tikzpicture}
+    \vbox to \paperheight\bgroup
+      \vskip0.6cm
+      \begin{center}
+        {\color{defense-navy}\sffamily\fontsize{12pt}{14pt}\selectfont\addfontfeature{LetterSpace=20.0}THANK YOU}
+      \end{center}
+      \vfill
+      \begin{center}
+        {\color{defense-gold}\rule{1.6cm}{0.6pt}\hspace{0.5cm}\raisebox{0.18em}{$\bullet$}\hspace{0.5cm}\rule{1.6cm}{0.6pt}}\\[0.6cm]
+        {\color{defense-navy}\sffamily\fontsize{26pt}{34pt}\selectfont\mdseries #1}\\[0.5cm]
+        {\color{textgray}\sffamily\fontsize{10pt}{12pt}\selectfont #2}
+      \end{center}
+      \vskip1.0cm
+    \egroup
+  \end{frame}
+}
+
+% ============================================================
+% TOC 样式
+% ============================================================
+\setbeamertemplate{section in toc}{%
+  \leavevmode%
+  \llap{%
+    \tikz[baseline=(num.base)]{%
+      \node[fill=defense-navy, text=white, circle, inner sep=1.5pt, font=\scriptsize\bfseries] (num) {\inserttocsectionnumber};%
+    }%
+    \hspace{6pt}%
+  }%
+  \usebeamerfont{section in toc}\inserttocsection\par%
+}
+
+\setbeamertemplate{subsection in toc}{%
+  \hspace{1.8em}\inserttocsubsection\par%
+}
+
+\endinput

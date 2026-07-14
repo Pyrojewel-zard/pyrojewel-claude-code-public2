@@ -1,0 +1,392 @@
+% beamerthemeAcademic.sty
+% ────────────────────────────────────────────────────────────────
+% Beamer academic-presentation theme · Swiss International Edition
+% Fuses: beamer-academic compilation pipeline + guizang-ppt-skill Swiss design system
+%
+% Design principles (from guizang-ppt-skill):
+%   1. Single accent color per deck
+%   2. Inverse weight staircase: large text → light weight
+%   3. No rounded corners, no shadows, no gradients
+%   4. Information-driven hierarchy
+%   5. Content-shape matching for layout selection
+% ────────────────────────────────────────────────────────────────
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{beamerthemeAcademic}[2026/06/02 Swiss Academic Beamer Theme]
+
+% ── Required packages ──────────────────────────────────────────
+\RequirePackage{tikz}
+\usetikzlibrary{calc,positioning,backgrounds,fit}
+\RequirePackage{booktabs}
+\RequirePackage{graphicx}
+\RequirePackage{amsmath,amssymb}
+\RequirePackage{ragged2e}
+\RequirePackage{xcolor}
+\RequirePackage{calc}
+\RequirePackage{etoolbox}
+
+% ── Swiss Color System (from guizang-ppt-skill) ───────────────
+% Fixed grey scale
+\definecolor{swiss-paper}{HTML}{FAFAF8}
+\definecolor{swiss-ink}{HTML}{0A0A0A}
+\definecolor{swiss-grey-1}{HTML}{F0F0EE}
+\definecolor{swiss-grey-2}{HTML}{D4D4D2}
+\definecolor{swiss-grey-3}{HTML}{737373}
+
+% Accent palette (4 themes, mutually exclusive)
+\definecolor{ikb}{HTML}{002FA7}
+\definecolor{lemon}{HTML}{FFD500}
+\definecolor{lime}{HTML}{C5E803}
+\definecolor{orange}{HTML}{FF6B35}
+
+% Accent-on colors (text on accent background)
+\definecolor{ikb-on}{HTML}{FFFFFF}
+\definecolor{lemon-on}{HTML}{0A0A0A}
+\definecolor{lime-on}{HTML}{0A0A0A}
+\definecolor{orange-on}{HTML}{FFFFFF}
+
+% Default accent = IKB
+\colorlet{accent}{ikb}
+\colorlet{accent-on}{ikb-on}
+
+% Theme selection commands
+\newcommand{\useikb}{%
+  \colorlet{accent}{ikb}\colorlet{accent-on}{ikb-on}%
+  \setbeamercolor{alerted text}{fg=ikb}%
+  \setbeamercolor{accent bar}{bg=ikb}%
+  \setbeamercolor{accent block title}{fg=white,bg=ikb}%
+  \setbeamercolor{accent block body}{fg=swiss-ink,bg=swiss-grey-1}%
+}
+\newcommand{\uselemon}{%
+  \colorlet{accent}{lemon}\colorlet{accent-on}{lemon-on}%
+  \setbeamercolor{alerted text}{fg=lemon}%
+  \setbeamercolor{accent bar}{bg=lemon}%
+  \setbeamercolor{accent block title}{fg=lemon-on,bg=lemon}%
+  \setbeamercolor{accent block body}{fg=swiss-ink,bg=swiss-grey-1}%
+}
+\newcommand{\uselime}{%
+  \colorlet{accent}{lime}\colorlet{accent-on}{lime-on}%
+  \setbeamercolor{alerted text}{fg=lime}%
+  \setbeamercolor{accent bar}{bg=lime}%
+  \setbeamercolor{accent block title}{fg=lime-on,bg=lime}%
+  \setbeamercolor{accent block body}{fg=swiss-ink,bg=swiss-grey-1}%
+}
+\newcommand{\useorange}{%
+  \colorlet{accent}{orange}\colorlet{accent-on}{orange-on}%
+  \setbeamercolor{alerted text}{fg=orange}%
+  \setbeamercolor{accent bar}{bg=orange}%
+  \setbeamercolor{accent block title}{fg=orange-on,bg=orange}%
+  \setbeamercolor{accent block body}{fg=swiss-ink,bg=swiss-grey-1}%
+}
+
+% ── Beamer Color Assignments ───────────────────────────────────
+\setbeamercolor{normal text}{fg=swiss-ink,bg=white}
+\setbeamercolor{structure}{fg=swiss-ink}
+\setbeamercolor{alerted text}{fg=ikb}
+
+\setbeamercolor{palette primary}{fg=swiss-ink,bg=swiss-paper}
+\setbeamercolor{palette secondary}{fg=swiss-ink,bg=swiss-grey-1}
+\setbeamercolor{palette tertiary}{fg=white,bg=swiss-ink}
+
+\setbeamercolor{frametitle}{fg=swiss-ink,bg=}
+\setbeamercolor{title}{fg=swiss-ink}
+\setbeamercolor{subtitle}{fg=swiss-grey-3}
+
+\setbeamercolor{block title}{fg=white,bg=swiss-ink}
+\setbeamercolor{block body}{fg=swiss-ink,bg=swiss-grey-1}
+
+\setbeamercolor{block title alerted}{fg=accent-on,bg=accent}
+\setbeamercolor{block body alerted}{fg=swiss-ink,bg=swiss-grey-1}
+
+\setbeamercolor{block title example}{fg=swiss-ink,bg=swiss-grey-2}
+\setbeamercolor{block body example}{fg=swiss-ink,bg=swiss-grey-1}
+
+\setbeamercolor{item}{fg=accent}
+\setbeamercolor{enumerate item}{fg=accent}
+\setbeamercolor{enumerate subitem}{fg=swiss-grey-3}
+
+% ── Beamer Font Assignments (Swiss Inverse Weight Staircase) ───
+\setbeamerfont{title}{size=\fontsize{28pt}{34pt},series=\mdseries}
+\setbeamerfont{subtitle}{size=\large,series=\mdseries}
+\setbeamerfont{frametitle}{size=\large,series=\mdseries}
+\setbeamerfont{framesubtitle}{size=\normalsize,series=\mdseries}
+\setbeamerfont{normal text}{size=\normalsize}
+\setbeamerfont{alerted text}{series=\bfseries}
+\setbeamerfont{block title}{size=\normalsize,series=\mdseries}
+\setbeamerfont{enumerate item}{series=\bfseries}
+\setbeamerfont{enumerate subitem}{series=\mdseries}
+\setbeamerfont{footnote}{size=\tiny}
+
+% ── Remove Navigation & Footline ───────────────────────────────
+\setbeamertemplate{navigation symbols}{}
+
+\setbeamertemplate{footline}{%
+  \hfill{\usebeamerfont{footline}\usebeamercolor[fg]{footline}%
+    \insertframenumber\,/\,\inserttotalframenumber\hspace*{6pt}}\vspace{3pt}%
+}
+
+% ── Frametitle Template (Swiss: left-aligned, hairline below) ──
+\setbeamertemplate{frametitle}{%
+  \vspace{6pt}%
+  \nointerlineskip
+  \begin{beamercolorbox}[wd=\paperwidth,leftskip=12pt,rightskip=12pt]{frametitle}%
+    \usebeamerfont{frametitle}\insertframetitle%
+    \ifx\insertframesubtitle\empty\else
+      \\[2pt]{\usebeamerfont{framesubtitle}\usebeamercolor[fg]{framesubtitle}\insertframesubtitle}%
+    \fi
+  \end{beamercolorbox}%
+  \vspace{2pt}%
+  \begin{tikzpicture}[overlay,remember picture]
+    \draw[swiss-grey-2,line width=0.4pt]
+      ([yshift=-1pt]current page.north west) ++(12pt,0) -- ++({\paperwidth-24pt},0);
+  \end{tikzpicture}%
+  \vspace{4pt}%
+}
+
+% ── Itemize / Enumerate ────────────────────────────────────────
+\setbeamertemplate{itemize item}{\textcolor{accent}{\rule{4pt}{4pt}}}
+\setbeamertemplate{itemize subitem}{\textcolor{swiss-grey-3}{\rule{3pt}{3pt}}}
+\setbeamertemplate{itemize subsubitem}{\textcolor{swiss-grey-3}{\rule{2pt}{2pt}}}
+
+\setbeamertemplate{enumerate items}[default]
+\setbeamertemplate{section in toc}[sections numbered]
+
+% ── Swiss Spacing Tokens (IBM Carbon 2x Grid) ─────────────────
+\newlength{\spXXS}\setlength{\spXXS}{3pt}
+\newlength{\spXS}\setlength{\spXS}{5pt}
+\newlength{\spSM}\setlength{\spSM}{8pt}
+\newlength{\spMD}\setlength{\spMD}{12pt}
+\newlength{\spLG}\setlength{\spLG}{18pt}
+\newlength{\spXL}\setlength{\spXL}{28pt}
+\newlength{\spXXL}\setlength{\spXXL}{42pt}
+
+% ════════════════════════════════════════════════════════════════
+% SWISS CONTENT COMMANDS
+% ════════════════════════════════════════════════════════════════
+
+% ── Typography Commands ────────────────────────────────────────
+
+% \swisshero{text} — Hero display text
+\newcommand{\swisshero}[1]{%
+  {\fontsize{48pt}{56pt}\selectfont\mdseries #1}%
+}
+
+% \swisschapter{text} — Chapter-level title
+\newcommand{\swisschapter}[1]{%
+  {\fontsize{22pt}{28pt}\selectfont\mdseries #1}%
+}
+
+% \swisskpi{number}{label} — KPI mega number
+\newcommand{\swisskpi}[2]{%
+  {\fontsize{36pt}{42pt}\selectfont\mdseries\textcolor{accent}{#1}}\\[2pt]%
+  {\fontsize{7pt}{9pt}\selectfont\bfseries\textcolor{swiss-grey-3}{#2}}%
+}
+
+% \swisslead{text} — Lead paragraph
+\newcommand{\swisslead}[1]{%
+  {\fontsize{11pt}{17pt}\selectfont\mdseries #1}%
+}
+
+% \swissmeta{text} — Meta/kicker text
+\newcommand{\swissmeta}[1]{%
+  {\fontsize{7pt}{9pt}\selectfont\bfseries\textcolor{swiss-grey-3}{#1}}%
+}
+
+% ── Content Block Commands ─────────────────────────────────────
+
+% \keybox{text} — Accent-filled box (no rounded corners)
+\newcommand{\keybox}[1]{%
+  \begin{tikzpicture}
+    \node[
+      fill=accent,
+      text=accent-on,
+      rounded corners=0pt,
+      inner sep=10pt,
+      text width={\dimexpr\linewidth-20pt\relax},
+      font=\normalsize\mdseries
+    ]{#1};
+  \end{tikzpicture}%
+}
+
+% \greybox{text} — Grey background block
+\newcommand{\greybox}[1]{%
+  \begin{tikzpicture}
+    \node[
+      fill=swiss-grey-1,
+      text=swiss-ink,
+      rounded corners=0pt,
+      inner sep=10pt,
+      text width={\dimexpr\linewidth-20pt\relax},
+      font=\normalsize\mdseries
+    ]{#1};
+  \end{tikzpicture}%
+}
+
+% \inkbox{text} — Ink-black background, white text
+\newcommand{\inkbox}[1]{%
+  \begin{tikzpicture}
+    \node[
+      fill=swiss-ink,
+      text=white,
+      rounded corners=0pt,
+      inner sep=10pt,
+      text width={\dimexpr\linewidth-20pt\relax},
+      font=\normalsize\mdseries
+    ]{#1};
+  \end{tikzpicture}%
+}
+
+% ── Layout Commands ────────────────────────────────────────────
+
+% \hairline — 0.4pt horizontal rule in grey-2
+\newcommand{\hairline}{%
+  \begin{tikzpicture}
+    \draw[swiss-grey-2,line width=0.4pt] (0,0) -- (\linewidth,0);
+  \end{tikzpicture}%
+}
+
+% \whitehairline — 0.4pt white rule for accent/dark slides
+\newcommand{\whitehairline}{%
+  \begin{tikzpicture}
+    \draw[white,line width=0.4pt] (0,0) -- (\linewidth,0);
+  \end{tikzpicture}%
+}
+
+% \accentline — 1.6pt accent-colored rule
+\newcommand{\accentline}{%
+  \begin{tikzpicture}
+    \draw[accent,line width=1.6pt] (0,0) -- (\linewidth,0);
+  \end{tikzpicture}%
+}
+
+% \duocompare{left title}{left content}{right title}{right content}
+\newcommand{\duocompare}[4]{%
+  \begin{columns}[T]
+    \begin{column}{0.47\textwidth}
+      \hairline\vspace{6pt}%
+      {\bfseries\textcolor{swiss-grey-3}{#1}}\\[6pt]%
+      #2%
+    \end{column}
+    \begin{column}{0.47\textwidth}
+      \accentline\vspace{6pt}%
+      {\bfseries\textcolor{accent}{#3}}\\[6pt]%
+      #4%
+    \end{column}
+  \end{columns}%
+}
+
+% \threeforces{title1}{desc1}{title2}{desc2}{title3}{desc3}
+\newcommand{\threeforces}[6]{%
+  \begin{columns}[T]
+    \begin{column}{0.30\textwidth}
+      \greybox{%
+        {\fontsize{24pt}{28pt}\selectfont\mdseries\textcolor{swiss-grey-3}{01}}\\[4pt]%
+        {\bfseries #1}\\[4pt]%
+        #2%
+      }%
+    \end{column}
+    \begin{column}{0.30\textwidth}
+      \greybox{%
+        {\fontsize{24pt}{28pt}\selectfont\mdseries\textcolor{swiss-grey-3}{02}}\\[4pt]%
+        {\bfseries #3}\\[4pt]%
+        #4%
+      }%
+    \end{column}
+    \begin{column}{0.30\textwidth}
+      \keybox{%
+        {\fontsize{24pt}{28pt}\selectfont\mdseries 03}\\[4pt]%
+        {\bfseries #5}\\[4pt]%
+        #6%
+      }%
+    \end{column}
+  \end{columns}%
+}
+
+% \ledgerrow{number}{title}{description}{tag}
+\newcommand{\ledgerrow}[4]{%
+  \hairline\vspace{6pt}%
+  {\fontsize{28pt}{34pt}\selectfont\mdseries #1}\hspace{12pt}%
+  \begin{minipage}[t]{0.55\textwidth}%
+    {\bfseries #2}\\[2pt]%
+    {\small\textcolor{swiss-grey-3}{#3}}%
+  \end{minipage}\hfill%
+  {\swissmeta{#4}}\vspace{6pt}%
+}
+
+% \ledgerrowaccent{number}{title}{description}{tag}
+\newcommand{\ledgerrowaccent}[4]{%
+  \accentline\vspace{6pt}%
+  {\fontsize{28pt}{34pt}\selectfont\mdseries\textcolor{accent}{#1}}\hspace{12pt}%
+  \begin{minipage}[t]{0.55\textwidth}%
+    {\bfseries\textcolor{accent}{#2}}\\[2pt]%
+    {\small\textcolor{swiss-grey-3}{#3}}%
+  \end{minipage}\hfill%
+  {\swissmeta{\textcolor{accent}{#4}}}\vspace{6pt}%
+}
+
+% ── Figure Commands ────────────────────────────────────────────
+
+% \figcap{text} — Figure caption with auto-numbering
+\newcounter{figurecount}
+\setcounter{figurecount}{0}
+\newcommand{\figcap}[1]{%
+  \stepcounter{figurecount}%
+  {\fontsize{8pt}{10pt}\selectfont\textcolor{swiss-grey-3}{图~\thefigurecount\quad #1}}%
+}
+
+% ── Rhythm Commands ────────────────────────────────────────────
+
+% \accentslide — Set current slide to accent background
+\newcommand{\accentslide}{%
+  \setbeamercolor{background canvas}{bg=accent}%
+  \setbeamercolor{normal text}{fg=white}%
+  \setbeamercolor{frametitle}{fg=white}%
+  \usebeamercolor[fg]{normal text}%
+}
+
+% \darkslide — Set current slide to ink-black background
+\newcommand{\darkslide}{%
+  \setbeamercolor{background canvas}{bg=swiss-ink}%
+  \setbeamercolor{normal text}{fg=white}%
+  \setbeamercolor{frametitle}{fg=white}%
+  \usebeamercolor[fg]{normal text}%
+}
+
+% \lightslide — Reset to default white background
+\newcommand{\lightslide}{%
+  \setbeamercolor{background canvas}{bg=white}%
+  \setbeamercolor{normal text}{fg=swiss-ink}%
+  \setbeamercolor{frametitle}{fg=swiss-ink}%
+  \usebeamercolor[fg]{normal text}%
+}
+
+% ── Beamer Template Overrides ──────────────────────────────────
+
+% Title page template (Swiss: left-aligned, no decoration)
+\setbeamertemplate{title page}{%
+  \vfill
+  \begin{beamercolorbox}[leftskip=12pt]{title}
+    {\swissmeta{\insertsubtitle}}\\[10pt]%
+    {\usebeamerfont{title}\usebeamercolor[fg]{title}\inserttitle}\\[8pt]%
+    \hairline\\[8pt]%
+    {\swisslead{\textcolor{swiss-grey-3}{\insertinstitute}}}\\[4pt]%
+    {\swissmeta{\insertauthor\quad·\quad\insertdate}}%
+  \end{beamercolorbox}
+  \vfill
+}
+
+% Section page template
+\setbeamertemplate{section page}{%
+  \accentslide
+  \vfill
+  \begin{beamercolorbox}[leftskip=20pt]{section title}
+    {\swissmeta{\insertsectionnumber\quad·\quad SECTION}}\\[12pt]%
+    {\swisschapter{\textcolor{white}{\insertsection}}}%
+  \end{beamercolorbox}
+  \vfill
+}
+
+% ── Default Theme ──────────────────────────────────────────────
+\useikb
+
+\endinput

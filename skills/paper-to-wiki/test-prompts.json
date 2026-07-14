@@ -1,0 +1,17 @@
+[
+  {
+    "id": 1,
+    "prompt": "把这个项目下的论文和idea迁移到wiki目录",
+    "expected": "扫描项目下 raw/paper/, notes/papers/, idea-stage/, autoModel/ 等目录，按白名单/黑名单过滤，复制图片到 assets/ 平铺，.md 按 paper/notes/survey 分流，重写图片引用为 ../../assets/，最后报告统计和验证结果"
+  },
+  {
+    "id": 2,
+    "prompt": "导入论文 V3CPNXAY 到 llm-wiki",
+    "expected": "定位 V3CPNXAY 的 content.md 和图片，复制到 paper/ 和 assets/，重写图片引用，验证引用完整性"
+  },
+  {
+    "id": 3,
+    "prompt": "paper-to-wiki 同步当前文件夹到wiki",
+    "expected": "同 prompt 1 但用更简洁的触发词，应覆盖 paper + notes + survey + assets 全部类型，按黑名单过滤 paper-stage/ 和 EXPERIMENT_TRACKER 等"
+  }
+]

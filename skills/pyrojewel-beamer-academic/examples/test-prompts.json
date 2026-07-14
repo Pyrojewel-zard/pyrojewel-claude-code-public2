@@ -1,0 +1,11 @@
+[
+  {
+    "id": "defense-v1",
+    "input_md": "test/defense-paper.md",
+    "expected_pages": 35,
+    "expected_duration_min": 20,
+    "audience": "defense",
+    "language": "zh",
+    "notes": "博士/硕士答辩：深蓝横幅+金色校名封面，contentcard 卡片布局，双色调配色"
+  }
+]

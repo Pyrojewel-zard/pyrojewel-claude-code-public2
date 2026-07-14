@@ -1,0 +1,129 @@
+# Skill Source Map
+
+**Project:** `pyrojewel_claude_code`
+**Last Updated:** 2026-06-23T15:52:00+08:00
+**Purpose:** 维护当前项目内 skill 的来源、所属 flow、当前状态、同步策略，作为后续 upstream 更新分析的唯一总表。
+
+---
+
+## 1. 使用规则
+
+- 这张表只记录“当前项目内已经落地或明确保留的 skill”。
+- source repo 更新后，先看这张表里对应行，再决定是否需要同步到本项目。
+- 如果某个 skill 只是参考，不应接入主 flow，也要在这里标成 `reference-only`，避免重复评估。
+- 新 teammate 迁 skill 时，必须同时更新这张表。
+
+状态约定：
+
+- `active`：已接入当前 flow，后续持续维护
+- `adopted`：已迁入当前项目，但尚未完成端到端验证
+- `template-ready`：已有适配模板，下一轮可批量迁入
+- `reference-only`：只做参考，不直接接入
+- `superseded`：被新 skill 替代，保留历史意义
+
+---
+
+## 2. 当前项目 Skill 总表
+
+| Skill | Local Path | Flow | Status | Source Repo | Source Path / Basis | Current Owner | Sync Strategy |
+|------|------------|------|--------|-------------|---------------------|---------------|---------------|
+| `pyrojewel-paper` | `skills/pyrojewel-paper/skill.md` | Flow 1 | `active` | `ljg-skills` | `ljg-paper` 改编 | worker2 | 跟踪上游结构性改动；本地输出协议优先 |
+| `pyrojewel-paper-river` | `skills/pyrojewel-paper-river/skill.md` | Flow 1 | `active` | `ljg-skills` | `ljg-paper-river` 改编 | worker2 | 跟踪上游溯源方法；本地图片/路径策略优先 |
+| `pyrojewel-paper-qa` | `skills/pyrojewel-paper-qa/skill.md` | Flow 1 | `active` | `ljg-skills` | `ljg-qa` 改编 | worker2 | 跟踪问题设计方法；本地对齐输出优先 |
+| `pyrojewel-paper-flow` | `skills/pyrojewel-paper-flow/SKILL.md` | Flow 1 | `adopted` | self-built + local composition | 编排 `zotero-pdf-parse -> paper -> river -> qa -> beamer` | worker2 | 不看单一 upstream；按主链变化手工维护 |
+| `pyrojewel-beamer-academic` | `skills/pyrojewel-beamer-academic/SKILL.md` | Flow 1 / 11 | `adopted` | `beamer-academic` + `guizang-ppt-skill` | 上游 beamer + 本地版式改造 | worker2 | 跟踪上游 LaTeX/模板更新；版式规则本地优先 |
+| `analyze-results` | `skills/analyze-results/skill.md` | Flow 4 | `adopted` | `Auto-claude-code-research-in-sleep` | 原样迁移 | worker3 | 看上游是否有方法/输出结构更新 |
+| `experiment-plan` | `skills/experiment-plan/skill.md` | Flow 2 / 4 | `adopted` | `Auto-claude-code-research-in-sleep` | 原样迁移 | worker3 | 跟踪 claim-driven planning 更新 |
+| `paper-compile` | `skills/paper-compile/skill.md` | Flow 4 / 5 | `adopted` | `Auto-claude-code-research-in-sleep` | 原样迁移 | worker3 | 跟踪编译/修错流程更新 |
+| `dse-loop` | `skills/dse-loop/skill.md` | Flow 3 / 4 | `adopted` | `Auto-claude-code-research-in-sleep` | 原样迁移 | worker3 | 跟踪搜索策略更新 |
+| `formula-derivation` | `skills/formula-derivation/skill.md` | Flow 4 | `adopted` | `Auto-claude-code-research-in-sleep` | 原样迁移 | worker3 | 低频检查 |
+| `experiment-log-summarizer` | `skills/experiment-log-summarizer/skill.md` | Flow 4 | `adopted` | `academic-skills` | 原样迁移 | worker3 | 跟踪输出格式和日志归纳逻辑 |
+| `benchmark-extractor` | `skills/benchmark-extractor/skill.md` | Flow 4 | `adopted` | `academic-skills` | 原样迁移 | worker3 | 低频检查 |
+| `novelty-check` | `skills/novelty-check/skill.md` | Flow 2 / 4 | `adopted` | `Auto-claude-code-research-in-sleep` | 已做 `REVIEWER_MODEL` + `shared-references` 适配 | worker3 | 作为 P1 适配模板，优先跟踪 |
+| `idea-discovery` | `skills/idea-discovery/skill.md` | Flow 2 | `adopted` | `Auto-claude-code-research-in-sleep` | 已做 `REVIEWER_MODEL`(o3) + `shared-references` 路径适配；编排器，串联 idea-creator/novelty-check/research-review/research-refine | worker3 | 跟踪编排逻辑和子 skill 调用变化 |
+| `idea-creator` | `skills/idea-creator/skill.md` | Flow 2 | `adopted` | `Auto-claude-code-research-in-sleep` | 已做 `REVIEWER_MODEL`(o3) + `shared-references` 路径适配；helper resolve chain 保持 3 层 | worker3 | 跟踪 jury/fan-out 逻辑更新 |
+| `research-review` | `skills/research-review/skill.md` | Flow 2 / 4 | `adopted` | `Auto-claude-code-research-in-sleep` | 已做 `REVIEWER_MODEL`(o3) + `shared-references` 路径适配 | worker3 | 跟踪审稿 prompt/reviewer routing 更新 |
+| `research-refine-pipeline` | `skills/research-refine-pipeline/skill.md` | Flow 2 | `adopted` | `Auto-claude-code-research-in-sleep` | 已做 `shared-references` 路径适配（无 REVIEWER_MODEL 常量） | worker3 | 跟踪 refine→experiment-plan 链更新 |
+| `research-lit` | `skills/research-lit/skill.md` | Flow 2 | `adopted` | `Auto-claude-code-research-in-sleep` | 已迁入；shared-references 引用改为当前项目路径；helper/tool 解析链保留 | lead | 跟踪 helper 链和多源检索协议更新 |
+| `auto-review-loop` | `skills/auto-review-loop/skill.md` | Flow 4 / 5 | `adopted` | `Auto-claude-code-research-in-sleep` | 已做 `REVIEWER_MODEL`(o3) + `shared-references` 路径适配；save_trace resolve chain 保持 | worker3 | 跟踪 reviewer difficulty/debate protocol 更新 |
+| `experiment-bridge` | `skills/experiment-bridge/skill.md` | Flow 2 / 4 | `adopted` | `Auto-claude-code-research-in-sleep` | 已做 `shared-references` 路径适配；无 REVIEWER_MODEL 常量 | worker3 | 跟踪 experiment→review 桥接逻辑更新 |
+| `experiment-audit` | `skills/experiment-audit/skill.md` | Flow 4 | `adopted` | `Auto-claude-code-research-in-sleep` | 已做 `shared-references` 路径适配；REVIEWER_BACKEND=codex 默认值无需改 | worker3 | 跟踪实验完整性审查标准更新 |
+| `experiment-queue` | `skills/experiment-queue/SKILL.md` | Flow 4 | `adopted` | `Auto-claude-code-research-in-sleep` | 2026-06-23 迁入；shared-references 路径已适配；含 scripts/queue_manager.py + build_manifest.py | worker3 | 跟踪队列编排/OOM重试/wave过渡逻辑更新 |
+| `run-experiment` | `skills/run-experiment/SKILL.md` | Flow 4 | `adopted` | `Auto-claude-code-research-in-sleep` | 2026-06-23 迁入；无 shared-references 依赖；需 GPU 环境 | worker3 | 跟踪多环境部署（local/SSH/Vast/Modal）逻辑更新 |
+| `monitor-experiment` | `skills/monitor-experiment/SKILL.md` | Flow 4 | `adopted` | `Auto-claude-code-research-in-sleep` | 2026-06-23 迁入；shared-references 路径已适配；需 GPU 环境 | worker3 | 跟踪 W&B/SSH/Modal 监控逻辑更新 |
+| `ablation-planner` | `skills/ablation-planner/SKILL.md` | Flow 4 | `adopted` | `Auto-claude-code-research-in-sleep` | 2026-06-23 迁入；无 shared-references 依赖；Codex 主导设计 | worker3 | 跟踪消融实验设计方法论更新 |
+| `result-to-claim` | `skills/result-to-claim/SKILL.md` | Flow 4 | `adopted` | `Auto-claude-code-research-in-sleep` | 2026-06-23 迁入；shared-references 路径已适配；含 evidence pre-check | worker3 | 跟踪 claim 门控逻辑和证据预检查更新 |
+| `research-pipeline` | `skills/research-pipeline/SKILL.md` | Flow 2 / 4 / 5 | `adopted` | `Auto-claude-code-research-in-sleep` | 2026-06-23 迁入；shared-references 路径已适配；全流程编排器 | worker3 | 跟踪全流程编排逻辑和 resumable runs 更新 |
+| `vast-gpu` | `skills/vast-gpu/SKILL.md` | Flow 4 | `adopted` | `Auto-claude-code-research-in-sleep` | 2026-06-23 迁入；无 shared-references 依赖；需 vastai CLI | worker3 | 跟踪 Vast.ai API/定价/GPU 选择逻辑更新 |
+| `training-check` | `skills/training-check/SKILL.md` | Flow 4 | `adopted` | `Auto-claude-code-research-in-sleep` | 2026-06-23 迁入；shared-references 路径已适配；需 W&B | worker3 | 跟踪训练健康检查阈值和 Codex 判断逻辑更新 |
+| `serverless-modal` | `skills/serverless-modal/SKILL.md` | Flow 4 | `adopted` | `Auto-claude-code-research-in-sleep` | 2026-06-23 迁入；无 shared-references 依赖；需 Modal CLI | worker3 | 跟踪 Modal API/GPU/Volume 配置更新 |
+| `virtuoso` | `skills/virtuoso/SKILL.md` | RF/EDA | `adopted` | `virtuoso-bridge-lite` (upstream Arcadia-1) | 2026-07-13 迁入；含 profile 配置（default/smic110/smic55/smic55v2/gf110）+ references/ | lead | 跟踪 upstream bridge API 更新；本地 profile 配置优先保留 |
+| `zotero-pdf-parse` | `skills/zotero-pdf-parse/skill.md` | Flow 1 / 9 | `adopted` | `skill_manager` (改编) | env var 替换 + 输出约定对齐 pyrojewel-paper-flow Phase 1 | worker2 | 高优先，跟踪 MarkerPDF 路径变化 |
+| `wiki-capture` | `skills/wiki-capture/skill.md` | Flow 10 | `adopted` | `llm_wiki` | 原样迁入，SKILL.md→skill.md | worker2 | 跟踪上游 capture 逻辑变化 |
+| `inbox-prepare` | `skills/inbox-prepare/skill.md` | Flow 10 | `adopted` | `llm_wiki` | 原样迁入，SKILL.md→skill.md | worker2 | 跟踪上游 workspace 评估逻辑 |
+| `wiki-compile` | `skills/wiki-compile/skill.md` | Flow 10 | `adopted` | `llm_wiki` | 原样迁入，SKILL.md→skill.md | worker2 | 跟踪上游 compile 策略变化 |
+| `wiki-crystallize` | `skills/wiki-crystallize/skill.md` | Flow 10 | `adopted` | `llm_wiki` | 原样迁入，SKILL.md→skill.md | worker2 | 跟踪上游 crystallize/提炼逻辑 |
+| `wiki-lint` | `skills/wiki-lint/skill.md` | Flow 10 | `adopted` | `llm_wiki` | 原样迁入，SKILL.md→skill.md | worker2 | 跟踪上游 lint 规则更新 |
+| `wiki-query` | `skills/wiki-query/skill.md` | Flow 10 | `adopted` | `llm_wiki` | 原样迁入，SKILL.md→skill.md | worker2 | 跟踪上游 query/retrieval 逻辑 |
+| `wiki-research` | `skills/wiki-research/skill.md` | Flow 10 | `adopted` | `llm_wiki` | 原样迁入，SKILL.md→skill.md | worker2 | 跟踪上游 research/补充逻辑 |
+| `arxiv` | `skills/arxiv/skill.md` | Flow 2 support | `adopted` | `Auto-claude-code-research-in-sleep` | 已迁入；shared-references 引用改为当前项目路径 | lead | 跟踪下载/检索 helper 解析链 |
+| `render-html` | `skills/render-html/skill.md` | Flow 2 support | `adopted` | `Auto-claude-code-research-in-sleep` | 已迁入；脚本与模板一并落地；shared-references 引用改为当前项目路径 | lead | 跟踪 HTML 渲染脚本与模板更新 |
+| `pyrojewel-academic-ppt` | `.claude/skills/pyrojewel-academic-ppt/` | Flow 11 | `superseded` | local legacy | 被 `pyrojewel-beamer-academic` 替代 | worker2 | 不再同步 |
+| `beamer-academic` | external repo only | Flow 11 | `reference-only` | `beamer-academic` | 上游模板来源 | worker2 | 只分析 upstream 变更是否值得吸收 |
+| `guizang-ppt-skill` | external repo only | Flow 11 | `reference-only` | `guizang-ppt-skill` | 版式规则来源 | worker2 | 只分析版式/渲染经验 |
+| `scientific-thinking-literature-review` | `skills/scientific-thinking-literature-review/SKILL.md` | ECC legacy | `reference-only` | `ECC` | 历史导入 | worker1 | 默认不继续演化 |
+| `deep-research` | `skills/deep-research/SKILL.md` | ECC legacy | `reference-only` | `ECC` | 历史导入 | worker1 | 仅作参考 |
+| `search-first` | `skills/search-first/SKILL.md` | ECC legacy | `reference-only` | `ECC` | 历史导入 | worker1 | 仅作参考 |
+| `mle-workflow` | `skills/mle-workflow/SKILL.md` | ECC legacy | `reference-only` | `ECC` | 历史导入 | worker1 | 后续可清理 |
+| `verification-loop` | `skills/verification-loop/SKILL.md` | ECC legacy | `reference-only` | `ECC` | 历史导入 | worker1 | 仅作参考 |
+| `continuous-learning-v2` | `skills/continuous-learning-v2/SKILL.md` | ECC legacy | `reference-only` | `ECC` | 历史导入 | worker1 | 与 wiki 线重叠，后续可清理 |
+| `darwin-skill` | `skills/darwin-skill/skill.md` | Meta | `active` | `skill_manager` | 原样迁移后本地使用 | lead | 低频跟踪上游优化方法 |
+
+---
+
+## 3. Source Repo Watch List
+
+| Source Repo | Primary Flows | What To Watch | Check Trigger | Decision Output |
+|------------|---------------|---------------|---------------|-----------------|
+| `ljg-skills` | Flow 1 | `ljg-paper`, `ljg-paper-river`, `ljg-qa` 方法论变化 | 论文阅读主线有质量问题，或 upstream 有显著更新 | 是否同步到 `pyrojewel-paper*` |
+| `beamer-academic` | Flow 1 / 11 | LaTeX 模板、编译脚本、字体/布局修复 | 需要更稳的编译链，或 upstream 新增关键版式 | 是否吸收到 `pyrojewel-beamer-academic` |
+| `guizang-ppt-skill` | Flow 11 | 版式、结构密度、视觉层级规则 | PPT 版式需要增强 | 是否只吸收规则，不吸收动态渲染 |
+| `skill_manager` | Flow 1 / 9 / Meta | `zotero-pdf-parse`, `darwin-skill`, wiki 相关工具 | Flow 1 入口不稳，或 skill_manager 有实用更新 | 是否迁入/更新本地 skill |
+| `llm_wiki` | Flow 10 | wiki-capture/compile/crystallize/lint/query/research, inbox-prepare | wiki 线需要增强，或上游 pipeline 逻辑有更新 | 是否同步到本地 wiki skill |
+| `Auto-claude-code-research-in-sleep` | Flow 2 / 4 / 5 | `idea-*`, `research-*`, `experiment-*`, `paper-*` | idea/experiment 主线要推进，或上游有方法改动 | 是否批量套模板适配 |
+| `academic-skills` | Flow 2 / 4 / 6 / 7 | 轻量零依赖学术 skill | 需要低成本补充 flow | 是否直接迁入 |
+| `nature-skills` | Flow 5 / 11 | `nature-polishing`, `paper2ppt`, `figure` 等增强工具 | 写作或汇报线要增强 | 是否作为增强 skill 接入 |
+| `ECC` | Flow 3 | hooks, agents, rules | 框架稳定化或上游 runtime 经验更新 | 是否吸收 hook/rule 改进 |
+| `virtuoso-bridge-lite` | RF/EDA | `virtuoso` skill, bridge API, examples, references | upstream 发新 release 或新增 API | 是否同步到 `skills/virtuoso/` |
+
+---
+
+## 4. Sync Review Workflow
+
+每次参考仓库更新后，按这个顺序处理：
+
+1. 先同步 source repo 本身
+2. 找出变更触及的 skill
+3. 到本表定位这些 skill 对应哪条 flow、当前状态是什么
+4. 判断该变更属于哪一类：
+   - 方法/工作流增强
+   - 依赖/路径修复
+   - 输出格式变化
+   - 无关的风格/营销更新
+5. 只把前 3 类里“对当前 flow 有价值”的改动吸收进本项目
+6. 更新本表中的：
+   - `Status`
+   - `Sync Strategy`
+   - 如有必要，补 `Current Owner`
+
+---
+
+## 5. Immediate Follow-ups
+
+1. ~~把 `zotero-pdf-parse` 正式迁入 `skills/`~~ ✅ 已完成
+2. ~~继续迁 `idea-creator`、`research-review`、`research-refine-pipeline`~~ ✅ 已完成
+3. ~~下一批：迁 `ablation-planner` + `paper-plan` / `paper-write`~~ ✅ 已完成（2026-06-23 迁入 10 个实验 skills + 6 个 tools，research-pipeline 全链补齐）
+4. 等 `pyrojewel-paper-flow` 和 `pyrojewel-beamer-academic` 完成实测后，把它们的 `Status` 从 `adopted` 改成 `active`
+5. 后续清理 ECC legacy skills，决定哪些继续保留、哪些仅保留文档引用
+6. 下一批：迁 `paper-plan` / `paper-write` / `paper-figure` 等论文写作链 skills
+7. ~~`virtuoso` skill 迁入 `skills/virtuoso/`~~ ✅ 已完成（2026-07-13 从 virtuoso-bridge-lite upstream 同步，含 profile 配置 + references）
