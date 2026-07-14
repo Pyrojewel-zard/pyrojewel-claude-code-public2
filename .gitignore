@@ -21,3 +21,5 @@ test/
 test-paper/
 pyrojewel_claude_code/.claude/
 skills/zotero-manager/.env
+skills/vision-batch-read/.env
+skills/*/.env
