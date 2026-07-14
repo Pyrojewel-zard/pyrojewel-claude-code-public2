@@ -102,7 +102,7 @@ venue: {发表场所/年份}
 
 **Zotero Markdown 优先路径**：search_library → get_item_details → 拼接 `$ZOTERO_MARKDOWN_PATH/<attachmentKey>/content.md` → ls 验证 → 存在则 Read（保留图片引用），不存在则回退 get_content。
 
-**图片理解（content.md 存在时）**：扫描 `![](xxx.jpeg)` 引用，Read 关键图片，记录图注和内容描述。每张引用到笔记的图都必须经过 Read 实际读图。
+**图片理解（content.md 存在时）**：扫描 `![](xxx.jpeg)` 引用，一律用 vision-batch-read skill 批量并发读图（淘汰 Read 逐张读）。记图注和内容描述。每张引用到笔记的图都必须经过实际读图。
 
 **递归溯源中的图片资产管理（pyrojewel新增）**：
 

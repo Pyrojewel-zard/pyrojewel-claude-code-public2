@@ -212,7 +212,7 @@ subtitle: 把"还要写多远"做成一个 value 函数 — Length Value Model: 
 4. `ls` 验证 content.md 存在
 5. Read content.md（保留 `![](xxx.jpeg)` 图片引用语法）
 6. 扫描 `$ZOTERO_MARKDOWN_PATH/<attachmentKey>/` 下所有 `*_image*.jpeg` 文件
-7. **逐张读图**：对每张图片用 Read 工具读取并分析（见下方"图片理解"节）
+7. **读图**：见下方"图片理解"节。一律用 vision-batch-read 批量并发读。
 
 **Zotero Markdown 优先路径（1a）**：
 1. `search_library` 搜索标题关键词 → 获得 item key
@@ -225,17 +225,32 @@ subtitle: 把"还要写多远"做成一个 value 函数 — Length Value Model: 
 
 **图片理解（content.md 路径命中时必须执行）**：
 
-读图不是可选步骤，是精读流程的**必经环节**。每张引用到笔记中的图片都必须经过 Read 工具实际读图理解——不放没看过的图。
+读图不是可选步骤，是精读流程的**必经环节**。每张引用到笔记中的图片都必须经过实际读图理解——不放没看过的图。
 
-1. 扫描 content.md 中所有 `![](xxx.jpeg)` 引用
-2. **逐张读取**：对 $IMAGES_DIR/{attachmentKey}/ 下**所有**图片用 Read 工具读取（不是只读关键图，是全部）
-3. 对每张图片写分析记录（2-3句）：
-   - 图中展示了什么内容
-   - 关键数据/趋势/结论
-   - 对论文核心贡献的支撑作用
-   - 一句话图注（Fig.X 编号 + 内容概括）
-4. 基于读图结果在笔记中精准引用——**禁止不读图就放置引用**
-5. 读图分析直接写入笔记的 "## Key Figures" 部分（见下方格式要求），后续做 PPT/river 时无需重新读图
+**统一用 vision-batch-read skill 批量并发读**（淘汰 Read 逐张读，防止 stall）：
+
+```bash
+# 在 pyrojewel-paper 输出目录下执行
+python3 <vision_skill_path>/scripts/batch_read.py \
+  --dir $IMAGES_DIR/{attachmentKey}/ \
+  --out $IMAGES_DIR/{attachmentKey}/_analysis.jsonl \
+  --concurrency 12
+```
+
+vision-batch-read skill 路径和配置见其 SKILL.md（环境变量 VISION_API_KEY 等），
+配置文件（.env）放在 skill 目录或项目根目录下。
+
+读图结果落地后，Claude 用一次 Read 消费整个 JSONL：
+1. Read `$IMAGES_DIR/{attachmentKey}/_analysis.jsonl` → 拿回所有图的结构化分析（caption/content/key_data/support 四字段）
+2. 扫描 content.md 中所有 `![](xxx.jpeg)` 引用，逐图核对 JSONL 中的分析
+3. 将分析填入笔记的 "## Key Figures" 节
+4. 如需确认具体图的细节，可补 Read 该 jpeg（极少情况，不批量）
+
+**Key Figures 条目必须含**：
+- 标准 markdown `![Fig.X 一句话图注](images/{attachmentKey}/xxx.jpeg)` 引用
+- 图注编号（Fig.X）+ 一句话概括
+- 下方 2-3 句内容分析：图中展示的内容、关键数据/趋势/结论、对论文核心贡献的支撑作用
+- 读图分析写入笔记后，后续做 PPT/river 无需重新读图
 
 **Key Figures 格式要求**：
 
@@ -256,7 +271,7 @@ subtitle: 把"还要写多远"做成一个 value 函数 — Length Value Model: 
 
 每张图必须有三层信息：(1) alt 文本承载 `Fig.X + 一句话图注` (2) 相对路径引用 (3) 图片下方一段 2-3 句内容分析（用空行隔开，别贴在 `![]()` 后面）。三层缺任何一层就是验收失败。
 
-**关键原则：所有图片必须读图+分析，分析写入笔记，后续无需重读。**
+**关键原则：所有图片必须读图+分析，分析写入笔记，后续无需重读。一律用 vision-batch-read 批量并发，淘汰 Read 逐张读。**
 
 **图片资产管理（pyrojewel新增）**：
 

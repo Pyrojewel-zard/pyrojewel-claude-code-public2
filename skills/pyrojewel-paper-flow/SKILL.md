@@ -134,7 +134,7 @@ trigger:
 
 **关键约束**（从 pyrojewel-paper 继承）：
 - 图片引用使用相对路径 `images/{key}/xxx.jpeg`
-- 每张图必须 Read 查看后再引用
+- 每张图必须实际读图后再引用（一律用 vision-batch-read skill 批量并发读，淘汰 Read 逐张读）
 - 博导审稿必须有明确判断（accept/borderline/reject）
 
 **在溯源模式下的递归**：
