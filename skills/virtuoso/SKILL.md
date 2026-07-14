@@ -682,3 +682,27 @@ Uses `xwininfo` to find virtuoso-owned dialog windows and `XTestFakeKeyEvent` to
 ## Related skills
 
 - **spectre** — standalone netlist-driven Spectre simulation (no Virtuoso GUI). Use when the user has a `.scs` netlist and wants to run it directly.
+
+## 详情阅读 / Deep Dives
+
+> SKILL.md 是 virtuoso-bridge 的轻量入口。需要完整能力图谱和底层实现细节时，查阅以下资源：
+
+### Virtuoso Bridge 仓库
+
+| 资源 | 路径 | 说明 |
+|------|------|------|
+| **仓库根目录** | `/home/DataTransfer/Pyrojewel/code/02_claudeSkill/virtuoso/` | 完整 bridge Python 库 + skill 定义 + 示例 + 文档 |
+| **Python 源码** | `src/virtuoso_bridge/` | 传输层(SSH)、客户端层(VirtuosoClient)、业务层(layout/schematic/symbol/maestro/spectre) |
+| **示例代码** | `examples/01_virtuoso/` | 30+ 可运行示例（basic/schematic/layout/symbol/maestro/diagnostics/digital_import） |
+| **快速接入** | `docs/virtuoso_bridge_quick_use.md` | 270 行快速入门（安装/连接/三层API/功能速查/已知坑） |
+| **CLAUDE.md** | `virtuoso/CLAUDE.md` | 项目 CLAUDE.md —— 项目边界、Git 工作流、Profile 配置、常见坑 |
+
+### Memory 交叉引用
+
+| memory 文件 | 内容 | 适用场景 |
+|------------|------|----------|
+| `[[virtuoso-bridge-profiles]]` | 5 个 profile 端口/用途/tech lib | 连接/启动时选择 profile |
+| `[[virtuoso-bridge-capabilities]]` | 完整功能清单（按 API 层级归类） | 需要了解 bridge 有哪些 API 可用 |
+| `[[virtuoso-bridge-ciw-load-commands]]` | 各 profile CIW daemon 加载命令 | 首次连通/daemon 掉线后重新加载 |
+| `[[virtuoso-skill]]` | skill 入口概述 | 回顾本 skill 的文件结构和引用关系 |
+| `[[skillbridge-gds-batch-pattern]]` | Skillbridge TCP 批量 GDS 生成 | GDS 生成场景（注意：virtuoso-bridge 不适用于 GDS 生成） |

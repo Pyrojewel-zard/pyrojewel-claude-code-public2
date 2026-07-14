@@ -107,6 +107,11 @@ Protected files: `.env`, credentials, `pyproject.toml`, `setup.cfg`, `conda-lock
 
 - `darwin-skill`
 
+### EDA / Virtuoso
+
+- `virtuoso` — remote Cadence Virtuoso control via bridge (5 profiles: default/smic110/smic55/smic55v2/gf110)
+- **Repo**: `/home/DataTransfer/Pyrojewel/code/02_claudeSkill/virtuoso/` | **Skills**: `skills/virtuoso/`
+
 ## Active Agents
 
 Project agent role definitions live in `agents/`:
