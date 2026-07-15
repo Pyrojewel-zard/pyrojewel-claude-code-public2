@@ -20,9 +20,33 @@ trigger:
 - **ZOTERO_MARKDOWN_PATH** = `{zotero_markdown_path}` (from .claude/settings.json env)
 - **MARKERPDF_SCRIPT** = `$MARKERPDF_SCRIPT` (default: `/home/DataTransfer/Pyrojewel/01_lab/markerpdf_zotero/scripts/markerpdf_convert.py`)
 - **MARKERPDF_ENV** = `$MARKERPDF_ENV` (default: `/home/DataTransfer/Pyrojewel/01_lab/markerpdf_zotero/.env`)
-- **OUTPUT_DIR** = `{project}/notes/papers/`
-- **IMAGES_DIR** = `{OUTPUT_DIR}/images/`
-- **SOURCES_DIR** = `{OUTPUT_DIR}/sources/`
+- **PROJECT_PAPER_OVERVIEW_DIR** = `{project}/paper_overview/` (if this directory exists)
+- **DIRECTION** = required or inferred direction slug, e.g. `vf-literature`, `transformer-modeling`, `inverse-synthesis`
+- **READINGS_DIR** =
+  - paper_overview mode: `{project}/paper_overview/readings/{DIRECTION}/`
+  - legacy mode: `{project}/notes/papers/`
+- **RIVERS_DIR** =
+  - paper_overview mode: `{project}/paper_overview/rivers/{DIRECTION}/`
+  - legacy mode: `{project}/notes/papers/`
+- **SOURCES_DIR** =
+  - paper_overview mode: `{project}/paper_overview/sources/`
+  - legacy mode: `{project}/notes/papers/sources/`
+
+### Project-aware output rule
+
+If `{project}/paper_overview/` exists, this flow **must** run in paper_overview mode. Final outputs must be routed by role:
+
+```text
+paper_overview/
+├── sources/<paper_id_or_attachmentKey>/content.md
+├── sources/<paper_id_or_attachmentKey>/images/*.jpeg
+├── readings/<DIRECTION>/<timestamp>--paper-<short-title>.md
+├── rivers/<DIRECTION>/<timestamp>--paper-river-<topic>.md
+├── surveys/<DIRECTION>/research-map-<topic>.md
+└── indexes/
+```
+
+Do not leave final outputs in `{project}/raw/paper/`, `{project}/notes/papers/`, `autoModel/raw/paper/`, `autoModel/paper_Read/`, or `autoModel/idea-stage/` when paper_overview mode is available.
 
 ---
 
@@ -35,17 +59,17 @@ trigger:
   │
   ├─ Phase 1: PDF预处理 ── /zotero-pdf-parse（无content.md时）
   │     输入: Zotero item key 或 PDF 路径
-  │     输出: content.md + 图片资产（存入 $SOURCES_DIR + $IMAGES_DIR）
+  │     输出: content.md + 图片资产（存入 $SOURCES_DIR/{paper_id}/）
   │     条件: 仅当 content.md 不存在时执行；已有则跳过
   │
   ├─ Phase 2: 精读 ── /pyrojewel-paper
   │     输入: content.md 或论文原文
-  │     输出: {ts}--paper-{short-title}.md（7-section 精读笔记）
+  │     输出: $READINGS_DIR/{ts}--paper-{short-title}.md（7-section 精读笔记）
   │     必经步骤，所有模式都执行
   │
   ├─ Phase 3: 溯源 ── /pyrojewel-paper-river（溯源/闭环模式）
   │     输入: Phase 2 的精读笔记（提取批判链）
-  │     输出: {ts}--paper-river-{core-title}.md（溯源图谱）
+  │     输出: $RIVERS_DIR/{ts}--paper-river-{core-title}.md（溯源图谱）
   │     条件: 溯源模式或完整闭环时执行；单篇精读跳过
   │     递归: 对链上每篇新论文，回到 Phase 1 → Phase 2
   │
@@ -105,7 +129,7 @@ trigger:
 
 **后续衔接**：
 - Phase 2 的 `/pyrojewel-paper` 读取此 content.md 作为论文全文输入
-- 图片资产在 Phase 2 的资产管理步骤中复制到 `$IMAGES_DIR/{attachmentKey}/`
+- paper_overview mode 中图片资产在 Phase 2 的资产管理步骤中复制到 `paper_overview/sources/{paper_id_or_attachmentKey}/images/`
 
 **跳过条件**：
 - content.md 已存在 → 直接进入 Phase 2
@@ -128,12 +152,14 @@ trigger:
 - 或 IEEE/arXiv URL（pyrojewel-paper 内部处理获取）
 
 **输出约定**：
-- `{OUTPUT_DIR}/{ts}--paper-{short-title}.md` — 7-section 精读笔记
-- `$IMAGES_DIR/{key}/*.jpeg` — 复制的图片资产
-- `$SOURCES_DIR/{key}.md` — content.md 备份
+- paper_overview mode: `$READINGS_DIR/{ts}--paper-{short-title}.md` — 7-section 精读笔记
+- paper_overview mode: `$SOURCES_DIR/{paper_id_or_attachmentKey}/images/*.jpeg` — 复制的图片资产
+- paper_overview mode: `$SOURCES_DIR/{paper_id_or_attachmentKey}/content.md` — content.md 备份
+- legacy mode: `{project}/notes/papers/{ts}--paper-{short-title}.md`
 
 **关键约束**（从 pyrojewel-paper 继承）：
-- 图片引用使用相对路径 `images/{key}/xxx.jpeg`
+- paper_overview mode 图片引用使用相对路径 `../../sources/{paper_id_or_attachmentKey}/images/xxx.jpeg`
+- legacy mode 图片引用使用相对路径 `images/{key}/xxx.jpeg`
 - 每张图必须实际读图后再引用（一律用 vision-batch-read skill 批量并发读，淘汰 Read 逐张读）
 - 博导审稿必须有明确判断（accept/borderline/reject）
 
@@ -152,7 +178,7 @@ trigger:
 - 或用户直接指定的核心论文
 
 **输出约定**：
-- `{OUTPUT_DIR}/{ts}--paper-river-{core-title}.md` — 溯源图谱，包含：
+- paper_overview mode: `$RIVERS_DIR/{ts}--paper-river-{core-title}.md` — 溯源图谱，包含：
   - ASCII 溯源树（谁批判谁→谁改进谁）
   - 每篇论文的一句话定位
   - 演化叙事（问题如何一步步被重新定义）
@@ -179,10 +205,10 @@ trigger:
 
 **输入约定**：
 - Phase 2 产出的精读笔记（paper-report-X.md）
-- 可选：原始 content.md 备份（$SOURCES_DIR/{key}.md）
+- 可选：原始 content.md 备份（paper_overview mode: `$SOURCES_DIR/{paper_id_or_attachmentKey}/content.md`）
 
 **输出约定**：
-- `{OUTPUT_DIR}/{ts}--qa-{short-title}.md` — QA 对齐报告，包含：
+- paper_overview mode: `$READINGS_DIR/{ts}--qa-{short-title}.md` — QA 对齐报告，包含：
   - 每个 Q 的 AI 判断 + 用户判断
   - 对齐状态：✅ 一致 / ⚠️ 补充 / ❌ 不同
   - 逼问记录
@@ -202,7 +228,11 @@ trigger:
 
 **输入**：Phase 2 × N + Phase 3 + Phase 4 × N 的所有产出
 
-**输出**：`{OUTPUT_DIR}/research-map-{topic}.md`，包含：
+**输出**：
+- paper_overview mode: `paper_overview/surveys/{DIRECTION}/research-map-{topic}.md`
+- legacy mode: `{project}/notes/papers/research-map-{topic}.md`
+
+包含：
 - 溯源树（ASCII）
 - 论文对比表格（方法/维度/精度/判决）
 - 已对齐/待对齐理解点
@@ -219,7 +249,7 @@ trigger:
 
 **输入约定**：
 - Phase 2 产出的精读笔记（.md）
-- 图片资产（$IMAGES_DIR/ 下的图片）
+- 图片资产（paper_overview mode: `paper_overview/sources/<paper_id>/images/`）
 - Phase 3 的溯源图谱（如有，用于 PPT 框架页）
 - Phase 4 的 QA 对齐结论（如有，用于综合判断页）
 
@@ -253,21 +283,20 @@ trigger:
 
 ## 文件结构
 
+paper_overview mode:
+
+```text
+paper_overview/
+├── sources/{paper_id_or_attachmentKey}/
+│   ├── content.md
+│   └── images/*.jpeg
+├── readings/{DIRECTION}/{ts}--paper-{short-title}.md
+├── readings/{DIRECTION}/{ts}--qa-{short-title}.md
+├── rivers/{DIRECTION}/{ts}--paper-river-{core-title}.md
+└── surveys/{DIRECTION}/research-map-{topic}.md
 ```
-notes/papers/
-├── {ts}--paper-{short-title}.md          ← Phase 2 精读报告
-├── {ts}--paper-river-{core-title}.md     ← Phase 3 溯源报告（仅溯源模式）
-├── {ts}--qa-{short-title}.md             ← Phase 4 QA对齐报告
-├── research-map-{topic}.md               ← Phase 5 汇总地图
-├── images/
-│   ├── {key1}/                            ← 论文1图片
-│   ├── {key2}/                            ← 论文2图片
-│   └── ...
-└── sources/
-    ├── {key1}.md                           ← 论文1 content.md备份
-    ├── {key2}.md                           ← 论文2 content.md备份
-    └── ...
-```
+
+legacy mode remains `{project}/notes/papers/`.
 
 时间戳：`YYYYMMDDTHHmmss`
 

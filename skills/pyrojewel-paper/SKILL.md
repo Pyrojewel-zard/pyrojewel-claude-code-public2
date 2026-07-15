@@ -8,7 +8,7 @@ trigger:
   - "paper analysis"
   - "论文精读"
 user_invocable: true
-version: "4.13.0"
+version: "4.14.0"
 ---
 
 # pyrojewel-paper: 读论文
@@ -19,9 +19,34 @@ version: "4.13.0"
 
 - **ZOTERO_MARKDOWN_PATH** = `{zotero_markdown_path}` (from .claude/settings.json env; points to Zotero markdown export directory)
 - **ZOTERO_STORAGE** = `ZOTERO_MARKDOWN_PATH` (backward-compat alias)
-- **OUTPUT_DIR** = `{project}/notes/papers/`
-- **IMAGES_DIR** = `{OUTPUT_DIR}/images/`
-- **SOURCES_DIR** = `{OUTPUT_DIR}/sources/`
+- **DEFAULT_OUTPUT_DIR** = `{project}/notes/papers/`
+- **PROJECT_PAPER_OVERVIEW_DIR** = `{project}/paper_overview/` (if this directory exists)
+- **DIRECTION** = required or inferred direction slug, e.g. `vf-literature`, `transformer-modeling`, `inverse-synthesis`
+- **OUTPUT_DIR** =
+  - paper_overview mode: `{project}/paper_overview/readings/{DIRECTION}/`
+  - legacy mode: `{project}/notes/papers/`
+- **SOURCES_DIR** =
+  - paper_overview mode: `{project}/paper_overview/sources/`
+  - legacy mode: `{OUTPUT_DIR}/sources/`
+- **IMAGES_DIR** =
+  - paper_overview mode: `{project}/paper_overview/sources/{paper_id_or_attachmentKey}/images/`
+  - legacy mode: `{OUTPUT_DIR}/images/{attachmentKey}/`
+
+### Project-aware output rule
+
+If `{project}/paper_overview/` exists, this skill **must** use paper_overview mode. Do not write final reading outputs to `{project}/raw/paper/`, `{project}/notes/papers/`, `autoModel/raw/paper/`, `autoModel/paper_Read/`, or `autoModel/idea-stage/`.
+
+paper_overview mode separates assets by role:
+
+```text
+paper_overview/
+├── sources/<paper_id_or_attachmentKey>/content.md
+├── sources/<paper_id_or_attachmentKey>/images/*.jpeg
+├── readings/<DIRECTION>/<timestamp>--paper-<short-title>.md
+└── indexes/paper_registry.json
+```
+
+`DIRECTION` must be a stable slug. If the user did not provide one and it cannot be inferred from the task, ask for it before writing files.
 
 ## 总目标（先看这个）
 
@@ -48,8 +73,10 @@ version: "4.13.0"
 ### 输出目录
 
 - 输出目录：**$OUTPUT_DIR**（若不存在则 `mkdir -p`）
-- 图片目录：**$IMAGES_DIR/{attachmentKey}/**（按论文分区）
-- 原文备份：**$SOURCES_DIR/{attachmentKey}.md**
+- paper_overview mode 图片目录：`paper_overview/sources/{paper_id_or_attachmentKey}/images/`
+- paper_overview mode 原文备份：`paper_overview/sources/{paper_id_or_attachmentKey}/content.md`
+- legacy mode 图片目录：`$OUTPUT_DIR/images/{attachmentKey}/`
+- legacy mode 原文备份：`$OUTPUT_DIR/sources/{attachmentKey}.md`
 
 ### 文件命名规范
 
@@ -65,10 +92,13 @@ title: {一句精练语句提炼论文核心思想或发现}
 subtitle: {论文原始标题，通常英文}
 date: {YYYY-MM-DD HH:MM}
 tags: [paper]
+direction: {DIRECTION}
 identifier: {YYYYMMDDTHHMMSS}
 source: {URL 或来源描述}
 authors: {作者列表}
 venue: {发表场所/年份}
+paper_id: {paper_id_or_attachmentKey}
+canonical_source: paper_overview/sources/{paper_id_or_attachmentKey}/
 ---
 ```
 
@@ -230,10 +260,10 @@ subtitle: 把"还要写多远"做成一个 value 函数 — Length Value Model: 
 **统一用 vision-batch-read skill 批量并发读**（淘汰 Read 逐张读，防止 stall）：
 
 ```bash
-# 在 pyrojewel-paper 输出目录下执行
+# 在 pyrojewel-paper 图片资产目录下执行
 python3 <vision_skill_path>/scripts/batch_read.py \
-  --dir $IMAGES_DIR/{attachmentKey}/ \
-  --out $IMAGES_DIR/{attachmentKey}/_analysis.jsonl \
+  --dir $IMAGES_DIR \
+  --out $IMAGES_DIR/_analysis.jsonl \
   --concurrency 12
 ```
 
@@ -241,29 +271,30 @@ vision-batch-read skill 路径和配置见其 SKILL.md（环境变量 VISION_API
 配置文件（.env）放在 skill 目录或项目根目录下。
 
 读图结果落地后，Claude 用一次 Read 消费整个 JSONL：
-1. Read `$IMAGES_DIR/{attachmentKey}/_analysis.jsonl` → 拿回所有图的结构化分析（caption/content/key_data/support 四字段）
+1. Read `$IMAGES_DIR/_analysis.jsonl` → 拿回所有图的结构化分析（caption/content/key_data/support 四字段）
 2. 扫描 content.md 中所有 `![](xxx.jpeg)` 引用，逐图核对 JSONL 中的分析
 3. 将分析填入笔记的 "## Key Figures" 节
 4. 如需确认具体图的细节，可补 Read 该 jpeg（极少情况，不批量）
 
 **Key Figures 条目必须含**：
-- 标准 markdown `![Fig.X 一句话图注](images/{attachmentKey}/xxx.jpeg)` 引用
+- paper_overview mode 标准 markdown `![Fig.X 一句话图注](../../sources/{paper_id_or_attachmentKey}/images/xxx.jpeg)` 引用
+- legacy mode 标准 markdown `![Fig.X 一句话图注](images/{attachmentKey}/xxx.jpeg)` 引用
 - 图注编号（Fig.X）+ 一句话概括
 - 下方 2-3 句内容分析：图中展示的内容、关键数据/趋势/结论、对论文核心贡献的支撑作用
 - 读图分析写入笔记后，后续做 PPT/river 无需重新读图
 
 **Key Figures 格式要求**：
 
-用**标准 markdown 图片引用**语法 `![alt](path)`，路径**相对于笔记 md 文件**（`$OUTPUT_DIR/{文件名}.md` → `images/{attachmentKey}/xxx.jpeg`）。禁止 HTML `<img>`、禁止绝对路径、禁止 Zotero storage 原始路径。
+用**标准 markdown 图片引用**语法 `![alt](path)`，路径**相对于笔记 md 文件**。paper_overview mode 中笔记位于 `paper_overview/readings/{DIRECTION}/`，图片引用必须写成 `../../sources/{paper_id_or_attachmentKey}/images/xxx.jpeg`。legacy mode 才使用 `images/{attachmentKey}/xxx.jpeg`。禁止 HTML `<img>`、禁止绝对路径、禁止 Zotero storage 原始路径。
 
 ```markdown
 ## Key Figures
 
-![Fig.1 一句话图注](images/{attachmentKey}/xxx_image00001.jpeg)
+![Fig.1 一句话图注](../../sources/{paper_id_or_attachmentKey}/images/xxx_image00001.jpeg)
 
 图中展示了...。关键结论是...。支撑了论文的[核心贡献点]。
 
-![Fig.2 一句话图注](images/{attachmentKey}/xxx_image00002.jpeg)
+![Fig.2 一句话图注](../../sources/{paper_id_or_attachmentKey}/images/xxx_image00002.jpeg)
 
 图中展示了...。关键数据是...。说明[某个机制/对比]的效果。
 ...
@@ -276,11 +307,12 @@ vision-batch-read skill 路径和配置见其 SKILL.md（环境变量 VISION_API
 **图片资产管理（pyrojewel新增）**：
 
 Zotero路径命中后，执行以下资产管理：
-1. 创建目录：`mkdir -p $IMAGES_DIR/{attachmentKey}` 和 `mkdir -p $SOURCES_DIR`
-2. 复制关键图片：`cp $ZOTERO_MARKDOWN_PATH/{attachmentKey}/*.{jpeg,png,jpg} $IMAGES_DIR/{attachmentKey}/ 2>/dev/null; true`
-3. 复制content.md备份：`cp $ZOTERO_MARKDOWN_PATH/{attachmentKey}/content.md $SOURCES_DIR/{attachmentKey}.md`
-4. 笔记中图片引用使用相对路径：`images/{attachmentKey}/xxx.jpeg`（不再是Zotero storage绝对路径）
-5. QA对齐时可通过 `$SOURCES_DIR/{attachmentKey}.md` 回看原文
+1. paper_overview mode 创建目录：`mkdir -p paper_overview/sources/{paper_id_or_attachmentKey}/images`
+2. paper_overview mode 复制关键图片：`cp $ZOTERO_MARKDOWN_PATH/{attachmentKey}/*.{jpeg,png,jpg} paper_overview/sources/{paper_id_or_attachmentKey}/images/ 2>/dev/null; true`
+3. paper_overview mode 复制 content.md 备份：`cp $ZOTERO_MARKDOWN_PATH/{attachmentKey}/content.md paper_overview/sources/{paper_id_or_attachmentKey}/content.md`
+4. paper_overview mode 笔记中图片引用使用相对路径：`../../sources/{paper_id_or_attachmentKey}/images/xxx.jpeg`
+5. legacy mode 可继续使用 `$OUTPUT_DIR/images/{attachmentKey}/xxx.jpeg` 与 `$OUTPUT_DIR/sources/{attachmentKey}.md`
+6. QA对齐时可通过 canonical source 的 `content.md` 回看原文
 
 **IEEE 论文检索必须串行**：
 - `/ieee-get-fulltext` 涉及浏览器自动化，必须等待导航完成（约 20 秒）
@@ -305,7 +337,7 @@ Zotero路径命中后，执行以下资产管理：
 - 图片文件不存在 → 跳过读图，笔记中标注"图片缺失，无法验证"
 - 网络完全不可用 → 告知用户需要手动提供论文文件
 
-如果论文有一张承载全文核心思路的总览图（overview / architecture diagram，通常是 Figure 1），提取并保存到 `{项目目录}/raw/paper/images/`，文件名 `{identifier}--paper-{简短标题}-overview.png`。
+如果论文有一张承载全文核心思路的总览图（overview / architecture diagram，通常是 Figure 1），paper_overview mode 保存到 `paper_overview/sources/{paper_id_or_attachmentKey}/images/`；legacy mode 保存到 `{项目目录}/notes/papers/images/`。文件名 `{identifier}--paper-{简短标题}-overview.png`。
 
 判断标准：这张图让人一看就抓住论文在做什么。不是所有论文都有——没有就跳过，不要硬找。
 
@@ -358,7 +390,7 @@ Zotero路径命中后，执行以下资产管理：
 3. *一个反直觉的副发现* — 论文里最让人"哇"的一段，单独成节呈现。范本：LenVM 的"token 词云分析"（"think/wait" vs "finalize/confirm"）。**有就必须保留，不能因为追求凝练砍掉；没有就明说"这篇没有"，不要硬挤**
 4. *不放原始公式* — 公式对外行无用。要么用文字翻译（"L_len = ... 意思是模型每写一字都被监督一次"），要么留作可选附录 section。**主文里不出现 LaTeX / MathJax 风格公式**
 5. *关键图引用* — 引用论文原图时必须基于 Read 工具的读图结果，不能猜测图片内容。每张引用的图都要有：图注编号（Fig.1）、一句话说明这张图在论证什么。只引用帮助读者理解机制的图，不是所有图都要放
-6. *所有图读图分析* — 精读笔记的 "## Key Figures" 部分，每张图用标准 markdown `![Fig.X 图注](images/{attachmentKey}/xxx.jpeg)` 引用（路径相对 md 文件），图片下空行接 2-3 句内容分析。读图分析写入笔记后，后续做 PPT/river 无需重新读图
+6. *所有图读图分析* — 精读笔记的 "## Key Figures" 部分，每张图用标准 markdown 引用；paper_overview mode 用 `![Fig.X 图注](../../sources/{paper_id_or_attachmentKey}/images/xxx.jpeg)`，legacy mode 用 `![Fig.X 图注](images/{attachmentKey}/xxx.jpeg)`。图片下空行接 2-3 句内容分析。读图分析写入笔记后，后续做 PPT/river 无需重新读图
 
 ### 4. 核心概念：在同一例子上解锁
 
@@ -467,8 +499,8 @@ A：{...}
 
 1. 获取时间戳：`date +%Y%m%dT%H%M%S`
 2. 确定输出目录：**$OUTPUT_DIR**（若不存在则 `mkdir -p`）
-3. 图片资产已在步骤 1 "图片资产管理" 中复制到 `$IMAGES_DIR/{attachmentKey}/`
-4. 笔记中图片引用使用**相对于 md 文件**的路径：`![Fig.X 一句话图注](images/{attachmentKey}/xxx.jpeg)`——禁止绝对路径、禁止 Zotero storage 原始路径、禁止 HTML `<img>`
+3. 图片资产已在步骤 1 "图片资产管理" 中复制到 `$IMAGES_DIR`
+4. 笔记中图片引用使用**相对于 md 文件**的路径：paper_overview mode 用 `![Fig.X 一句话图注](../../sources/{paper_id_or_attachmentKey}/images/xxx.jpeg)`；legacy mode 用 `![Fig.X 一句话图注](images/{attachmentKey}/xxx.jpeg)`。禁止绝对路径、禁止 Zotero storage 原始路径、禁止 HTML `<img>`
 5. 按格式约束写入 Markdown 文件（含末尾的 `## QA 自检` 章节，见步骤 9）
 6. 报告文件路径给用户
 
@@ -489,5 +521,5 @@ A：{...}
 - *翻译节五件齐*：承重类比 / 三组数字 / 反直觉副发现 / 无原始公式 / 关键图引用
 - *核心概念 ≥ 3*：包含一个"设计选择"概念（不止"组件"）
 - *博导审稿见预设*：方法成熟度一项里指出至少一个未被讨论的根本预设/隐忧
-- *Key Figures 走标准 markdown*：`![alt](相对路径)` 语法，alt 里带 `Fig.X 图注`，路径相对 md 文件（`images/{attachmentKey}/xxx.jpeg`），不用 HTML `<img>`、不用绝对路径
+- *Key Figures 走标准 markdown*：`![alt](相对路径)` 语法，alt 里带 `Fig.X 图注`，路径相对 md 文件；paper_overview mode 用 `../../sources/{paper_id_or_attachmentKey}/images/xxx.jpeg`，legacy mode 用 `images/{attachmentKey}/xxx.jpeg`，不用 HTML `<img>`、不用绝对路径
 - *QA 自检必备*：末尾 `## QA 自检` 章节存在，5-8 组 Q/A，覆盖"问题/方法/发现/洞见"四条主线且至少含一组"设计选择"或"隐忧"题；缺章节或题数不足 = 验收失败

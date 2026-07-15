@@ -1,6 +1,6 @@
 ---
 name: pyrojewel-paper-to-beamer
-version: 2.0
+version: 2.1
 description: >
   论文阅读笔记 → PPT 内容编排调度层。输入 pyrojewel-paper-river 溯源文档 + 其中每篇论文的
   pyrojewel-paper 精读笔记，输出双层结构 PPT Markdown（River全局框架 + 逐篇精读展现），
@@ -31,7 +31,20 @@ pyrojewel-paper 产出的精读笔记是叙事性、对话式的个人理解，p
 | 语气 | 对话式、亲历叙事、"变形描述" | 正式论证 |
 | 结构 | 故事弧线 / 溯源地图 | 双层：全局脉络 → 逐篇细节 |
 | 粒度 | 一篇笔记 = 一篇论文 | 每篇 2-3 页幻灯片 |
-| 图片 | `images/{attachmentKey}/xxx.jpeg` | `materials/figures/xxx.jpeg`（平坦目录） |
+| 图片 | paper_overview: `../../sources/{paper_id}/images/xxx.jpeg`; legacy: `images/{attachmentKey}/xxx.jpeg` | `materials/figures/xxx.jpeg`（平坦目录） |
+
+## Project-aware input rule
+
+If `{project}/paper_overview/` exists, read paper/river assets from paper_overview mode first:
+
+```text
+paper_overview/
+├── rivers/<DIRECTION>/*--paper-river-*.md
+├── readings/<DIRECTION>/*--paper-*.md
+└── sources/<paper_id_or_attachmentKey>/images/*.jpeg
+```
+
+Legacy `{project}/notes/papers/` lookup is only a fallback when `paper_overview/` is absent or the user explicitly provides a legacy path.
 
 ## 输入定位
 
@@ -40,8 +53,10 @@ pyrojewel-paper 产出的精读笔记是叙事性、对话式的个人理解，p
 | # | 来源 | 查找方式 | 路径示例 |
 |---|------|---------|---------|
 | 1 | 用户显式指定 | 用户直接在 prompt 中给出路径 | `/path/to/paper-river-xxx.md` |
-| 2 | river 文档 | `ls {project}/notes/papers/*--paper-river-*.md` 按时间排序取最新 | `notes/papers/2026-06-02--paper-river-CFD-PE.md` |
-| 3 | paper 精读 | river 文档的"正向费曼叙事"中每篇论文对应一个 `*--paper-*.md`，`grep -l "论文标题关键词" {project}/notes/papers/*--paper-*.md` | `notes/papers/2026-06-01--paper-CFD-PE.md` |
+| 2 | paper_overview river 文档 | `ls {project}/paper_overview/rivers/*/*--paper-river-*.md` 按时间排序取最新，或限定 `rivers/{DIRECTION}/` | `paper_overview/rivers/vf-literature/20260602T120000--paper-river-CFD-PE.md` |
+| 3 | paper_overview paper 精读 | river 文档 frontmatter 的 `direction` 或路径推断方向，再 `grep -l "论文标题关键词" {project}/paper_overview/readings/{DIRECTION}/*--paper-*.md` | `paper_overview/readings/vf-literature/20260601T120000--paper-CFD-PE.md` |
+| 4 | legacy river 文档 | `ls {project}/notes/papers/*--paper-river-*.md` 按时间排序取最新 | `notes/papers/2026-06-02--paper-river-CFD-PE.md` |
+| 5 | legacy paper 精读 | `grep -l "论文标题关键词" {project}/notes/papers/*--paper-*.md` | `notes/papers/2026-06-01--paper-CFD-PE.md` |
 
 读取 river 文档后，从"溯源地图"和"正向费曼叙事"中提取每篇论文的标识（标题/作者/年份），然后用 `grep -l` 逐一找到对应的 paper 精读笔记。
 
@@ -124,12 +139,12 @@ PPT 预计总页数：{第一部分页数} + {第二部分页数} + 1 = {总页�
 | 关键方法 | `## Core Concepts` 中 1-2 个最核心概念 + `## Translation` 的类比 |
 | 实验结果 | 笔记中的具体数值（无则标注 `[未报告]`） |
 | 主要局限 | `## Advisor Review` 的方法成熟度段落 |
-| **图片** | `## Key Figures` 中所有 `![...](images/{attachmentKey}/xxx.jpeg)` 引用 |
+| **图片** | `## Key Figures` 中所有 markdown 图片引用；paper_overview mode 通常是 `../../sources/{paper_id}/images/xxx.jpeg`，legacy mode 通常是 `images/{attachmentKey}/xxx.jpeg` |
 
 图片提取规则：
 - 读取 `## Key Figures` 中每一张图片的引用路径、标题、分析文字
-- 图片路径格式：`images/{attachmentKey}/xxx_image0000N.jpeg`
-- 提取 attachmentKey 用于后续路径转换
+- 图片路径格式：paper_overview mode `../../sources/{paper_id}/images/xxx_image0000N.jpeg`；legacy mode `images/{attachmentKey}/xxx_image0000N.jpeg`
+- 提取 paper_id 或 attachmentKey 用于后续路径转换
 - 每张图片保留 paper 笔记中的标题（`Fig.X - 一句话标题`）作为 beamer 图注
 
 每篇论文 2-3 页：第 1 页（问题+方法），第 2 页（实验+结果），必要时第 3 页（关键细节展开）。图片根据内容和可用位置插入到对应页面。
@@ -229,20 +244,21 @@ PPT 预计总页数：{第一部分页数} + {第二部分页数} + 1 = {总页�
 
 ### 路径转换
 
-paper 笔记中使用相对路径 `images/{attachmentKey}/xxx.jpeg`，beamer 需要平坦目录 `materials/figures/`。转换规则：
+paper 笔记中使用相对路径，beamer 需要平坦目录 `materials/figures/`。转换规则：
 
 ```
-paper 笔记引用: images/{attachmentKey}/xxx_image00001.jpeg
+paper_overview 笔记引用: ../../sources/{paper_id}/images/xxx_image00001.jpeg
+legacy 笔记引用: images/{attachmentKey}/xxx_image00001.jpeg
         ↓
-beamer MD 引用: materials/figures/{attachmentKey}_image00001.jpeg
+beamer MD 引用: materials/figures/{paper_id_or_attachmentKey}_image00001.jpeg
         ↓
-文件实际存放: {beamer_dir}/materials/figures/{attachmentKey}_image00001.jpeg
+文件实际存放: {beamer_dir}/materials/figures/{paper_id_or_attachmentKey}_image00001.jpeg
 ```
 
 转换操作：
-1. 从 paper 笔记的图片引用中提取 attachmentKey 和文件名
-2. 生成 beamer 引用路径：`materials/figures/{attachmentKey}_{原始文件名}`
-3. 用 `{attachmentKey}_` 前缀避免多篇论文图片重名冲突
+1. 从 paper 笔记的图片引用中提取 paper_id 或 attachmentKey 和文件名
+2. 生成 beamer 引用路径：`materials/figures/{paper_id_or_attachmentKey}_{原始文件名}`
+3. 用 `{paper_id_or_attachmentKey}_` 前缀避免多篇论文图片重名冲突
 
 ### 选图策略
 

@@ -8,7 +8,7 @@ trigger:
   - "paper river"
   - "倒读法"
 user_invocable: true
-version: "1.2.0"
+version: "1.3.0"
 ---
 
 # pyrojewel-paper-river: 倒读法溯源
@@ -16,9 +16,35 @@ version: "1.2.0"
 ## Constants
 
 - **ZOTERO_MARKDOWN_PATH** = `{zotero_markdown_path}` (from .claude/settings.json env)
-- **OUTPUT_DIR** = `{project}/notes/papers/`
-- **IMAGES_DIR** = `{OUTPUT_DIR}/images/`
-- **SOURCES_DIR** = `{OUTPUT_DIR}/sources/`
+- **DEFAULT_OUTPUT_DIR** = `{project}/notes/papers/`
+- **PROJECT_PAPER_OVERVIEW_DIR** = `{project}/paper_overview/` (if this directory exists)
+- **DIRECTION** = required or inferred direction slug, e.g. `vf-literature`, `transformer-modeling`, `inverse-synthesis`
+- **OUTPUT_DIR** =
+  - paper_overview mode: `{project}/paper_overview/rivers/{DIRECTION}/`
+  - legacy mode: `{project}/notes/papers/`
+- **SOURCES_DIR** =
+  - paper_overview mode: `{project}/paper_overview/sources/`
+  - legacy mode: `{OUTPUT_DIR}/sources/`
+- **IMAGES_DIR** =
+  - paper_overview mode: `{project}/paper_overview/sources/{paper_id_or_attachmentKey}/images/`
+  - legacy mode: `{OUTPUT_DIR}/images/{attachmentKey}/`
+
+### Project-aware output rule
+
+If `{project}/paper_overview/` exists, this skill **must** use paper_overview mode. Do not write final river outputs to `{project}/raw/paper/`, `{project}/notes/papers/`, `autoModel/raw/paper/`, `autoModel/paper_Read/`, or `autoModel/idea-stage/`.
+
+paper_overview mode separates assets by role:
+
+```text
+paper_overview/
+├── sources/<paper_id_or_attachmentKey>/content.md
+├── sources/<paper_id_or_attachmentKey>/images/*.jpeg
+├── readings/<DIRECTION>/*.md
+├── rivers/<DIRECTION>/<timestamp>--paper-river-<topic>.md
+└── indexes/river_registry.json
+```
+
+`DIRECTION` must be a stable slug. If the user did not provide one and it cannot be inferred from the task, ask for it before writing files.
 
 ---
 
@@ -45,8 +71,10 @@ version: "1.2.0"
 ### 输出目录
 
 - 输出目录：**$OUTPUT_DIR**（若不存在则 `mkdir -p`）
-- 图片目录：**$IMAGES_DIR/{attachmentKey}/**（按论文分区）
-- 原文备份：**$SOURCES_DIR/{attachmentKey}.md**
+- paper_overview mode 图片目录：`paper_overview/sources/{paper_id_or_attachmentKey}/images/`
+- paper_overview mode 原文备份：`paper_overview/sources/{paper_id_or_attachmentKey}/content.md`
+- legacy mode 图片目录：`$OUTPUT_DIR/images/{attachmentKey}/`
+- legacy mode 原文备份：`$OUTPUT_DIR/sources/{attachmentKey}.md`
 
 ### 文件命名规范
 
@@ -61,10 +89,14 @@ version: "1.2.0"
 title: paper-river-{简短标题}
 date: {YYYY-MM-DD HH:MM}
 tags: [paper, river]
+direction: {DIRECTION}
 identifier: {YYYYMMDDTHHMMSS}
 source: {URL 或来源描述}
 authors: {目标论文作者}
 venue: {发表场所/年份}
+seed_paper: {paper_id_or_attachmentKey}
+canonical_sources:
+  - paper_overview/sources/{paper_id_or_attachmentKey}/
 ---
 ```
 
@@ -107,11 +139,12 @@ venue: {发表场所/年份}
 **递归溯源中的图片资产管理（pyrojewel新增）**：
 
 每递归到一篇新论文时，如果该论文来自Zotero（有attachmentKey）：
-1. `mkdir -p $IMAGES_DIR/{attachmentKey}` 和 `mkdir -p $SOURCES_DIR`
-2. `cp $ZOTERO_MARKDOWN_PATH/{attachmentKey}/*.{jpeg,png,jpg} $IMAGES_DIR/{attachmentKey}/ 2>/dev/null; true`
-3. `cp $ZOTERO_MARKDOWN_PATH/{attachmentKey}/content.md $SOURCES_DIR/{attachmentKey}.md`
-4. 笔记中引用该论文图片：`images/{attachmentKey}/xxx.jpeg`
-5. 不同论文的图片按attachmentKey分区，不会冲突
+1. paper_overview mode: `mkdir -p paper_overview/sources/{paper_id_or_attachmentKey}/images`
+2. paper_overview mode: `cp $ZOTERO_MARKDOWN_PATH/{attachmentKey}/*.{jpeg,png,jpg} paper_overview/sources/{paper_id_or_attachmentKey}/images/ 2>/dev/null; true`
+3. paper_overview mode: `cp $ZOTERO_MARKDOWN_PATH/{attachmentKey}/content.md paper_overview/sources/{paper_id_or_attachmentKey}/content.md`
+4. paper_overview mode 笔记中引用该论文图片：`../../sources/{paper_id_or_attachmentKey}/images/xxx.jpeg`（river 文件位于 `paper_overview/rivers/<DIRECTION>/`）
+5. legacy mode 仍可使用 `images/{attachmentKey}/xxx.jpeg`
+6. 不同论文的图片按 paper_id 或 attachmentKey 分区，不会冲突
 
 **IEEE 论文检索必须串行**：
 - `/ieee-get-fulltext` 涉及浏览器自动化，必须等待导航完成（约 20 秒）
@@ -227,7 +260,9 @@ mcp__zotero-mcp__semantic_search({
 ### 10. 生成 Markdown 文件
 
 1. 获取时间戳：`date +%Y%m%dT%H%M%S`
-2. 确定输出目录：`{当前项目目录}/raw/paper/`（若不存在则创建）
+2. 确定输出目录：
+   - paper_overview mode: `{当前项目目录}/paper_overview/rivers/{DIRECTION}/`
+   - legacy mode: `{当前项目目录}/notes/papers/`
 3. 按格式约束写入 Markdown 文件
 4. 报告文件路径给用户
 
