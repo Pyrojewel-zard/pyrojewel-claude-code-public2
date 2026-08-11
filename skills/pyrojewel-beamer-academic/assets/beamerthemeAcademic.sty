@@ -2,10 +2,10 @@
 % Academic Beamer Theme — Defense Mode Only
 % 答辩专用主题（博士/硕士答辩），不适用组会/研讨会/学术会议
 % 深藏蓝+金色双色调，校徽支持，高信息密度
-% v3.1：新增 infobox/quoteline/stepline/callout/threecard/sectionbar
+% v3.2：高密度默认字号、紧凑间距与三图证据布局
 %       多样性排版命令；修复 gridfourcap/gridtwocap 的 figcap+\\ 报错
 % ============================================================
-\ProvidesPackage{beamerthemeAcademic}[2026/07/02 Academic Beamer Theme v3.1 — Defense Only]
+\ProvidesPackage{beamerthemeAcademic}[2026/08/11 Academic Beamer Theme v3.2 — Dense Defense]
 
 % ---------- 依赖包 ----------
 \RequirePackage{tikz}
@@ -103,6 +103,7 @@
 \setbeamerfont{title}{size=\fontsize{20pt}{26pt}\selectfont, series=\mdseries}
 \setbeamerfont{frametitle}{size=\fontsize{14pt}{18pt}\selectfont, series=\mdseries, family=\sffamily}
 \setbeamerfont{framesubtitle}{size=\normalsize}
+\setbeamerfont{normal text}{size=\fontsize{9.4pt}{11.2pt}\selectfont}
 \setbeamerfont{headline}{size=\fontsize{14pt}{18pt}\selectfont, series=\bfseries}
 \setbeamerfont{footline}{size=\fontsize{9pt}{11pt}\selectfont}
 \setbeamerfont{block title}{size=\normalsize, series=\bfseries}
@@ -300,12 +301,12 @@
   \begin{tikzpicture}
     \pgfmathsetlength{\pgf@xa}{0.94\columnwidth}%
     \node[draw=none, fill=defense-banner,
-          rounded corners=1.5pt, inner xsep=14pt, inner ysep=4.5pt,
+          rounded corners=1.5pt, inner xsep=12pt, inner ysep=3.5pt,
           font=\fontsize{10.5pt}{12.5pt}\selectfont\bfseries\color{white}, anchor=south,
           drop shadow={opacity=0.18, shadow xshift=0.7pt, shadow yshift=-0.7pt}] (banner)
           at (0, 0) {\begin{varwidth}{0.78\columnwidth}\centering #1\end{varwidth}};
     \node[draw=defense-frame-border, line width=1.0pt, fill=white,
-          rounded corners=7pt, inner sep=8pt,
+          rounded corners=7pt, inner sep=6pt,
           text width=\pgf@xa, align=left, anchor=north] (body)
           at ([yshift=-4pt]banner.south) {#2};
   \end{tikzpicture}
@@ -316,8 +317,8 @@
 % 用法: \cardtable{\begin{tabular}{lcc} ... \end{tabular}}
 \newcommand{\cardtable}[1]{%
   \begingroup
-  \small
-  \renewcommand{\arraystretch}{1.12}%
+  \fontsize{7.6pt}{8.7pt}\selectfont
+  \renewcommand{\arraystretch}{1.02}%
   \setlength{\tabcolsep}{3.2pt}%
   \begin{center}
     \begin{adjustbox}{max width=0.96\linewidth}
@@ -355,11 +356,11 @@
 
 % 平坦 defense 页标题（用于非 contentcard 包裹的 frame）
 \newcommand{\defenseframetitle}[1]{%
-  \vskip0.18cm%
+  \vskip0.10cm%
   {\color{defense-navy}\sffamily\fontsize{15pt}{18pt}\selectfont\bfseries #1\par}%
-  \vskip3pt%
+  \vskip2pt%
   {\color{defense-frame-border}\rule{\textwidth}{0.6pt}}%
-  \vskip8pt%
+  \vskip5pt%
 }
 
 % Defense 紧凑子标题
@@ -379,12 +380,12 @@
 
 % 论文章节小注
 \newcommand{\chapnote}[1]{%
-  {\fontsize{7pt}{9pt}\selectfont\color{textgray}\itshape #1\par}\vskip6pt%
+  {\fontsize{7pt}{8.5pt}\selectfont\color{textgray}\itshape #1\par}\vskip4pt%
 }
 
 % 图说
 \newcommand{\figcap}[1]{%
-  \vskip-2pt{\centering\fontsize{8pt}{10pt}\selectfont\itshape\color{textgray}#1\par}%
+  \vskip-2pt{\centering\fontsize{7.2pt}{8.5pt}\selectfont\itshape\color{textgray}#1\par}%
 }
 
 % 结论高亮框（灰色边框，浅灰底）
@@ -392,8 +393,9 @@
   \begin{center}
   \begin{tikzpicture}
     \node[draw=lightline, line width=0.5pt, fill=lightbg,
-          rounded corners=0pt, inner sep=12pt,
-          text width=0.92\linewidth, align=left, font=\small]{#1};
+          rounded corners=0pt, inner sep=7pt,
+          text width=0.92\linewidth, align=left,
+          font=\fontsize{8pt}{9.4pt}\selectfont]{#1};
   \end{tikzpicture}
   \end{center}
 }
@@ -409,7 +411,7 @@
 }
 
 % ============================================================
-% 多样性排版命令（v3.1 新增 — 丰富页面节奏）
+% 多样性排版命令（v3.2 — 高密度页面节奏）
 % ============================================================
 % 目的：打破"每页都是 contentcard"的单调，提供轻量、嵌入式、
 % 流程式、警示式等多种页面类型，供同一份 PPT 内交替轮换使用。
@@ -419,8 +421,9 @@
 \newcommand{\infobox}[2]{%
   \begin{center}
   \begin{tikzpicture}
-    \node[draw=none, fill=lightbg, rounded corners=3pt, inner sep=10pt,
-          text width=0.90\linewidth, align=left, font=\small] (box) {%
+    \node[draw=none, fill=lightbg, rounded corners=3pt, inner sep=7pt,
+          text width=0.90\linewidth, align=left,
+          font=\fontsize{8pt}{9.4pt}\selectfont] (box) {%
       \begingroup\setbox0=\hbox{#1}\ifdim\wd0>0pt
         {\color{defense-navy}\bfseries #1\par}\vskip3pt
       \fi\endgroup #2};
@@ -435,8 +438,9 @@
   \vskip6pt
   \begin{center}
   \begin{tikzpicture}
-    \node[draw=none, fill=white, inner sep=10pt,
-          text width=0.88\linewidth, align=left, font=\itshape\small] (q) {#1};
+    \node[draw=none, fill=white, inner sep=7pt,
+          text width=0.88\linewidth, align=left,
+          font=\itshape\fontsize{8pt}{9.4pt}\selectfont] (q) {#1};
     \draw[defense-gold, line width=3pt] (q.north west) -- (q.south west);
   \end{tikzpicture}
   \end{center}
@@ -449,8 +453,9 @@
   \vskip4pt
   \begin{tikzpicture}
     \node[draw=defense-gold, fill=defense-gold, circle, minimum size=0.62cm,
-          inner sep=0pt, font=\small\bfseries\color{white}] (n) at (0,0) {#1};
-    \node[anchor=west, text width=0.84\linewidth, align=left, font=\small]
+          inner sep=0pt, font=\fontsize{8pt}{9.4pt}\selectfont\bfseries\color{white}] (n) at (0,0) {#1};
+    \node[anchor=west, text width=0.84\linewidth, align=left,
+          font=\fontsize{8pt}{9.4pt}\selectfont]
           at ([xshift=8pt]n.east) {#2};
   \end{tikzpicture}
   \vskip2pt%
@@ -470,8 +475,9 @@
   \begin{tikzpicture}
     \node[draw={\calloutbordername}, line width=1.0pt,
           fill={\calloutbordername!6},
-          rounded corners=4pt, inner sep=9pt,
-          text width=0.88\linewidth, align=left, font=\small]{#2};
+          rounded corners=4pt, inner sep=7pt,
+          text width=0.88\linewidth, align=left,
+          font=\fontsize{8pt}{9.4pt}\selectfont]{#2};
   \end{tikzpicture}
   \end{center}
 }
@@ -553,6 +559,24 @@
     \begin{column}{0.48\textwidth}
       \centering\includegraphics[width=\linewidth, height=4.0cm, keepaspectratio]{#3}\par
       \vspace{2pt}\figcap{#4}
+    \end{column}
+  \end{columns}
+}
+
+% 3×1 并排 + 图注：适用于三阶段、三方法或三组证据的同页对照。
+\newcommand{\gridthreecap}[6]{%
+  \begin{columns}[T]
+    \begin{column}{0.31\textwidth}
+      \centering\includegraphics[width=\linewidth, height=3.0cm, keepaspectratio]{#1}\par
+      \vspace{2pt}\figcap{#2}
+    \end{column}
+    \begin{column}{0.31\textwidth}
+      \centering\includegraphics[width=\linewidth, height=3.0cm, keepaspectratio]{#3}\par
+      \vspace{2pt}\figcap{#4}
+    \end{column}
+    \begin{column}{0.31\textwidth}
+      \centering\includegraphics[width=\linewidth, height=3.0cm, keepaspectratio]{#5}\par
+      \vspace{2pt}\figcap{#6}
     \end{column}
   \end{columns}
 }

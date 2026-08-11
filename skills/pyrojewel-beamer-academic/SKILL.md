@@ -1,10 +1,9 @@
 ---
 name: pyrojewel-beamer-academic
-version: 4.2
+version: 4.3
 description: >
-  学术 Beamer 幻灯片生成器。默认排版：圆角卡片 + 纯蓝标题条，深藏蓝+金色双色调。
-  v4.2 扩充多样性排版命令（infobox/quoteline/stepline/callout/threecard/sectionbar），
-  要求同一份 PPT 内交替轮换 ≥4 种页面类型，避免全程 contentcard 单调。
+  学术 Beamer 幻灯片生成器。默认排版：高信息密度、圆角卡片 + 纯蓝标题条，深藏蓝+金色双色调。
+  v4.3 增加页级信息预算、多图优先和密度回归检查；v4.2 的多样性排版命令继续兼容。
   支持 output_path 参数指定输出目录；未指定时默认输出到 Obsidian 周会文件夹（$OBSIDIAN_VAULT_ROOT/weekly/{YYYY}_W{WW}/）。
 trigger:
   - "答辩PPT"
@@ -18,16 +17,18 @@ trigger:
   - "学术报告"
 ---
 
-# pyrojewel-beamer-academic v4.2
+# pyrojewel-beamer-academic v4.3
 
-基于 `beamerthemeAcademic.sty`（v3.1）的学术幻灯片生成技能。适用场景：博士/硕士答辩、组会报告、学术会议。默认排版：圆角卡片 + 纯蓝标题条。
+基于 `beamerthemeAcademic.sty`（v3.2）的学术幻灯片生成技能。适用场景：博士/硕士答辩、组会报告、学术会议。默认排版：高信息密度、圆角卡片 + 纯蓝标题条。
+
+**v4.3 高密度排版**：每页默认组织为“论点 + 证据 + 解释”，普通文字页目标 180--240 字；同一页优先承载两张或三张互相关联的图，单图页只用于完整流程、总框架或关键结果。每份综述/组会报告至少 6 页双图/多图，其中至少 2 页为三图或“1 大图 + 2 细节图”。
 
 **v4.2 多样性排版**：主题新增 6 个排版命令，SKILL 强制要求同一份 PPT 内交替轮换页面类型（卡片 / 段落 / 双栏图文 / 全图 / 表格 / 流程 / 警示），禁止连续 ≥3 页使用同一种布局。第一页起即进入内容，章节切换用嵌入式 `\sectionbar` 而非整页过渡页。
 
 **v4.1 两阶段流程**：先产出完整内容 Markdown（非大纲），用户确认后再生成 beamer。所有 LaTeX/编译产物/图片资产放入以 md 文件名命名的子目录。默认编译带北邮 logo（白色横版，headline 用）。文件名支持 type 标签前缀（论文调研 / autoModel / 组会 / 答辩）。
 
 核心资源：
-- 主题文件：`assets/beamerthemeAcademic.sty`（v3.1，含 6 个多样性排版命令）
+- 主题文件：`assets/beamerthemeAcademic.sty`（v3.2，含多样性排版命令与 `gridthreecap` 三图组件）
 - 配置：`assets/config.yaml`
 - 排版样式参考：`references/writing-style.md`（7+ 种页面 Pattern，生成时必读）
 
@@ -47,7 +48,10 @@ trigger:
 
    撰写要求：
    - 每页对应一个 `##` 二级标题，标题为术语+限定条件
-   - 每页 200-300 字完整论证文字，不是 bullet point 大纲
+   - 普通页面 180--240 字完整论证文字，不是 bullet point 大纲；表格、公式和多图页按“可读信息量”核算，不机械补字
+   - 每页先写清一个结论，再安排证据：至少一张图、一组数据或一个公式，随后补充证据解释或适用边界
+   - 关联图优先同页组合：默认使用 `gridtwocap`、`gridfourcap`、`gridonextwo`、图+表格或图+公式；连续单图页最多 1 页
+   - 多图页不得只堆图：每张图有“图中事实 + 本页作用”的短图注，页底有跨图结论
    - 方法页包含公式（LaTeX 数学模式）+ 图片引用标注
    - 实验页包含具体数据 + 对比分析文字
    - 结论页包含 takeaway + 局限性 + 未来方向
@@ -115,7 +119,7 @@ trigger:
 
 13. **编译输出** → `{beamer_dir}/{文件名}.pdf`（`xelatex` 两次）
 
-14. **CHECKPOINT**：编译后检查 .log 无 Error/Overfull，有问题先修；同时执行 §3.4 反单调检查（逐页统计页面类型代号，确认 ≥4 种且无连续 ≥3 页同代号），不达标回到第 12 步重写对应 frame
+14. **CHECKPOINT**：编译后检查 `.log` 无 Error/Overfull，有问题先修；同时执行 §3.4 页面类型和 §3.5 信息密度检查，不达标回到第 12 步重写对应 frame
 
 ### 输出目录结构
 
@@ -138,8 +142,10 @@ trigger:
 
 | 维度 | 风格 ✓ | 禁止 ✗ |
 |------|-----------|--------|
-| **信息密度** | 高优先，200-300字/页（中文） | 低密度，一句话占整页 |
-| **页面多样性** | 同一份 PPT 交替轮换 ≥4 种页面类型 | 连续 ≥3 页用同一种布局 |
+| **信息密度** | 高优先，普通页 180--240 字；表格/公式/多图页按等价信息量 | 低密度，一句话占整页 |
+| **证据结构** | 论点 + 论文证据 + 解释/边界 | 图片与文字各说各话 |
+| **图文组合** | 默认双图/三图/主图+细节图 | 连续单图页 |
+| **页面多样性** | 同一份 PPT 交替轮换 ≥5 种页面类型 | 连续 ≥3 页用同一种布局 |
 | **视觉装饰** | 色块用于 banner / callout / sectionbar，克制 | 全屏色块内容页、花哨装饰 |
 | **标题风格** | 术语 + 限定条件 | 诗意/口语化 |
 | **数据呈现** | booktabs 表格 + 公式 + 图 | KPI 卡片、仪表盘 |
@@ -156,13 +162,13 @@ trigger:
 内容页（类型 A）→ 内容页（类型 B）→ … → 结论与展望
 ```
 
-- **内容页**：白底，200-300 字（中文），必须包含具体论证
+- **内容页**：白底，普通页 180--240 字（中文），必须包含具体论证；表格、公式和多图页按信息量核算
 - 第一页直接进入内容页，禁止封面页、致谢页；整页过渡页仅答辩场景可选用 `\sectiondivider`，组会/论文调研场景**禁止**整页过渡
 - 章节切换：直接用 `\section{标题}`（headline 自动显示当前 section）；若需更强视觉分隔，在内容页顶部用嵌入式 `\sectionbar{章节标题}`，**不占整页**
 
 ### 3.2 页面类型轮换表（强制）
 
-生成 beamer 前必须规划每页的页面类型，确保**同一份 PPT 内出现 ≥4 种不同类型**，且**不连续 ≥3 页使用同一类型**。可用页面类型：
+生成 beamer 前必须规划每页的页面类型，确保**同一份 PPT 内出现 ≥5 种不同类型**，且**不连续 ≥3 页使用同一类型**。可用页面类型：
 
 | 代号 | 页面类型 | 典型命令组合 | 适用内容 |
 |------|---------|-------------|---------|
@@ -171,6 +177,8 @@ trigger:
 | **C** | 双栏图文页 | `\begin{columns}` + 文字 + `\colimg` / `\safeimg` | 架构图+解读、流程图+说明 |
 | **D** | 全图页 | `\fullimg` / `\topfig` / `\gridtwo` | 实验结果、波形、架构总览 |
 | **E** | 多图网格页 | `\gridfour` / `\gridfourcap` / `\gridonextwo` | 多视角结果对比 |
+| **K** | 图文证据页 | `\gridtwocap` / `\gridonextwo` + 解释段 | 主证据配局部细节和边界 |
+| **L** | 图表组合页 | `columns` + 图 + `\cardtable` | 定性图和定量表共同支撑结论 |
 | **F** | 表格页 | `\defenseframetitle` + `\cardtable` + booktabs | 数据对比、参数列表 |
 | **G** | 公式页 | 段落 + `\[...\]` / `$...$` + `\summarybar` | 方法推导、损失函数 |
 | **H** | 流程页 | `\stepline` 串联步骤 + `\sectionbar` | 方法流程、实验步骤 |
@@ -198,8 +206,21 @@ P9  类型 I 警示/结论   — \callout{warn} 局限 + \callout{tip} 未来
 ### 3.4 反单调检查（生成后必做）
 
 生成全部 frame 后，逐页统计页面类型代号：
-- 若出现 ≥4 种不同代号 → 通过
-- 若 <4 种，或连续 ≥3 页同代号 → 回到阶段二重新分配页面类型，重写对应 frame
+- 若出现 ≥5 种不同代号 → 通过
+- 若 <5 种，或连续 ≥3 页同代号 → 回到阶段二重新分配页面类型，重写对应 frame
+
+### 3.5 信息密度与图文组合检查（生成后必做）
+
+逐页记录 `frame_id`、页面类型、正文/表格/公式、图片数、图注数和页底结论。
+
+- 普通文字页：正文目标 180--240 字；必须有明确结论条或 `keybox/summarybar/callout`。
+- 双图/多图页：图片数至少 2；每张图有图注；页内有一段跨图解释或总结。
+- 三图页：至少 2 页；优先使用 `gridfourcap` 的三格变体或 `gridonextwo`。
+- 综述/组会整份 PPT：至少 6 页双图或多图；连续单图页最多 1 页。
+- 表格页：表格必须有表头、至少两行数据或明确的定量对照，并配一段结论。
+- 任何页面不得以把正文压到 7.2pt 以下来通过密度检查；若出现 `Overfull \\vbox`、图注不可辨认或图文重叠，判定失败。
+
+将检查结果附在阶段二产物旁或进度日志中，作为下一轮生成的回归依据。
 
 ---
 
@@ -247,6 +268,7 @@ P9  类型 I 警示/结论   — \callout{warn} 局限 + \callout{tip} 未来
 |------|------|---------|
 | `\gridtwo{图1}{图2}` | 2×1 并排 | 对比实验 |
 | `\gridtwocap{图1}{注1}{图2}{注2}` | 2×1 并排 + 图注 | 对比+说明 |
+| `\gridthreecap{图1}{注1}{图2}{注2}{图3}{注3}` | 3×1 并排 + 图注 | 三阶段/三方法/三组证据 |
 | `\gridfour{图1}{图2}{图3}{图4}` | 2×2 网格 | 多视角结果 |
 | `\gridfourcap{f1}{c1}{f2}{c2}{f3}{c3}{f4}{c4}` | 2×2 网格 + 图注 | 4组对比 |
 | `\gridonextwo{大图}{小图1}{小图2}` | 1大+2小 | 架构图+细节 |
@@ -266,7 +288,7 @@ P9  类型 I 警示/结论   — \callout{warn} 局限 + \callout{tip} 未来
 
 清空校徽：`\sethorizseal{}`。替换为其他学校 logo：将文件放入 `materials/figures/` 后修改对应命令。
 
-### 4.6 多样性排版命令（v3.1 新增）
+### 4.6 多样性排版命令（v4.3 默认高密度）
 
 用于打破"每页都是 contentcard"的单调，在同一份 PPT 内交替使用：
 
@@ -315,7 +337,7 @@ P9  类型 I 警示/结论   — \callout{warn} 局限 + \callout{tip} 未来
 | `\defensecover` / `\thanksframe`（组会/论文调研场景） | 直接进入内容页 | 组会无需封面致谢；答辩场景除外 |
 | `\sectiondivider` 过渡页（组会/论文调研场景） | `\section{标题}` + 内容页，或顶部 `\sectionbar{}` | 整页过渡无实质内容；答辩可酌用 |
 | 连续 ≥3 页 `\contentcard` 单卡片 | 交替 `\contentcard` / `\infobox` / 段落 / 双栏图文 | 视觉单调，违反多样性轮换 |
-| 全程只用 1-2 种页面类型 | 按 §3.2 轮换表选 ≥4 种 | 排版单一 |
+| 全程只用 1-2 种页面类型 | 按 §3.2 轮换表选 ≥5 种 | 排版单一 |
 | `\includegraphics[width=\textwidth]{...}` | `\colimg{...}` 或 `\fullimg{...}` | 无高度校验导致 Overfull |
 | 漏写 `\graphicspath` | preamble 加 `\graphicspath{{materials/figures/}{./}}` | `\sethorizseal` 找不到图，编译失败 |
 | `\usepackage{ctex}` + `\usetheme{Academic}` | `\usepackage{xeCJK}` + 手动设字体 | ctex 与 beamer 主题冲突 |
@@ -328,7 +350,7 @@ P9  类型 I 警示/结论   — \callout{warn} 局限 + \callout{tip} 未来
 
 ## 7. LaTeX 模板
 
-模板演示 6 种页面类型轮换（J 引言 → H 流程 → G 公式 → C 双栏图文 → D 全图 → I 警示结论），生成时按内容调整但须保持 ≥4 种轮换：
+模板演示 6 种页面类型轮换（J 引言 → H 流程 → G 公式 → C 双栏图文 → D 全图 → I 警示结论），生成时按内容调整但须保持 ≥5 种轮换：
 
 ```latex
 \documentclass[aspectratio=169, 10pt]{beamer}
@@ -370,7 +392,7 @@ P9  类型 I 警示/结论   — \callout{warn} 局限 + \callout{tip} 未来
 \begin{frame}
   \defenseframetitle{背景论证}
   \chapnote{对应论文 §1.2}
-  CFD-PE 方法源于复频域极点展开理论……（200-300字论证段落）。
+  CFD-PE 方法源于复频域极点展开理论……（180--240字论证段落）。
   \keybox{\textbf{核心结论}：极点分离是频响建模精度的瓶颈。}
 \end{frame}
 
@@ -508,13 +530,13 @@ xelatex {文件名}.tex
 
 ## {页面1标题：术语+限定条件}
 
-{200-300字完整论证段落。包含问题定义、方法思路、关键公式。}
+{180--240字完整论证段落。包含问题定义、方法思路、关键公式。}
 
 ![图注](materials/figures/fig_xxx.jpeg)
 
 ## {页面2标题}
 
-{200-300字完整论证段落。包含实验设置、数据对比、分析结论。}
+{180--240字完整论证段落。包含实验设置、数据对比、分析结论。}
 
 | 方法 | 指标A | 指标B |
 |------|-------|-------|
@@ -532,7 +554,7 @@ xelatex {文件名}.tex
 
 ### 内容要求
 
-- 每个 `##` 节 200-300 字完整段落，不是 bullet list
+- 每个 `##` 节普通页 180--240 字完整段落，不是 bullet list；表格、公式和多图页按可读信息量核算
 - 方法节包含 LaTeX 数学公式（`$...$` 或 `$$...$$`）
 - 实验节包含具体数值 + 对比分析
 - 图片用 `![图注](materials/figures/xxx.jpeg)` 标注位置
@@ -549,8 +571,8 @@ xelatex {文件名}.tex
 | `.log` 出现 `Overfull \vbox` | 换 `\colimg`/`\safeimg` 降低图片高度 | 减少该页文字量 20% |
 | `.log` 出现 `Overfull \hbox`（<15pt，contentcard/pair/threecard） | 忽略，属 drop shadow 的固有微溢出，不影响渲染 | 若 >15pt 则缩短 banner 标题文字 |
 | `.log` 出现 `File not found`（图片） | 检查 `\graphicspath` 和文件名大小写 | 用绝对路径 `\graphicspath{{/full/path/}}` |
-| `.log` 出现 `Undefined control sequence`（infobox/quoteline/stepline/callout/threecard/sectionbar） | 检查 .sty 版本为 v3.1+，旧版无这些命令 | 重新从 `assets/beamerthemeAcademic.sty` 复制 |
+| `.log` 出现 `Undefined control sequence`（infobox/quoteline/stepline/callout/threecard/sectionbar/gridthreecap） | 检查 .sty 版本为 v3.2+，旧版无这些命令 | 重新从 `assets/beamerthemeAcademic.sty` 复制 |
 | `.log` 出现 `Missing \endcsname`（callout） | 检查 `\callout` 第一参数是否为 `note`/`tip`/`warn` 之一 | 改用默认 `\callout{note}{...}` |
-| `.log` 出现 `There's no line here to end` | 检查 `\figcap` 后是否紧跟 `\\`，改用 `\par\vspace` | 升级 .sty 到 v3.1（已修复 gridfourcap） |
-| `.log` 出现 `Undefined control sequence`（其它） | 检查 .sty 版本为 v3.1+ | 确认 `\usepackage{colortbl}` |
+| `.log` 出现 `There's no line here to end` | 检查 `\figcap` 后是否紧跟 `\\`，改用 `\par\vspace` | 升级 .sty 到 v3.2（已修复 gridfourcap/gridthreecap） |
+| `.log` 出现 `Undefined control sequence`（其它） | 检查 .sty 版本为 v3.2+ | 确认 `\usepackage{colortbl}` |
 | **STOP**: `.log` 存在 `Error` → 修复后再继续，不要忽略 | | |

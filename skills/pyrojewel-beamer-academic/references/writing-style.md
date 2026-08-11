@@ -1,4 +1,16 @@
-# Writing Style Guide（答辩专用）
+# Writing Style Guide（高密度学术汇报）
+
+## Density-first page contract
+
+默认不是“把一句话放大到一页”，而是让每页完成一次小论证：
+
+`结论/问题 → 论文证据 → 证据解释或边界`
+
+- 普通文字页目标 180--240 字；方法、表格、公式和多图页按可读信息量核算。
+- 连续单图页最多 1 页。单图必须是完整流程、总框架或关键主结果，否则应与相关图组成双图/三图页。
+- 每份综述或组会报告至少 6 页双图/多图，其中至少 2 页为三图或“1 大图 + 2 细节图”。
+- 多图页每张图都要有“图中事实 + 本页作用”图注，页底必须有跨图结论。
+- 正文、图注和表格不得通过压到 7.2pt 以下来换取密度；可读性检查失败即回退重排。
 
 ## Title Rules
 
@@ -203,7 +215,48 @@
 
 ## 多样性轮换规则（生成时强制）
 
-同一份 PTT 内必须出现 ≥4 种不同 Pattern，且不连续 ≥3 页用同一 Pattern。生成全部 frame 后逐页核对 Pattern 编号，不达标则重分配。详见 `SKILL.md` §3.2-3.4。
+同一份 PPT 内必须出现 ≥5 种不同 Pattern，且不连续 ≥3 页用同一 Pattern。生成全部 frame 后逐页核对 Pattern 编号，不达标则重分配。页面类型数量不能替代信息密度：多图页仍需图注和跨图解释。详见 `SKILL.md` §3.2-3.5。
+
+## Dense evidence patterns
+
+### Pattern 14: 双图对比 + 跨图结论
+
+```latex
+\begin{frame}
+  \defenseframetitle{两条方法路线的共同约束}
+  \gridtwocap{fig_a.jpeg}{左图：方法 A 的输入与响应。}{fig_b.jpeg}{右图：方法 B 的输出与验证。}
+  \small 两张图分别展示表示空间与验证环节；共同结论是……
+  \summarybar{图 A 解决搜索表达，图 B 解决物理回代，两者不能互相替代。}
+\end{frame}
+```
+
+### Pattern 15: 主图 + 两个细节图
+
+```latex
+\begin{frame}
+  \defenseframetitle{主流程与局部证据}
+  \gridonextwo{fig_main.jpeg}{fig_detail_a.jpeg}{fig_detail_b.jpeg}
+  \small 主图给出整体流程，两个细节图分别说明数据入口和验证出口；文字必须解释三者如何共同支撑本页结论。
+\end{frame}
+```
+
+### Pattern 16: 图 + 定量表格
+
+```latex
+\begin{frame}
+  \defenseframetitle{定性结构与定量边界}
+  \begin{columns}[T]
+    \begin{column}{0.47\textwidth}
+      \safeimg[4.0cm]{fig_structure.jpeg}
+      \figcap{结构图说明搜索空间。}
+    \end{column}
+    \begin{column}{0.49\textwidth}
+      \cardtable{\begin{tabular}{lcc} ... \end{tabular}}
+      \small 表格说明误差、数据量或验证层级，不能只放一个最终数字。
+    \end{column}
+  \end{columns}
+\end{frame}
+```
 
 ## 内容 Anti-AI 检查
 
