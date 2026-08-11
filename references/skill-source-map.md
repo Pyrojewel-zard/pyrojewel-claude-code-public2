@@ -162,3 +162,22 @@
 **未同步：** `pyrojewel-paper-qa`（已最新）、`pyrojewel-beamer-academic`（上游无新 commit）。
 
 **详细报告：** `references/upstream-sync-2026-08-11.md` + `references/skill-sync-plan-2026-08-11.md`
+
+### 2026-08-12 — 日常同步（无 skill 变更）
+
+**上游仓库更新：**
+
+| 仓库 | 同步方式 | 结果 | 新 commit |
+|------|---------|------|----------|
+| `Auto-claude-code-research-in-sleep` | HTTPS fetch + manual merge（SSH key 缺失，临时切 HTTPS） | ✅ `e8887cc`→`e12e07c` | 3 |
+| `ljg-skills` | `git fetch upstream` | ✅ 已最新 | 0 |
+| `beamer-academic` | HTTPS pull | ✅ 已最新 | 0 |
+| `virtuoso-bridge-lite` | `git fetch upstream` | ✅ 已最新 | 0 |
+
+**新 commit 内容：** `Auto-claude-code-research-in-sleep` 3 个 commit 全部为 README.md / README_CN.md 文档更新（HERO sibling-project callout + Anti-Autoresearch pull-quote），不涉及任何 skill / shared-references / tools 文件。
+
+**同步到当前项目的 skill：** 无（无 skill 文件变更）。
+
+**push 状态：** 无需 commit/push（pyrojewel_claude_code 无变更）。
+
+**备注：** 本次会话 VM 无 SSH key（`~/.ssh/` 不存在），origin SSH pull 不可用。`Auto-claude-code-research-in-sleep` 和 `beamer-academic` 通过临时切换 origin 为 HTTPS 完成拉取后恢复 SSH remote。`ljg-skills` 和 `virtuoso` 的 upstream 为 HTTPS，fetch 正常。挂载盘 git merge 受 `unlink` 权限限制，通过 `git show` + `cp` + `git update-ref` workaround 完成 HEAD 更新。
