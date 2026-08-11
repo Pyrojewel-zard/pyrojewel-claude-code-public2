@@ -1,7 +1,7 @@
 # Skill Source Map
 
 **Project:** `pyrojewel_claude_code`
-**Last Updated:** 2026-06-23T15:52:00+08:00
+**Last Updated:** 2026-08-11T00:00:00+08:00
 **Purpose:** 维护当前项目内 skill 的来源、所属 flow、当前状态、同步策略，作为后续 upstream 更新分析的唯一总表。
 
 ---
@@ -37,8 +37,8 @@
 | `paper-compile` | `skills/paper-compile/skill.md` | Flow 4 / 5 | `adopted` | `Auto-claude-code-research-in-sleep` | 原样迁移 | worker3 | 跟踪编译/修错流程更新 |
 | `dse-loop` | `skills/dse-loop/skill.md` | Flow 3 / 4 | `adopted` | `Auto-claude-code-research-in-sleep` | 原样迁移 | worker3 | 跟踪搜索策略更新 |
 | `formula-derivation` | `skills/formula-derivation/skill.md` | Flow 4 | `adopted` | `Auto-claude-code-research-in-sleep` | 原样迁移 | worker3 | 低频检查 |
-| `experiment-log-summarizer` | `skills/experiment-log-summarizer/skill.md` | Flow 4 | `adopted` | `academic-skills` | 原样迁移 | worker3 | 跟踪输出格式和日志归纳逻辑 |
-| `benchmark-extractor` | `skills/benchmark-extractor/skill.md` | Flow 4 | `adopted` | `academic-skills` | 原样迁移 | worker3 | 低频检查 |
+| `experiment-log-summarizer` | `skills/experiment-log-summarizer/skill.md` | Flow 4 | `adopted` | unknown | 原标 academic-skills 已核实磁盘无此仓库（2026-08-11）；`academic-research-skills` 亦无此 skill，来源不可核实 | worker3 | 无需同步外部源，作为本地 skill 维护 |
+| `benchmark-extractor` | `skills/benchmark-extractor/skill.md` | Flow 4 | `adopted` | unknown | 原标 academic-skills 已核实磁盘无此仓库（2026-08-11）；`academic-research-skills` 亦无此 skill，来源不可核实 | worker3 | 无需同步外部源，作为本地 skill 维护 |
 | `novelty-check` | `skills/novelty-check/skill.md` | Flow 2 / 4 | `adopted` | `Auto-claude-code-research-in-sleep` | 已做 `REVIEWER_MODEL` + `shared-references` 适配 | worker3 | 作为 P1 适配模板，优先跟踪 |
 | `idea-discovery` | `skills/idea-discovery/skill.md` | Flow 2 | `adopted` | `Auto-claude-code-research-in-sleep` | 已做 `REVIEWER_MODEL`(o3) + `shared-references` 路径适配；编排器，串联 idea-creator/novelty-check/research-review/research-refine | worker3 | 跟踪编排逻辑和子 skill 调用变化 |
 | `idea-creator` | `skills/idea-creator/skill.md` | Flow 2 | `adopted` | `Auto-claude-code-research-in-sleep` | 已做 `REVIEWER_MODEL`(o3) + `shared-references` 路径适配；helper resolve chain 保持 3 层 | worker3 | 跟踪 jury/fan-out 逻辑更新 |
@@ -59,13 +59,13 @@
 | `serverless-modal` | `skills/serverless-modal/SKILL.md` | Flow 4 | `adopted` | `Auto-claude-code-research-in-sleep` | 2026-06-23 迁入；无 shared-references 依赖；需 Modal CLI | worker3 | 跟踪 Modal API/GPU/Volume 配置更新 |
 | `virtuoso` | `skills/virtuoso/SKILL.md` | RF/EDA | `adopted` | `virtuoso-bridge-lite` (upstream Arcadia-1) | 2026-07-13 迁入；含 profile 配置（default/smic110/smic55/smic55v2/gf110）+ references/ | lead | 跟踪 upstream bridge API 更新；本地 profile 配置优先保留 |
 | `zotero-pdf-parse` | `skills/zotero-pdf-parse/skill.md` | Flow 1 / 9 | `adopted` | `skill_manager` (改编) | env var 替换 + 输出约定对齐 pyrojewel-paper-flow Phase 1 | worker2 | 高优先，跟踪 MarkerPDF 路径变化 |
-| `wiki-capture` | `skills/wiki-capture/skill.md` | Flow 10 | `adopted` | `llm_wiki` | 原样迁入，SKILL.md→skill.md | worker2 | 跟踪上游 capture 逻辑变化 |
-| `inbox-prepare` | `skills/inbox-prepare/skill.md` | Flow 10 | `adopted` | `llm_wiki` | 原样迁入，SKILL.md→skill.md | worker2 | 跟踪上游 workspace 评估逻辑 |
-| `wiki-compile` | `skills/wiki-compile/skill.md` | Flow 10 | `adopted` | `llm_wiki` | 原样迁入，SKILL.md→skill.md | worker2 | 跟踪上游 compile 策略变化 |
-| `wiki-crystallize` | `skills/wiki-crystallize/skill.md` | Flow 10 | `adopted` | `llm_wiki` | 原样迁入，SKILL.md→skill.md | worker2 | 跟踪上游 crystallize/提炼逻辑 |
-| `wiki-lint` | `skills/wiki-lint/skill.md` | Flow 10 | `adopted` | `llm_wiki` | 原样迁入，SKILL.md→skill.md | worker2 | 跟踪上游 lint 规则更新 |
-| `wiki-query` | `skills/wiki-query/skill.md` | Flow 10 | `adopted` | `llm_wiki` | 原样迁入，SKILL.md→skill.md | worker2 | 跟踪上游 query/retrieval 逻辑 |
-| `wiki-research` | `skills/wiki-research/skill.md` | Flow 10 | `adopted` | `llm_wiki` | 原样迁入，SKILL.md→skill.md | worker2 | 跟踪上游 research/补充逻辑 |
+| `wiki-capture` | `skills/wiki-capture/skill.md` | Flow 10 | `adopted` | local self-built | 本地自建 | worker2 | 不依赖外部上游 |
+| `inbox-prepare` | `skills/inbox-prepare/skill.md` | Flow 10 | `adopted` | local self-built | 本地自建 | worker2 | 不依赖外部上游 |
+| `wiki-compile` | `skills/wiki-compile/skill.md` | Flow 10 | `adopted` | local self-built | 本地自建 | worker2 | 不依赖外部上游 |
+| `wiki-crystallize` | `skills/wiki-crystallize/skill.md` | Flow 10 | `adopted` | local self-built | 本地自建 | worker2 | 不依赖外部上游 |
+| `wiki-lint` | `skills/wiki-lint/skill.md` | Flow 10 | `adopted` | local self-built | 本地自建 | worker2 | 不依赖外部上游 |
+| `wiki-query` | `skills/wiki-query/skill.md` | Flow 10 | `adopted` | local self-built | 本地自建 | worker2 | 不依赖外部上游 |
+| `wiki-research` | `skills/wiki-research/skill.md` | Flow 10 | `adopted` | local self-built | 本地自建 | worker2 | 不依赖外部上游 |
 | `arxiv` | `skills/arxiv/skill.md` | Flow 2 support | `adopted` | `Auto-claude-code-research-in-sleep` | 已迁入；shared-references 引用改为当前项目路径 | lead | 跟踪下载/检索 helper 解析链 |
 | `render-html` | `skills/render-html/skill.md` | Flow 2 support | `adopted` | `Auto-claude-code-research-in-sleep` | 已迁入；脚本与模板一并落地；shared-references 引用改为当前项目路径 | lead | 跟踪 HTML 渲染脚本与模板更新 |
 | `pyrojewel-academic-ppt` | `.claude/skills/pyrojewel-academic-ppt/` | Flow 11 | `superseded` | local legacy | 被 `pyrojewel-beamer-academic` 替代 | worker2 | 不再同步 |
@@ -77,7 +77,7 @@
 | `mle-workflow` | `skills/mle-workflow/SKILL.md` | ECC legacy | `reference-only` | `ECC` | 历史导入 | worker1 | 后续可清理 |
 | `verification-loop` | `skills/verification-loop/SKILL.md` | ECC legacy | `reference-only` | `ECC` | 历史导入 | worker1 | 仅作参考 |
 | `continuous-learning-v2` | `skills/continuous-learning-v2/SKILL.md` | ECC legacy | `reference-only` | `ECC` | 历史导入 | worker1 | 与 wiki 线重叠，后续可清理 |
-| `darwin-skill` | `skills/darwin-skill/skill.md` | Meta | `active` | `skill_manager` | 原样迁移后本地使用 | lead | 低频跟踪上游优化方法 |
+| `darwin-skill` | `skills/darwin-skill/skill.md` | Meta | `active` | local self-built | 本地自建，不依赖外部上游 | lead | 不再同步外部源 |
 
 ---
 
@@ -88,10 +88,9 @@
 | `ljg-skills` | Flow 1 | `ljg-paper`, `ljg-paper-river`, `ljg-qa` 方法论变化 | 论文阅读主线有质量问题，或 upstream 有显著更新 | 是否同步到 `pyrojewel-paper*` |
 | `beamer-academic` | Flow 1 / 11 | LaTeX 模板、编译脚本、字体/布局修复 | 需要更稳的编译链，或 upstream 新增关键版式 | 是否吸收到 `pyrojewel-beamer-academic` |
 | `guizang-ppt-skill` | Flow 11 | 版式、结构密度、视觉层级规则 | PPT 版式需要增强 | 是否只吸收规则，不吸收动态渲染 |
-| `skill_manager` | Flow 1 / 9 / Meta | `zotero-pdf-parse`, `darwin-skill`, wiki 相关工具 | Flow 1 入口不稳，或 skill_manager 有实用更新 | 是否迁入/更新本地 skill |
-| `llm_wiki` | Flow 10 | wiki-capture/compile/crystallize/lint/query/research, inbox-prepare | wiki 线需要增强，或上游 pipeline 逻辑有更新 | 是否同步到本地 wiki skill |
+| `skill_manager` | Flow 1 / 9 / Meta | `zotero-pdf-parse` | Flow 1 入口不稳，或 skill_manager 有实用更新 | 是否迁入/更新本地 skill |
 | `Auto-claude-code-research-in-sleep` | Flow 2 / 4 / 5 | `idea-*`, `research-*`, `experiment-*`, `paper-*` | idea/experiment 主线要推进，或上游有方法改动 | 是否批量套模板适配 |
-| `academic-skills` | Flow 2 / 4 / 6 / 7 | 轻量零依赖学术 skill | 需要低成本补充 flow | 是否直接迁入 |
+| ~~`academic-skills`~~（已核实不存在） | Flow 2 / 4 / 6 / 7 | ~~轻量零依赖学术 skill~~ | ~~需要低成本补充 flow~~ | 2026-08-11 核实：磁盘无 `academic-skills` 仓库，`academic-research-skills` 亦无相关 skill，条目移除 |
 | `nature-skills` | Flow 5 / 11 | `nature-polishing`, `paper2ppt`, `figure` 等增强工具 | 写作或汇报线要增强 | 是否作为增强 skill 接入 |
 | `ECC` | Flow 3 | hooks, agents, rules | 框架稳定化或上游 runtime 经验更新 | 是否吸收 hook/rule 改进 |
 | `virtuoso-bridge-lite` | RF/EDA | `virtuoso` skill, bridge API, examples, references | upstream 发新 release 或新增 API | 是否同步到 `skills/virtuoso/` |
@@ -127,3 +126,39 @@
 5. 后续清理 ECC legacy skills，决定哪些继续保留、哪些仅保留文档引用
 6. 下一批：迁 `paper-plan` / `paper-write` / `paper-figure` 等论文写作链 skills
 7. ~~`virtuoso` skill 迁入 `skills/virtuoso/`~~ ✅ 已完成（2026-07-13 从 virtuoso-bridge-lite upstream 同步，含 profile 配置 + references）
+
+---
+
+## 6. Sync Log
+
+### 2026-08-11 — 四仓库批量同步
+
+**上游仓库更新：**
+
+| 仓库 | 同步方式 | 结果 | 新 commit |
+|------|---------|------|----------|
+| `Auto-claude-code-research-in-sleep` | HTTPS fetch + ff-only merge → `bab594e` | ✅ | 54 |
+| `ljg-skills` | `git fetch upstream` → 无新 commit | ✅ 已最新 | 0 |
+| `beamer-academic` | HTTPS fetch + pull → 无新 commit | ✅ 已最新 | 0 |
+| `virtuoso-bridge-lite` | `git fetch upstream` + merge（解决 2 个冲突）→ `5d52326` | ✅ | 15 |
+
+**已同步到当前项目的 skill：**
+
+| Skill | 变更类型 | 操作方式 |
+|-------|---------|---------|
+| `experiment-queue` (SKILL.md + queue_manager.py) | Scheduler bug fix | 直接覆盖脚本 + 适配路径 |
+| `research-lit` | 静默跳过修复 | 选择合并（保留本地 IEEE 功能） |
+| `virtuoso` (SKILL.md + 11 references) | API 统一为 `client.*` | 覆盖 + 回插本地 Profile/Deep Dives 段落 |
+| `experiment-audit` | 身份验证增强 | 覆盖 + 保留 trigger/REVIEWER_MODEL |
+| `idea-creator` | 身份验证 + bundle 模式 | 覆盖 + 保留 trigger/REVIEWER_MODEL |
+| `research-review` | 身份验证 + brief 模式 | 覆盖 + 保留 trigger/REVIEWER_MODEL |
+| `idea-discovery` | Evidence gate | 覆盖 + 保留 trigger/REVIEWER_MODEL |
+| `auto-review-loop` | Copilot native 支持 | 覆盖 + 保留 trigger/REVIEWER_MODEL |
+| `shared-references/` × 4 | helper 第4层 + 身份追踪 | 覆盖 + 路径回退 |
+| `pyrojewel-paper` | 上游方法论合并 | 合并 3.5/3.6/5.5/5.6 节 |
+
+**统一适配规则：** `../shared-references/` → `shared-references/` 路径回退；`REVIEWER_MODEL` 保留本地 `o3`；保留本地中文 trigger；保留本地独有段落。
+
+**未同步：** `pyrojewel-paper-qa`（已最新）、`pyrojewel-beamer-academic`（上游无新 commit）。
+
+**详细报告：** `references/upstream-sync-2026-08-11.md` + `references/skill-sync-plan-2026-08-11.md`

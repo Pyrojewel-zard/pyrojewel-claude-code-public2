@@ -171,7 +171,13 @@ Before searching online, check if the user already has relevant papers locally:
 
 5. **Build local knowledge base**: Compile summaries into a "papers you already have" section. This becomes the starting point — external search fills the gaps.
 
-> 📚 If no local papers are found, skip to Step 1. If the user has a comprehensive local collection, the external search can be more targeted (focus on what's missing).
+> 📚 If the user has a comprehensive local collection, the external search can be more targeted (focus on what's missing).
+>
+> ⚠️ **If all three PAPER_LIBRARY paths miss, say so before moving on** — do not skip silently. A user whose PDFs live in a reference manager (Zotero, Mendeley, ...) otherwise assumes `— sources: all` covered them. Emit:
+>
+> `WARN: local contributed nothing — no PDFs found in papers/, literature/, or a configured paper library. To include yours, add a "## Paper Library" heading to CLAUDE.md followed by the directory path.`
+>
+> Then continue to Step 1.
 
 ### Step 1: Search (external)
 - Use WebSearch to find recent papers on the topic
@@ -208,6 +214,9 @@ on failure, never abort the whole aggregate):
 cd "$(git rev-parse --show-toplevel 2>/dev/null || pwd)" || exit 1
 if [ -z "${ARIS_REPO:-}" ] && [ -f .aris/installed-skills.txt ]; then
     ARIS_REPO=$(awk -F'\t' '$1=="repo_root"{print $2; exit}' .aris/installed-skills.txt 2>/dev/null) || true
+fi
+if [ -z "${ARIS_REPO:-}" ] && [ -f "$HOME/.aris/repo" ]; then
+    ARIS_REPO=$(cat "$HOME/.aris/repo" 2>/dev/null) || true
 fi
 ARXIV_FETCHER=".aris/tools/arxiv_fetch.py"
 [ -f "$ARXIV_FETCHER" ] || ARXIV_FETCHER="tools/arxiv_fetch.py"
@@ -250,6 +259,9 @@ cd "$(git rev-parse --show-toplevel 2>/dev/null || pwd)" || exit 1
 if [ -z "${ARIS_REPO:-}" ] && [ -f .aris/installed-skills.txt ]; then
     ARIS_REPO=$(awk -F'\t' '$1=="repo_root"{print $2; exit}' .aris/installed-skills.txt 2>/dev/null) || true
 fi
+if [ -z "${ARIS_REPO:-}" ] && [ -f "$HOME/.aris/repo" ]; then
+    ARIS_REPO=$(cat "$HOME/.aris/repo" 2>/dev/null) || true
+fi
 # Resolve $S2_FETCHER (Policy D2 — warn-and-skip on missing).
 S2_FETCHER=".aris/tools/semantic_scholar_fetch.py"
 [ -f "$S2_FETCHER" ] || S2_FETCHER="tools/semantic_scholar_fetch.py"
@@ -287,6 +299,9 @@ When the user explicitly requests `— sources: deepxiv` (or includes `deepxiv` 
 cd "$(git rev-parse --show-toplevel 2>/dev/null || pwd)" || exit 1
 if [ -z "${ARIS_REPO:-}" ] && [ -f .aris/installed-skills.txt ]; then
     ARIS_REPO=$(awk -F'\t' '$1=="repo_root"{print $2; exit}' .aris/installed-skills.txt 2>/dev/null) || true
+fi
+if [ -z "${ARIS_REPO:-}" ] && [ -f "$HOME/.aris/repo" ]; then
+    ARIS_REPO=$(cat "$HOME/.aris/repo" 2>/dev/null) || true
 fi
 # Resolve $DEEPXIV_FETCHER (Policy D2 — warn-and-skip on missing).
 DEEPXIV_FETCHER=".aris/tools/deepxiv_fetch.py"
@@ -330,6 +345,9 @@ When the user explicitly requests `— sources: exa` (or includes `exa` in a com
 cd "$(git rev-parse --show-toplevel 2>/dev/null || pwd)" || exit 1
 if [ -z "${ARIS_REPO:-}" ] && [ -f .aris/installed-skills.txt ]; then
     ARIS_REPO=$(awk -F'\t' '$1=="repo_root"{print $2; exit}' .aris/installed-skills.txt 2>/dev/null) || true
+fi
+if [ -z "${ARIS_REPO:-}" ] && [ -f "$HOME/.aris/repo" ]; then
+    ARIS_REPO=$(cat "$HOME/.aris/repo" 2>/dev/null) || true
 fi
 # Resolve $EXA_FETCHER (Policy D2 — warn-and-skip on missing).
 EXA_FETCHER=".aris/tools/exa_search.py"
@@ -419,6 +437,9 @@ cd "$(git rev-parse --show-toplevel 2>/dev/null || pwd)" || exit 1
 if [ -z "${ARIS_REPO:-}" ] && [ -f .aris/installed-skills.txt ]; then
     ARIS_REPO=$(awk -F'\t' '$1=="repo_root"{print $2; exit}' .aris/installed-skills.txt 2>/dev/null) || true
 fi
+if [ -z "${ARIS_REPO:-}" ] && [ -f "$HOME/.aris/repo" ]; then
+    ARIS_REPO=$(cat "$HOME/.aris/repo" 2>/dev/null) || true
+fi
 # Resolve $OPENALEX_FETCHER (Policy D2 — warn-and-skip on missing).
 OPENALEX_FETCHER=".aris/tools/openalex_fetch.py"
 [ -f "$OPENALEX_FETCHER" ] || OPENALEX_FETCHER="tools/openalex_fetch.py"
@@ -500,6 +521,9 @@ cd "$(git rev-parse --show-toplevel 2>/dev/null || pwd)" || exit 1
 if [ -z "${ARIS_REPO:-}" ] && [ -f .aris/installed-skills.txt ]; then
     ARIS_REPO=$(awk -F'\t' '$1=="repo_root"{print $2; exit}' .aris/installed-skills.txt 2>/dev/null) || true
 fi
+if [ -z "${ARIS_REPO:-}" ] && [ -f "$HOME/.aris/repo" ]; then
+    ARIS_REPO=$(cat "$HOME/.aris/repo" 2>/dev/null) || true
+fi
 ARXIV_FETCHER=".aris/tools/arxiv_fetch.py"
 [ -f "$ARXIV_FETCHER" ] || ARXIV_FETCHER="tools/arxiv_fetch.py"
 [ -f "$ARXIV_FETCHER" ] || { [ -n "${ARIS_REPO:-}" ] && ARXIV_FETCHER="$ARIS_REPO/tools/arxiv_fetch.py"; }
@@ -530,6 +554,9 @@ rather than silently dropping candidates.
 cd "$(git rev-parse --show-toplevel 2>/dev/null || pwd)" || exit 1
 if [ -z "${ARIS_REPO:-}" ] && [ -f .aris/installed-skills.txt ]; then
     ARIS_REPO=$(awk -F'\t' '$1=="repo_root"{print $2; exit}' .aris/installed-skills.txt 2>/dev/null) || true
+fi
+if [ -z "${ARIS_REPO:-}" ] && [ -f "$HOME/.aris/repo" ]; then
+    ARIS_REPO=$(cat "$HOME/.aris/repo" 2>/dev/null) || true
 fi
 VERIFY_PAPERS=".aris/tools/verify_papers.py"
 [ -f "$VERIFY_PAPERS" ] || VERIFY_PAPERS="tools/verify_papers.py"
