@@ -181,3 +181,26 @@
 **push 状态：** 无需 commit/push（pyrojewel_claude_code 无变更）。
 
 **备注：** 本次会话 VM 无 SSH key（`~/.ssh/` 不存在），origin SSH pull 不可用。`Auto-claude-code-research-in-sleep` 和 `beamer-academic` 通过临时切换 origin 为 HTTPS 完成拉取后恢复 SSH remote。`ljg-skills` 和 `virtuoso` 的 upstream 为 HTTPS，fetch 正常。挂载盘 git merge 受 `unlink` 权限限制，通过 `git show` + `cp` + `git update-ref` workaround 完成 HEAD 更新。
+
+### 2026-08-12 — 手动试运行（含邮件链路验证）
+
+**上游仓库更新：**
+
+| 仓库 | 同步方式 | 结果 | 新 commit |
+|------|---------|------|----------|
+| `Auto-claude-code-research-in-sleep` | SSH fetch（直连上游） | ✅ 已最新 | 0 |
+| `ljg-skills` | HTTPS fetch upstream（绕代理）+ merge → `3777618` | ✅ | 3（v1.17.85/v1.17.86） |
+| `beamer-academic` | SSH fetch（直连上游） | ✅ 已最新 | 0 |
+| `virtuoso-bridge-lite` | HTTPS fetch upstream（绕代理） | ✅ 已最新 | 0 |
+
+**ljg-skills merge 处理：** 8 个文件冲突（ljg-book×3、ljg-paper×2、ljg-push×2、ljg-writes×1），全部为「本地 markdown migration」vs「上游 Org 版方法论更新」冲突。按规则保留本地 markdown 版本（`git checkout --ours`）。上游新增 `ljg-classic` skill（项目未采用，不接入）。fork 已 push（`dd4bd54..3777618`）。
+
+**同步到当前项目的 skill：** 无直接覆盖。
+
+**待评估（重要）：** `ljg-paper` 上游做了完整方法论重构（v1.17.85/86）——从「承重概念 + 四段结构」改为「x/R/f/E 回流链 + 单例驱动」，目标受众为 non-academics。本地 `pyrojewel-paper` 是面向研究者的高度本地化版本（Zotero/paper_overview 集成），按「本地输出协议优先」原则**未自动同步**，需人工评估是否吸收部分方法论。上游新版文件已备份（`git show upstream/master:skills/ljg-paper/{SKILL.md,ReadingGuide.md}` 可从 fork 随时取回）。
+
+**push 状态：** pyrojewel_claude_code 本任务无变更（仅本次日志）。
+
+**邮件链路：** SMTP 配置验证通过，测试邮件已发送到 2895687337@qq.com。定时任务 `daily-upstream-sync` 已更新为同步完成后自动发邮件汇报。
+
+**备注：** 本 VM 环境变量带 `https_proxy=http://172.16.10.254:7897`（当前不可达），HTTPS 访问 GitHub 需绕代理（`env -u https_proxy ... git fetch`）。SSH（443 端口 via `~/.ssh/config`）可用。
