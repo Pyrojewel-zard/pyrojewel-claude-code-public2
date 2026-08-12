@@ -204,3 +204,25 @@
 **邮件链路：** SMTP 配置验证通过，测试邮件已发送到 2895687337@qq.com。定时任务 `daily-upstream-sync` 已更新为同步完成后自动发邮件汇报。
 
 **备注：** 本 VM 环境变量带 `https_proxy=http://172.16.10.254:7897`（当前不可达），HTTPS 访问 GitHub 需绕代理（`env -u https_proxy ... git fetch`）。SSH（443 端口 via `~/.ssh/config`）可用。
+
+### 2026-08-12 — ljg-paper 对齐 v1.17.86（fork 内完成）
+
+**背景：** ljg-paper 上游 v1.17.85/86 做了方法论级重构（承重概念+四段结构 → x/R/f/E 回流链+内容驱动标题）。上一轮 merge 只把 ReadingGuide.md 自动合入新版，SKILL.md/template.md 因冲突仍为旧版，头身错位。
+
+**本次操作（fork `Pyrojewel-zard/ljg-skills` @ `3210fa9`）：**
+
+| 文件 | 处理 |
+|------|------|
+| `skills/ljg-paper/SKILL.md` | 对齐 v1.17.86 全量，markdown 适配（org→md），新增「阅读纪律：概念必须真正形成（精细阅读基线）」节 |
+| `skills/ljg-paper/ReadingGuide.md` | v1.17.86 全量 + 插入「阅读纪律」节（概念缺口账本/依赖顺序补概念/最小模型三查/证据纪律） |
+| `skills/ljg-paper/references/template.md` | 对齐新版内容驱动标题模板 + 保留精细阅读写作备忘 |
+
+**精细阅读基线（来自 pyrojewel-paper 要求，融合进新框架）：**
+- 概念缺口账本：承重概念必须通过区分/关系/案例三重检验，「假熟悉」仍算缺口
+- 按依赖顺序补概念，不按出现顺序罗列
+- 最小解释模型三查：解释原锚点 / 区分邻近情况 / 预测条件变化
+- 证据纪律：区分「论文直接测到的/作者解释的/讲解者推演的」，用词匹配证据强度
+
+**pyrojewel-claude_code 项目侧：** `pyrojewel-paper`（研究者向，Zotero/paper_overview 集成）本次不同步——其阅读协议已含概念缺口账本/三重检验/最小模型三查，是精细阅读基线的来源；新框架的叙事引擎与研究者向定位不符。fork 对齐版作为方法论参考保留，后续如需可选择性吸收证据纪律表述。
+
+**push 状态：** ljg-skills fork 已 push（`3777618..3210fa9`）；pyrojewel-claude_code 本次仅此日志。
