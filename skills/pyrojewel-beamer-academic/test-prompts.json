@@ -2,7 +2,7 @@
   {
     "id": 1,
     "prompt": "帮我做论文调研PPT，论文是 attachmentKey=ABC123 的这篇 CFD-PE 频响极点展开的论文",
-    "expected": "两阶段流程：先生成完整内容MD（含200-300字论证段落、公式、图片标注），用户确认后再生成beamer。MD文件名带'论文调研'type标签和日期前缀。beamer子目录包含.sty/图片资产/bupt-logo-white.png，用xelatex编译。无封面，直接进入内容页。编译后逐页复核排版，检查Overfull/图片溢出/文字截断等问题并自动修复。"
+    "expected": "两阶段流程：先生成完整内容MD（普通页180-240字论证段落；表格、公式、多图页按可读信息量核算；含公式、图片标注、页级证据契约和同目录page_manifest.tsv），用户确认后再生成beamer。MD文件名带'论文调研'type标签和日期前缀。beamer子目录包含.sty/图片资产/bupt-logo-white.png，用xelatex编译。无封面，直接进入内容页。编译后逐页复核排版，生成qa.md并运行pdfinfo/pdftotext/pdftoppm，检查未解释的Overfull/图片溢出/文字截断等问题并自动修复。"
   },
   {
     "id": 2,
@@ -12,6 +12,6 @@
   {
     "id": 3,
     "prompt": "PPT编译完了，帮我检查一下排版有没有问题",
-    "expected": "逐页复核：打开PDF检查每页——Overfull vbox（内容溢出页面底部）、图片是否超出边界、文字是否被截断、公式是否完整显示。发现问题后自动修复：拆分过长内容到多页、调整图片高度参数、缩小过长公式字体。修复后重新编译并再次检查，直到0问题。"
+    "expected": "逐页复核：打开PDF检查每页——Overfull vbox（内容溢出页面底部）、图片是否超出边界、文字是否被截断、公式是否完整显示；同时运行pdfinfo/pdftotext/pdftoppm并生成qa.md。发现问题后按结构拆分、调整图片高度、缩短标题或公式；不得优先靠缩小字号解决。修复后重新编译并再次检查，直到无未解释问题（主题宏<1pt例外须在QA中定位记录）。"
   }
 ]

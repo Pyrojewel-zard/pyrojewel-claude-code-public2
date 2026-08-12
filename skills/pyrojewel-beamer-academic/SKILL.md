@@ -1,9 +1,9 @@
 ---
 name: pyrojewel-beamer-academic
-version: 4.3
+version: 4.4
 description: >
-  学术 Beamer 幻灯片生成器。默认排版：高信息密度、圆角卡片 + 纯蓝标题条，深藏蓝+金色双色调。
-  v4.3 增加页级信息预算、多图优先和密度回归检查；v4.2 的多样性排版命令继续兼容。
+  学术 Beamer 幻灯片生成器。默认排版：高信息密度、证据可追溯、圆角卡片 + 纯蓝标题条，深藏蓝+金色双色调。
+  v4.4 增加内容证据契约、理论边界检查、PDF 视觉 QA 和综述专用页面模板；v4.3 的密度规则继续兼容。
   支持 output_path 参数指定输出目录；未指定时默认输出到 Obsidian 周会文件夹（$OBSIDIAN_VAULT_ROOT/weekly/{YYYY}_W{WW}/）。
 trigger:
   - "答辩PPT"
@@ -17,9 +17,11 @@ trigger:
   - "学术报告"
 ---
 
-# pyrojewel-beamer-academic v4.3
+# pyrojewel-beamer-academic v4.4
 
-基于 `beamerthemeAcademic.sty`（v3.2）的学术幻灯片生成技能。适用场景：博士/硕士答辩、组会报告、学术会议。默认排版：高信息密度、圆角卡片 + 纯蓝标题条。
+基于 `beamerthemeAcademic.sty`（v3.2）的学术幻灯片生成技能。适用场景：博士/硕士答辩、组会报告、学术会议。默认排版：高信息密度、证据可追溯、圆角卡片 + 纯蓝标题条。
+
+**v4.4 证据与 QA 规则**：每页必须能回答“结论是什么、证据来自哪里、证据支持到哪一步”。综述页还要区分原文报告、跨文献归纳、项目结果和未知信息；理论补强不得把汇报者推断写成论文定理。阶段二编译后必须同时通过内容、理论、视觉三类终检。
 
 **v4.3 高密度排版**：每页默认组织为“论点 + 证据 + 解释”，普通文字页目标 180--240 字；同一页优先承载两张或三张互相关联的图，单图页只用于完整流程、总框架或关键结果。每份综述/组会报告至少 6 页双图/多图，其中至少 2 页为三图或“1 大图 + 2 细节图”。
 
@@ -94,6 +96,25 @@ trigger:
 
 9. **🔴 CHECKPOINT**：展示完整 MD 内容给用户确认，未确认不进入阶段二
 
+### 阶段一内容与证据契约
+
+在写入 MD 前，为每页建立一条 page record。每份阶段一 MD 必须在同目录生成唯一的机器可读文件 `page_manifest.tsv`；阶段二将它复制到对应的 beamer 子目录。字段不能省略：
+
+```text
+page_id | takeaway | evidence | source_id/location | interpretation | boundary | evidence_status
+```
+
+- `takeaway`：一句可在 15 秒内复述的结论；一页只保留一个主结论。
+- `evidence`：图、表、公式、数字或论文案例，最多 3 组，必须能在页面上定位。
+- `source_id/location`：论文 itemKey + attachmentKey（若有）、DOI 或文件名，以及 section/page/table/figure；没有定位就不能写成已证实事实。
+- `interpretation`：说明证据为什么支持 takeaway，避免图片与文字各说各话。
+- `boundary`：写明不支持什么、未报告什么、验证层级到哪里。
+- `evidence_status`：只能使用 `reported`（原文明确报告）、`synthesized`（跨文献归纳）、`project_result`（本项目结果）或 `unknown`（未知/未报告）。
+
+理论或公式页额外记录 `assumptions`、`symbols/units`、`validity_scope` 和 `derivation_status`。`derivation_status` 只能是 `source_equation`、`cross_paper_synthesis`、`author_explanation` 或 `not_available`。
+
+**🔴 STOP · 证据不足**：如果数字、公式、比较结论或图片含义无法绑定来源，删掉该 claim 或明确标成“未报告/待验证”；不得用常识、标题、摘要或模型名称补写论文没有给出的结果。
+
 ### 阶段二：Beamer 生成与编译
 
 10. **创建 beamer 子目录**：
@@ -119,7 +140,7 @@ trigger:
 
 13. **编译输出** → `{beamer_dir}/{文件名}.pdf`（`xelatex` 两次）
 
-14. **CHECKPOINT**：编译后检查 `.log` 无 Error/Overfull，有问题先修；同时执行 §3.4 页面类型和 §3.5 信息密度检查，不达标回到第 12 步重写对应 frame
+14. **CHECKPOINT**：编译后执行 §3.6 的内容、理论、视觉三类 QA；再检查 `.log` 无未解释的 Error/Overfull（仅允许 QA 中记录的主题宏 <1pt 微溢出），同时执行 §3.4 页面类型和 §3.5 信息密度检查。不达标回到第 12 步重写对应 frame。
 
 ### 输出目录结构
 
@@ -215,12 +236,60 @@ P9  类型 I 警示/结论   — \callout{warn} 局限 + \callout{tip} 未来
 
 - 普通文字页：正文目标 180--240 字；必须有明确结论条或 `keybox/summarybar/callout`。
 - 双图/多图页：图片数至少 2；每张图有图注；页内有一段跨图解释或总结。
-- 三图页：至少 2 页；优先使用 `gridfourcap` 的三格变体或 `gridonextwo`。
+- 三图页：至少 2 页；优先使用 `gridthreecap` 或 `gridonextwo`。
 - 综述/组会整份 PPT：至少 6 页双图或多图；连续单图页最多 1 页。
 - 表格页：表格必须有表头、至少两行数据或明确的定量对照，并配一段结论。
 - 任何页面不得以把正文压到 7.2pt 以下来通过密度检查；若出现 `Overfull \\vbox`、图注不可辨认或图文重叠，判定失败。
 
 将检查结果附在阶段二产物旁或进度日志中，作为下一轮生成的回归依据。
+
+### 3.6 内容、理论与视觉三类终检（硬门）
+
+三类终检都必须有 `PASS` 或 `FAIL`，不能用“基本可用”代替。必须产出 `{filename}-qa.md`，至少包含逐页表和失败修复记录。
+
+**A. 内容提炼 QA**
+
+逐页核对 `takeaway/evidence/source_id/location/interpretation/boundary`：
+
+- 结论能否在 15 秒内复述；页面是否只保留一个主结论；
+- 每个数字、比较、公式和论文案例是否有来源定位；
+- 图注是否同时写“图中事实”和“本页作用”；表格是否有比较字段而非数字堆叠；
+- 综述页是否明确区分 `reported`、`synthesized`、`project_result`、`unknown`；
+- 内容不满足时：删掉无来源句子、降级为边界说明，或拆分页面；禁止用空泛段落补字数。
+
+**B. 理论分析 QA**
+
+- 每个公式都定义符号、单位、输入/输出和适用范围；
+- 每个理论判断都标注来源方程、跨文献归纳或作者解释；
+- 不把综述的分类、工程经验或单个实验结果写成定理、证明或普适规律；
+- 原文理论很少时，使用“物理关系/约束链/因果映射”替代虚构定理，并在页脚标注证据级别；
+- 公式无法核对、假设缺失或推断超出证据时：保留原文事实，移除推导性强的措辞，并标 `not_available`。
+
+**C. PDF 视觉 QA**
+
+编译后必须用 `pdfinfo`、`pdftotext -layout` 和 `pdftoppm -png` 检查 PDF，而不是只看 xelatex 返回码：
+
+1. `pdfinfo`：页数、16:9 页面尺寸、输出文件存在；
+2. `.log`：无 `LaTeX Error`、`Missing character`、`Overfull \\vbox`；`Overfull \\hbox` 也必须归零，或在 QA 中记录小于 1pt 的已解释例外；
+3. `pdftoppm -png -r 120`：生成逐页缩略图/联系页，检查裁切、重叠、图注不可读、标题超过两行和底部空白失衡；
+4. 可读性下限：正文不低于 8pt，表格不低于 7.6pt，图注不低于 7pt；不得通过缩小字号解决溢出；
+5. 发现失败时：先调整页面结构（拆分、改双图/图表组合、缩短标题），再调整图片高度，最后才微调字号；重新编译两遍并重复三类 QA。
+
+**🔴 STOP · 视觉失败**：任何裁切、重叠、缺字、不可读图注或未解释的溢出都阻止交付 PDF。
+
+### 3.7 预设页面模板（优先套用）
+
+这些模板不是新的主题宏，而是内容组织契约；可用现有 `columns`、`gridtwocap`、`gridthreecap`、`cardtable`、`keybox` 和 `summarybar` 实现。
+
+| 模板 | 页面结构 | 适用场景 | 必须出现 |
+|---|---|---|---|
+| `claim2evidence` | 结论 + 2 张证据图/表 + 边界 | 综述主判断、研究动机 | takeaway、两条 source/location、boundary |
+| `theory_guarded` | 物理关系/公式 + 假设 + 适用范围 | 理论薄弱的综述页 | assumptions、symbols/units、derivation_status |
+| `paper_case_matrix` | 工作/对象/指标/验证层级/未覆盖边界 | 芯片案例和论文对标 | 至少两行定量或层级对照 |
+| `representation_tradeoff` | 参数/像素/图/物理响应四栏或分两页 | 表示空间比较 | 自由度、样本效率、制造约束、输出一致性 |
+| `visual_audit` | 问题截图/缩略图 + 修复动作 + 回归结果 | 已有 PDF 迭代 | page_id、失败类型、修复后状态 |
+
+使用模板时，先给出页面序列和每页 `takeaway`，再写正文和 LaTeX；禁止先堆文字再强行塞进卡片。
 
 ---
 
@@ -569,7 +638,7 @@ xelatex {文件名}.tex
 | `.log` 出现 `Font not found` | `apt install fonts-arphic-uming fonts-droid-fallback` | 改用 `\setCJKmainfont{Noto Sans CJK SC}` |
 | `.log` 出现 `Package ctex Error` | 删除 `\usepackage{ctex}`，改用 `\usepackage{xeCJK}` + 手动设字体 | 检查 xelatex 是否在 PATH |
 | `.log` 出现 `Overfull \vbox` | 换 `\colimg`/`\safeimg` 降低图片高度 | 减少该页文字量 20% |
-| `.log` 出现 `Overfull \hbox`（<15pt，contentcard/pair/threecard） | 忽略，属 drop shadow 的固有微溢出，不影响渲染 | 若 >15pt 则缩短 banner 标题文字 |
+| `.log` 出现 `Overfull \hbox`（仅允许 <1pt 且已定位为主题宏产生的微溢出） | 记录来源并保留；正文、表格、图片布局的溢出必须修复 | 任意正文溢出，或主题宏溢出 ≥1pt：缩短文字、调整结构或更新样式 |
 | `.log` 出现 `File not found`（图片） | 检查 `\graphicspath` 和文件名大小写 | 用绝对路径 `\graphicspath{{/full/path/}}` |
 | `.log` 出现 `Undefined control sequence`（infobox/quoteline/stepline/callout/threecard/sectionbar/gridthreecap） | 检查 .sty 版本为 v3.2+，旧版无这些命令 | 重新从 `assets/beamerthemeAcademic.sty` 复制 |
 | `.log` 出现 `Missing \endcsname`（callout） | 检查 `\callout` 第一参数是否为 `note`/`tip`/`warn` 之一 | 改用默认 `\callout{note}{...}` |
