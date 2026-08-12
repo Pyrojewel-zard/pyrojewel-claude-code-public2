@@ -1,9 +1,9 @@
 ---
 name: pyrojewel-beamer-academic
-version: 4.4
+version: 4.6
 description: >
   学术 Beamer 幻灯片生成器。默认排版：高信息密度、证据可追溯、圆角卡片 + 纯蓝标题条，深藏蓝+金色双色调。
-  v4.4 增加内容证据契约、理论边界检查、PDF 视觉 QA 和综述专用页面模板；v4.3 的密度规则继续兼容。
+  v4.6 统一阅读笔记覆盖矩阵和案例字段，并增加完整性验收；v4.5 的综述因果链页、证据契约、理论边界检查与 PDF 视觉 QA 继续兼容。
   支持 output_path 参数指定输出目录；未指定时默认输出到 Obsidian 周会文件夹（$OBSIDIAN_VAULT_ROOT/weekly/{YYYY}_W{WW}/）。
 trigger:
   - "答辩PPT"
@@ -17,11 +17,11 @@ trigger:
   - "学术报告"
 ---
 
-# pyrojewel-beamer-academic v4.4
+# pyrojewel-beamer-academic v4.6
 
 基于 `beamerthemeAcademic.sty`（v3.2）的学术幻灯片生成技能。适用场景：博士/硕士答辩、组会报告、学术会议。默认排版：高信息密度、证据可追溯、圆角卡片 + 纯蓝标题条。
 
-**v4.4 证据与 QA 规则**：每页必须能回答“结论是什么、证据来自哪里、证据支持到哪一步”。综述页还要区分原文报告、跨文献归纳、项目结果和未知信息；理论补强不得把汇报者推断写成论文定理。阶段二编译后必须同时通过内容、理论、视觉三类终检。
+**v4.5 阅读对齐规则**：综述或论文研读 PPT 还必须回答“笔记中的关键判断是否被覆盖、哪些是原文事实、哪些是阅读者归纳”。生成前先建立章节—页面—证据覆盖矩阵；阶段二不得只靠图片数量判定内容完整。每页必须能回答“结论是什么、证据来自哪里、证据支持到哪一步”。理论补强不得把汇报者推断写成论文定理。阶段二编译后必须同时通过内容、理论、视觉三类终检。
 
 **v4.3 高密度排版**：每页默认组织为“论点 + 证据 + 解释”，普通文字页目标 180--240 字；同一页优先承载两张或三张互相关联的图，单图页只用于完整流程、总框架或关键结果。每份综述/组会报告至少 6 页双图/多图，其中至少 2 页为三图或“1 大图 + 2 细节图”。
 
@@ -114,6 +114,30 @@ page_id | takeaway | evidence | source_id/location | interpretation | boundary |
 理论或公式页额外记录 `assumptions`、`symbols/units`、`validity_scope` 和 `derivation_status`。`derivation_status` 只能是 `source_equation`、`cross_paper_synthesis`、`author_explanation` 或 `not_available`。
 
 **🔴 STOP · 证据不足**：如果数字、公式、比较结论或图片含义无法绑定来源，删掉该 claim 或明确标成“未报告/待验证”；不得用常识、标题、摘要或模型名称补写论文没有给出的结果。
+
+### 1.1 综述阅读笔记对齐契约
+
+当输入包含长篇阅读笔记、逐段精读或多篇论文汇总时，阶段一必须在同目录生成严格制表符分隔的 `coverage_matrix.tsv`，并在 MD 中给出对应的页序。每行格式为：
+
+```text
+note_section<TAB>page_id<TAB>claim_type<TAB>claim<TAB>evidence_location<TAB>omitted_boundary
+```
+
+- `note_section`：笔记中的章节或小节标题；不能只填“全文/摘要”。笔记中的每个二级/三级标题必须至少有一行；若明确判断与本次汇报无关，也必须用 `unknown` 行记录理由。
+- `page_id`：承载该判断的页面；一个关键章节可以映射到多页，但不能无页面映射。
+- `claim_type`：只能是 `reported`、`synthesized`、`project_result` 或 `unknown`，与 page record 的 `evidence_status` 完全同名；阅读者解释写入 `claim`，并在 `evidence_location` 中绑定笔记段落或推理依据。
+- `claim` 与 `evidence_location`：分别写页面结论和原文/笔记中的 section、figure、table 或案例位置。
+- `omitted_boundary`：若因页数删除数据、负面结果、人工环节或验证限制，必须明确写出；禁止静默压缩。
+
+覆盖验收必须同时满足：`coverage_matrix.tsv` 的 `note_section` 去重集合覆盖笔记全部二级/三级标题；每个 `page_id` 在阶段一 MD 中存在；每个 claim 都有 `evidence_location`，或在 `omitted_boundary` 中明确填写“不适用/未知及理由”。不满足任一条件即 `FAIL`，不得用“已覆盖重点”替代缺失清单。
+
+综述型报告的页面序列至少覆盖以下三类页面：
+
+1. `causal_chain`：把表示方式、数据预算、候选搜索和物理验证连成一条因果链，而不是四页并列分类；
+2. `case_boundary`：用“工作/对象/自动化到哪一步/证据层级/未覆盖项”对照芯片案例；
+3. `synthesis_boundary`：明确综述能支持的判断、不能支持的判断和仍未解决的问题。
+
+**🔴 STOP · 阅读失真**：如果覆盖矩阵显示某个关键小节只有图片没有 claim，或页面把 `reported` 改写成未经依据标注的 `project_result`，必须回到阶段一重写；不得用新增装饰图或空泛总结掩盖信息损失。
 
 ### 阶段二：Beamer 生成与编译
 
@@ -285,7 +309,7 @@ P9  类型 I 警示/结论   — \callout{warn} 局限 + \callout{tip} 未来
 |---|---|---|---|
 | `claim2evidence` | 结论 + 2 张证据图/表 + 边界 | 综述主判断、研究动机 | takeaway、两条 source/location、boundary |
 | `theory_guarded` | 物理关系/公式 + 假设 + 适用范围 | 理论薄弱的综述页 | assumptions、symbols/units、derivation_status |
-| `paper_case_matrix` | 工作/对象/指标/验证层级/未覆盖边界 | 芯片案例和论文对标 | 至少两行定量或层级对照 |
+| `paper_case_matrix` | 工作/对象/自动化边界/证据层级/未覆盖项 | 芯片案例和论文对标 | 至少两行定量或层级对照 |
 | `representation_tradeoff` | 参数/像素/图/物理响应四栏或分两页 | 表示空间比较 | 自由度、样本效率、制造约束、输出一致性 |
 | `visual_audit` | 问题截图/缩略图 + 修复动作 + 回归结果 | 已有 PDF 迭代 | page_id、失败类型、修复后状态 |
 

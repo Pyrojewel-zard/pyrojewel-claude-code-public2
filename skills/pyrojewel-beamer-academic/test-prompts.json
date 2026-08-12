@@ -13,5 +13,10 @@
     "id": 3,
     "prompt": "PPT编译完了，帮我检查一下排版有没有问题",
     "expected": "逐页复核：打开PDF检查每页——Overfull vbox（内容溢出页面底部）、图片是否超出边界、文字是否被截断、公式是否完整显示；同时运行pdfinfo/pdftotext/pdftoppm并生成qa.md。发现问题后按结构拆分、调整图片高度、缩短标题或公式；不得优先靠缩小字号解决。修复后重新编译并再次检查，直到无未解释问题（主题宏<1pt例外须在QA中定位记录）。"
+  },
+  {
+    "id": 4,
+    "prompt": "根据一篇有长篇精读笔记的综述制作组会PPT，要求内容忠于原文，不要只堆图片",
+    "expected": "先生成严格制表符分隔的coverage_matrix.tsv，覆盖笔记全部二级/三级标题，并逐条映射章节到页面、claim类型和证据位置；页面序列至少包含causal_chain、case_boundary、synthesis_boundary。案例页固定写工作/对象/自动化边界/证据层级/未覆盖项；claim_type与page record统一使用reported/synthesized/project_result/unknown。"
   }
 ]
