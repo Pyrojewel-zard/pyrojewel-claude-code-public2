@@ -37,6 +37,11 @@ def validate_note(note: dict[str, Any]) -> list[str]:
         errors.append(f"slide {slide}: Chinese script has too little Chinese text ({cjk})")
     if latin > max(80, cjk * 0.7):
         errors.append(f"slide {slide}: Chinese script is dominated by Latin text (cjk={cjk}, latin={latin})")
+    if len(en) >= 300 and len(zh) < max(80, len(en) * 0.18):
+        errors.append(
+            f"slide {slide}: Chinese script is too compressed for the English scope "
+            f"(zh={len(zh)}, en={len(en)})"
+        )
     for marker in FORBIDDEN_ZH:
         if marker in zh:
             errors.append(f"slide {slide}: evidence-template text leaked into Chinese script: {marker}")

@@ -105,6 +105,7 @@ page image + mask/crop metadata
 - `scriptZh` 必须是中文讲演文本，不得包含“与该页时间窗严格对齐的讲者说明包括”“完整代表帧中的关键信息为”等证据模板。
 - 不得把 `englishProcessed`、Whisper 原文、OCR 行或英文摘要复制到 `scriptZh`。英文术语、缩写、专有名词和公式可以保留，但中文句法必须承担主要叙述。
 - 中文稿与英文稿必须逐页同范围、同顺序、同事实密度。中文稿少于英文稿的核心事实时，标记 `translation-incomplete`，不得编译最终 PDF。
+- 对英文稿超过 300 字符的技术页，中文稿长度原则上不得低于英文稿的 18% 且不得少于 80 字符；低于该密度通常意味着只写了摘要，必须回到英文讲演录补齐事实、例子、数字和限定条件。主持/致谢/结束页可由 Codex 标注为短页并人工复核。
 - 页面只有主持、致谢或结束语时可以短，但仍须是自然中文句子，不能用英文原文代替。
 - `author_workshop_handout_from_evidence.py` 只能生成证据草稿，不能直接生成最终 `authored-notes.json`；最终 `scriptZh` 和 `englishProcessed` 必须由 Codex 重新阅读后写入。
 
@@ -206,6 +207,7 @@ handout/
 - 报告是否明确区分录音事实、PPT事实、初步解释和最终待推导内容。
 - `scriptZh` 是否主要由中文句法构成，并且不包含英文讲演稿的长段复制。
 - 中文讲演稿是否逐页覆盖英文讲演稿的同一事实、限定词、因果关系和例子；不能以“看起来像中文”替代语义核对。
+- 中文/英文长度和事实密度是否合理；长英文技术页对应的中文不能只有一句概括性总结。
 - `handout.md`、`handout.tex` 和 PDF 正文是否不存在 `Raw transcript evidence` 标题、逐段 ASR 或独立来源元数据块；原始证据是否仍在 sidecar 文件中可定位。
 
 本 skill 目录同时提供 `scripts/validate_lecture_translation.py` 和

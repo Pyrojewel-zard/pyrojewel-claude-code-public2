@@ -7,6 +7,7 @@ import argparse
 import importlib.util
 import json
 import re
+import subprocess
 from pathlib import Path
 
 
@@ -49,6 +50,16 @@ def audit_handout(root: Path) -> dict[str, object]:
                 body_errors.append(f"{relative}: forbidden marker {marker}")
     errors.extend(body_errors)
     pdf = root / "handout" / "handout.pdf"
+    pdf_errors: list[str] = []
+    if pdf.is_file():
+        pdf_text = subprocess.run(["pdftotext", str(pdf), "-"], capture_output=True, text=True).stdout
+        for marker in FORBIDDEN_BODY:
+            if marker in pdf_text:
+                pdf_errors.append(f"PDF: forbidden marker {marker}")
+        info = subprocess.run(["pdfinfo", str(pdf)], capture_output=True, text=True)
+        if info.returncode != 0:
+            pdf_errors.append("PDF: pdfinfo failed; file may be incomplete or corrupt")
+    errors.extend(pdf_errors)
     return {
         "talk": root.parent.name,
         "pages": len(notes),
@@ -56,6 +67,7 @@ def audit_handout(root: Path) -> dict[str, object]:
         "translationPass": not errors,
         "errors": errors,
         "pdfPresent": pdf.is_file(),
+        "pdfErrors": pdf_errors,
     }
 
 
