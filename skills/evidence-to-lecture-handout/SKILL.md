@@ -5,9 +5,9 @@ description: Use when Codex must turn timestamped lecture transcripts and slide 
 
 # Evidence to Lecture Handout
 
-将视频证据整理成“原课件图 + 课件要点 + 中文讲演录 + 英文讲演录 + 完整问答”的双语技术讲义，并编译为图片与文字对应的 A4 竖版 XeLaTeX PDF。最终交付物是可连续阅读、可直接朗读的讲演录，不是 Raw transcript evidence 的拼接。Codex 本身负责最终阅读、理解、翻译和撰写；脚本只负责抽取、索引、缓存证据和排版。
+将视频证据整理成“原课件图 + 课件要点 + 辅助理解/补充推导 + 中文讲演录 + 英文讲演录 + 完整问答”的双语技术讲义，并编译为图片与文字对应的 A4 竖版 XeLaTeX PDF。最终交付物是可连续阅读、可直接朗读的讲演录，不是 Raw transcript evidence 的拼接。Codex 本身负责最终阅读、理解、翻译、分析和撰写；脚本只负责抽取、索引、缓存证据和排版。
 
-**最终讲演录禁止把外部 LLM 输出当成原始讲稿：** `.env` 中的 `OPENAI_MODEL`、vision LLM、翻译 API 只能用于独立实验或候选分析，不能未经 Codex 核验直接写入最终讲演录、问答或技术结论。最终稿必须由 Codex 基于原始图片、OCR 和 Whisper 时间戳理解、改写和翻译。
+**最终讲演录禁止把外部 LLM 输出当成原始讲稿：** `.env` 中的 `OPENAI_MODEL`、vision LLM、翻译 API 只能用于独立实验或候选分析，不能未经 Codex 核验直接写入最终讲演录、问答或技术结论。英文讲演录必须由 Codex 基于原始图片、OCR 和 Whisper 时间戳整理；中文讲演录必须是该英文稿的忠实中文翻译和适度润色。Codex 的新增背景知识、解释、类比、假设和推导必须写入独立的 `analysisZh`/`derivations` 字段，不得混入 `scriptZh`。
 
 **REQUIRED SUB-SKILL:** Use `pyrojewel-beamer-academic` only for academic typography, asset handling, and compile validation. The final document is A4 portrait `ctexart`, not Beamer.
 
@@ -49,15 +49,17 @@ page image + mask/crop metadata
 → page claims and timestamped explanation
 ```
 
-### 双语讲演录
+### 双语讲演录与分析边界
 
 每页必须按以下顺序呈现：
 
-1. `中文讲演录`：Codex 根据同一时间窗的英文讲演录、PPT 图片和 OCR 写成可直接朗读的中文讲演。必须完整表达英文中的事实、限定词、因果关系、转折、例子和论证顺序，不能只翻译标题或压缩成摘要。
-2. `English lecture script`：Codex 根据同一时间窗的 Whisper 原文修复成完整、自然的英文讲演录，删除口头填充、重复和明显识别噪声，但不得新增原文没有的事实、公式或结论。不得使用 `…` 截断，也不得把原始 ASR 片段直接当成最终稿。
-3. 页首只保留一行 `时间窗：[... ]；来源：\`[slide:N]\``。不再生成独立的“时间窗与来源”“录音时间窗”“PPT 页码”“绑定 Whisper 片段”“OCR 行数”元数据块。
+1. `English lecture script`：Codex 根据同一时间窗的 Whisper 原文、PPT 图片和 OCR 修复成完整、自然的英文讲演录，删除口头填充、重复和明显识别噪声，但不得新增原文没有的事实、公式或结论。不得使用 `…` 截断，也不得把原始 ASR 片段直接当成最终稿。
+2. `中文讲演录`：只对本页的 `English lecture script` 做忠实翻译和适度润色。必须保留英文稿的全部事实、数字、限定词、因果关系、转折、例子、论证顺序和不确定性；不得因为看懂图片而自行在中文讲演录中添加英文稿没有的背景知识或推导。中文稿可以调整中文语序、消除口语重复、统一术语，但不能扩展论点、替讲者下结论或把课件要点改写成讲演录。
+3. `课件要点`：列出图片/OCR 可确认的页面内容。Codex 的额外背景解释必须进入独立的 `辅助理解与补充分析`，并明确标注为分析而非讲者原话。
+4. `补充推导`：仅在图片公式、英文讲演录或明确的工程假设足够时增加。每一步标注 `[FACT-SLIDE]`、`[FACT-TRANSCRIPT]`、`[ASSUMPTION]`、`[DERIVED]` 或 `[TO-VERIFY]`，并与中文讲演录分开。
+5. 页首只保留一行 `时间窗：[...]；来源：\`[slide:N]\``。不再生成独立的“时间窗与来源”“录音时间窗”“PPT 页码”“绑定 Whisper 片段”“OCR 行数”元数据块。
 
-英文讲演录不是摘要，也不是逐字稿；它应保留该时间窗的完整实质内容，并能回溯到原始 Whisper 片段。中文讲演录是英文讲演录的完整中文表达，不能只保留要点。中文和英文都必须引用同一个页面图片和时间窗。
+英文讲演录不是摘要，也不是逐字稿；它应保留该时间窗的完整实质内容，并能回溯到原始 Whisper 片段。中文讲演录是英文讲演录的完整中文表达，不能只保留要点，也不能引入英文稿没有的新事实。任何新增解释必须进入 `analysisZh` 或 `derivations`。中文和英文都必须引用同一个页面图片和时间窗。
 
 只把与页面区间相交的 transcript segments 放入该页；页面内发生内容变化时拆成子窗口，例如 `[10:20–11:10]` 与 `[11:10–11:40]`。每个子窗口都要同时引用页面图片和对应录音，不得先独立总结录音、再把图片作为事后插图。
 
@@ -76,7 +78,9 @@ page image + mask/crop metadata
   "mask": {"applied": true, "regions": []},
   "sources": {"transcript": [], "ocr": [], "vision": []},
   "claims": [],
+  "analysisZh": [],
   "derivations": [],
+  "scriptZhMode": "translation-of-english",
   "uncertainties": []
 }
 ```
@@ -91,8 +95,10 @@ page image + mask/crop metadata
 2. 目录：按页面标题或讲座章节生成。
 3. 每页一个单元：
    - 原课件图
-   - `课件要点`：只列图片/OCR可确认内容
-   - `中文讲演录`：按时间窗改写为连贯、可朗读中文，不是条目式摘要
+   - `课件要点`：列出图片/OCR 可确认内容
+   - `辅助理解与补充分析`：Codex 的背景解释、术语解释、因果补充和页面阅读提示，明确标注为分析而非讲者原话
+   - `补充推导`：有来源、有假设、有步骤的公式推导；没有足够证据时不硬推
+   - `中文讲演录`：只翻译并适度润色英文讲演录，不是独立摘要或扩展讲义
    - `English lecture script`：同一时间窗的完整英文讲演录，不是 Raw transcript evidence
    - 页首时间窗与 `[slide:N]`：只提供最小导航信息
    - `公式与推导`：仅在证据足够时出现
@@ -100,12 +106,15 @@ page image + mask/crop metadata
 
 每个页面单元必须包含：`[mm:ss–mm:ss]`、`[slide:N]`、图片路径和可回溯的 transcript 来源。页面回看不能静默重复：标注“首次出现/回看/内容变体”。页面正文只能呈现整理后的中英文讲演录；逐段原文只能通过来源文件回溯。
 
-### 中文翻译硬门槛
+### 中文翻译与分析隔离硬门槛
 
+- `scriptZhMode` 必须为 `translation-of-english`。
 - `scriptZh` 必须是中文讲演文本，不得包含“与该页时间窗严格对齐的讲者说明包括”“完整代表帧中的关键信息为”等证据模板。
-- 不得把 `englishProcessed`、Whisper 原文、OCR 行或英文摘要复制到 `scriptZh`。英文术语、缩写、专有名词和公式可以保留，但中文句法必须承担主要叙述。
+- `scriptZh` 只能表达 `englishProcessed` 中已有的事实、数字、限定词、因果关系、转折和例子。英文术语、缩写、专有名词和公式可以保留，但中文句法必须承担主要叙述。
+- 不得把 OCR 行或页面图片中未被英文讲演录讲出的新增知识塞进 `scriptZh`；这些内容必须进入 `analysisZh` 或 `derivations`。
 - 中文稿与英文稿必须逐页同范围、同顺序、同事实密度。中文稿少于英文稿的核心事实时，标记 `translation-incomplete`，不得编译最终 PDF。
 - 对英文稿超过 300 字符的技术页，中文稿长度原则上不得低于英文稿的 18% 且不得少于 80 字符；低于该密度通常意味着只写了摘要，必须回到英文讲演录补齐事实、例子、数字和限定条件。主持/致谢/结束页可由 Codex 标注为短页并人工复核。
+- `analysisZh` 可以比讲演录更详细，但不得被用来掩盖 `scriptZh` 漏译；审核时分别检查翻译完整性和分析来源。
 - 页面只有主持、致谢或结束语时可以短，但仍须是自然中文句子，不能用英文原文代替。
 - `author_workshop_handout_from_evidence.py` 只能生成证据草稿，不能直接生成最终 `authored-notes.json`；最终 `scriptZh` 和 `englishProcessed` 必须由 Codex 重新阅读后写入。
 
