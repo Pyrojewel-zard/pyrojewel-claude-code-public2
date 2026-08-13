@@ -38,6 +38,8 @@ version: "5.1.0"
 | paper | Zotero attachmentKey.md（8位字母数字.md）| `raw/sources/paper/` |
 | notes | `paper_Read/` 下或含 `--paper-` 的 .md | `raw/sources/notes/` |
 | notes | `raw/paper/` 下非 attachmentKey 的 .md | `raw/sources/notes/` |
+| notes | ljg 系列笔记：`{ts}--{slug}__{type}.md`，type ∈ paper/book/reading/qa/rank/think/constraint/concept/is/structure/write/plain/blind/relationship/roundtable（Denote 命名，含 `__type` 后缀）| `raw/sources/notes/` |
+| notes | ljg 旧格式 .org 阅读笔记（`__type.org`，type 同上）| `raw/sources/notes/`（转换 md 后入库）|
 | survey | IDEA_REPORT.md（子方向级别）| `raw/sources/survey/{direction}/` |
 | survey | 文献综述/清单（FULL_REFERENCE_LIST, LITERATURE_LANDSCAPE 等）| `raw/sources/survey/` |
 | survey | 新颖性卷宗（NOVELTY_DOSSIER, NOVELTY_CHECK, NOVELTY_REVIEW 等）| `raw/sources/survey/{direction}/` |
@@ -116,7 +118,13 @@ version: "5.1.0"
 {project}/autoModel/raw/paper/*.md       → notes
 {project}/autoModel/paper_Read/**/*.md   → notes
 {project}/autoModel/idea-stage/**/*.md   → survey（按黑名单过滤）
+{project}/notes/*__*.md                   → notes（ljg 系列笔记）
+{project}/notes/*__*.org                  → notes（ljg 旧 org，转换 md 后入库）
+~/Documents/notes/*__*.md                 → notes（ljg 系列笔记，用户级）
+~/Documents/notes/*__*.org                → notes（ljg 旧 org，转换 md 后入库）
 ```
+
+> **ljg 笔记识别**：文件名 `{YYYYMMDDTHHMMSS}--{主题}__{type}.md/.org`，其中 `type` ∈ `paper|book|reading|qa|rank|think|constraint|concept|is|structure|write|plain|blind|relationship|roundtable`（Denote 命名）。所有 ljg 阅读笔记统一归 `raw/sources/notes/`。
 
 **扫描零文件 → 报错**："源项目下未找到任何 paper/notes/survey 素材，请检查项目路径"
 
@@ -138,8 +146,23 @@ version: "5.1.0"
 
 1. `cp` 图片 → `raw/assets/`（平铺，跳过 Thumbs.db/@eaDir）
 2. `cp` .md → 对应 `raw/sources/{type}/`
-3. 重写所有图片引用（按上方正则）
-4. 解码 URL 编码（%20 → 空格）
+3. **ljg 旧 .org → .md 转换**：若源是 `.org` 且匹配 ljg Denote 命名，先转换再入库——
+   - 有 `pandoc`：`pandoc file.org -o file.md`，再手工校订 org 语法残留（`*标题*` → `**标题**`、`#+title:` → YAML frontmatter、`~code~` → `` `code` ``、列表 `- item` 保留）
+   - 无 `pandoc`：按规则表手工转换（见下「org→md 转换规则」）
+   - 转换后的文件名 `.md` 入库，`.org` 源不复制
+4. 重写所有图片引用（按上方正则）
+5. 解码 URL 编码（%20 → 空格）
+
+**org→md 转换规则**（无 pandoc 时）：
+| org 写法 | markdown 写法 |
+|---------|--------------|
+| `#+title: X` | YAML frontmatter `title: X`（汇总到文件头）|
+| `#+date: [...]` | YAML `date:` |
+| `#+filetags: :a:b:` | YAML `tags: [a, b]` |
+| `* 标题` | `# 标题`（org 一级标题 → markdown 一级）|
+| `*bold*` | `**bold**` |
+| `=code=` / `~code~` | `` `code` `` |
+| 行内 `*` 强调 | 改为 `**` 包裹 |
 
 目标已存在时：
 - 内容一致 → 跳过
@@ -158,6 +181,7 @@ version: "5.1.0"
   raw/assets/         : {N} 张图片
   raw/sources/paper/  : {M1} 个
   raw/sources/notes/  : {M2} 个 ({R} img refs rewritten)
+  其中 ljg org→md 转换 : {M2_org} 个
   raw/sources/survey/ : {M3} 个
   跳过（黑名单）     : {列表}
   跳过（已存在）     : {列表}

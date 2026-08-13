@@ -13,5 +13,15 @@
     "id": 3,
     "prompt": "paper-to-wiki 同步当前文件夹到wiki",
     "expected": "同 prompt 1 但用更简洁的触发词，应覆盖 paper + notes + survey + assets 全部类型，按黑名单过滤 paper-stage/ 和 EXPERIMENT_TRACKER 等"
+  },
+  {
+    "id": 4,
+    "prompt": "把 ljg 阅读笔记迁移到 wiki",
+    "expected": "扫描项目 notes/ 和 ~/Documents/notes/ 下的 ljg 系列笔记（{ts}--{主题}__{type}.md/.org，type ∈ paper/book/reading/qa/rank/think/constraint/concept/is/structure/write/plain/blind/relationship/roundtable），统一归入 raw/sources/notes/，.org 先转换 .md 再入库，重写图片引用，报告转换数和统计"
+  },
+  {
+    "id": 5,
+    "prompt": "导入 ljg 的 qa 笔记 20260801T120000--qa-xxx__qa.org 到 wiki",
+    "expected": "定位该 .org 文件（项目 notes/ 或 ~/Documents/notes/），转换 org→md（pandoc 优先，无则按规则表），归入 raw/sources/notes/，重写图片引用，报告转换成功与目标路径"
   }
 ]
