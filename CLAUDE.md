@@ -41,7 +41,7 @@ Paper reading skills (`pyrojewel-paper`, `pyrojewel-paper-river`, `pyrojewel-bea
 |---|---------|-------------|-------------|-----------------|---------|
 | 1 | `wanshuiyin/Auto-claude-code-research-in-sleep` | `02_claudeSkill/Auto-claude-code-research-in-sleep/` | `git@github.com:wanshuiyin/Auto-claude-code-research-in-sleep.git`（直连上游，无 fork） | `analyze-results`, `experiment-plan`, `paper-compile`, `dse-loop`, `formula-derivation`, `novelty-check`, `idea-discovery`, `idea-creator`, `research-review`, `research-refine-pipeline`, `research-lit`, `auto-review-loop`, `experiment-bridge`, `experiment-audit`, `experiment-queue`, `run-experiment`, `monitor-experiment`, `ablation-planner`, `result-to-claim`, `research-pipeline`, `vast-gpu`, `training-check`, `serverless-modal`, `arxiv`, `render-html` | `git fetch` + 手动适配 |
 | 2 | `lijigang/ljg-skills` | `02_claudeSkill/ljg-skills/` | origin `git@github.com:Pyrojewel-zard/ljg-skills.git` + upstream `https://github.com/lijigang/ljg-skills.git` | `pyrojewel-paper`, `pyrojewel-paper-river`, `pyrojewel-paper-qa` | `git fetch upstream && git merge upstream/main` → push origin |
-| 3 | `Faust-Donf/beamer-academic` | `02_claudeSkill/beamer-academic/` | `git@github.com:Faust-Donf/beamer-academic.git`（直连上游） | `pyrojewel-beamer-academic` | `git pull` |
+| 3 | `Faust-Donf/beamer-academic` | `02_claudeSkill/beamer-academic/` | `git@github.com:Faust-Donf/beamer-academic.git`（直连上游） | `beamer-academic`（本地 fork，有 patch）, `pyrojewel-beamer-academic` | `git fetch` + **从 commit 对象提取**（`git archive`）——该工作区受挂载盘 unlink 限制会停在旧版，禁止 `cp` 工作区；详见 `skills/beamer-academic/LOCAL-NOTES.md` |
 | 4 | `Arcadia-1/virtuoso-bridge-lite` | `02_claudeSkill/virtuoso/` | origin `git@github.com:Pyrojewel-zard/virtuoso-bridge-lite.git` + upstream `https://github.com/Arcadia-1/virtuoso-bridge-lite.git` | `virtuoso` | `git fetch upstream` → merge |
 
 ### 低频 / 参考来源（不强制实时同步）
@@ -105,7 +105,10 @@ Protected files: `.env`, credentials, `pyproject.toml`, `setup.cfg`, `conda-lock
 - `pyrojewel-paper-qa`
 - `pyrojewel-paper-flow`
 - `zotero-pdf-parse`
-- `pyrojewel-beamer-academic`
+- `pyrojewel-beamer-academic` — 答辩主线（证据契约 + Obsidian 周会输出）；trigger: `答辩PPT`/`答辩`/`论文PPT`
+- `beamer-academic` — 开题/会议/conference talk 及通用学术汇报；本地 fork of upstream v1.5（`1.5+pyrojewel.1`），patch 日志见 `skills/beamer-academic/LOCAL-NOTES.md`
+
+> `zuhui-beammer`（ADC/电路组会线）已于 2026-08-17 删除，场景并入 `beamer-academic`。取回：`git checkout 0e128a2 -- skills/zuhui-beammer`
 
 ### Idea / Experiment Flow
 

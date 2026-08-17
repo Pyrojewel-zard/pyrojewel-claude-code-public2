@@ -1,8 +1,16 @@
 % ============================================================
 % Academic Beamer Theme
 % 白底、细线、满版章节页。不绑学校。
+%
+% LOCAL FORK — pyrojewel_claude_code
+% Base: Faust-Donf/beamer-academic @ 788e125 (v1.5, 2026-08-17)
+% Local patches (see ../LOCAL-NOTES.md):
+%   [P1] 2026-08-17  封面三处守卫 \ifx...\empty -> \ifdefempty
+%        \newcommand 生成 \long 宏，\empty 非 \long，\ifx 比较含前缀
+%        meaning 故永远为假：空 logo 触发 "File `' not found"，
+%        supervisor/major 空标签行照常打印。etoolbox 已 RequirePackage。
 % ============================================================
-\ProvidesPackage{beamerthemeAcademic}[2026/08/17 Academic Beamer Theme v1.5]
+\ProvidesPackage{beamerthemeAcademic}[2026/08/17 Academic Beamer Theme v1.5+pyrojewel.1]
 
 \RequirePackage{tikz}
 \RequirePackage{graphicx}
@@ -144,9 +152,9 @@
 \setbeamertemplate{title page}{%
   \vspace{1.15cm}%
   \begin{center}
-    \ifx\themelogo\empty\else
+    \ifdefempty{\themelogo}{}{%
       \includegraphics[height=1.05cm]{\themelogo}\\[0.35cm]
-    \fi
+    }%
     {\color{textgray}\small\insertinstitute}\\[0.95cm]
     {\usebeamerfont{title}\usebeamercolor[fg]{title}\inserttitle}\\[0.22cm]
     {\usebeamerfont{subtitle}\color{textgray}\insertsubtitle}\\[0.38cm]
@@ -155,12 +163,12 @@
   \vspace{0.7cm}%
   \begin{center}
     \makebox[4.6em][l]{\color{textgray}\authorlabel}\insertauthor\\[5pt]
-    \ifx\supervisor\empty\else
+    \ifdefempty{\supervisor}{}{%
       \makebox[4.6em][l]{\color{textgray}\supervisorlabel}\supervisor\\[5pt]
-    \fi
-    \ifx\major\empty\else
+    }%
+    \ifdefempty{\major}{}{%
       \makebox[4.6em][l]{\color{textgray}\majorlabel}\major\\[5pt]
-    \fi
+    }%
   \end{center}
   \vfill
   \begin{center}

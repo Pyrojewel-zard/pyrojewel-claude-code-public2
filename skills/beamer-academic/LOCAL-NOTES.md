@@ -1,82 +1,137 @@
 # beamer-academic — 本地说明
 
-**来源:** `Faust-Donf/beamer-academic` @ `788e125` (v1.5, 2026-08-17)
-**同步日期:** 2026-08-17
-**定位:** 上游原样保留，用于与 `pyrojewel-beamer-academic` 对比。**不是**主用 skill。
+**状态:** `active`(维护中的本地 fork,不是原样镜像)
+**Base:** `Faust-Donf/beamer-academic` @ `788e125` (v1.5, 2026-08-17)
+**当前版本:** `1.5+pyrojewel.1`
+**迁入 / 转维护:** 2026-08-17
 
-## 与其他两个 beamer skill 的关系
+## 定位与路由
 
-| Skill | 用途 | 触发 |
+`zuhui-beammer` 已于 2026-08-17 删除(ADC 组会线并入本 skill 的通用能力,专属能力不再维护)。当前保留两条 beamer 线:
+
+| Skill | 用途 | 主要触发词 |
 |---|---|---|
-| `pyrojewel-beamer-academic` | 答辩/学术汇报主线（本地 v4.6，带证据契约、Obsidian 输出） | `答辩PPT`、`beamer`、`学术报告` 等通用词 |
-| `zuhui-beammer` | ADC/电路组会（白底红线，语义化配色） | `zuhui-beammer`、`ADC标定PPT` 等 |
-| `beamer-academic`（本 skill） | 上游对照版 | 仅显式指名：`beamer-academic`、`上游 beamer` |
+| `beamer-academic`(本 skill) | 开题、会议、conference talk、通用学术汇报 | `beamer-academic`、`开题PPT`、`会议报告`、`conference PPT` |
+| `pyrojewel-beamer-academic` | 答辩主线;带证据契约、coverage matrix、Obsidian 周会输出 | `答辩PPT`、`答辩`、`论文PPT` |
 
-本 skill **故意不占用**通用触发词，避免和 `pyrojewel-beamer-academic` 抢路由。
+### ⚠ 未解决的路由歧义
 
-## 文件状态
+`pyrojewel-beamer-academic` 的 trigger 列表里仍有 `beamer`、`学术 PPT`、`学术报告`、`academic slides`、`paper presentation`、`beamer presentation` 这些**通用词**。本 skill 没有去抢,但用户说「做个 beamer」时两边都可能被选中。彻底解决需要收窄 `pyrojewel-beamer-academic` 的 trigger——那是它的文件,本次没有擅自改。
 
-`SKILL.md` 正文（frontmatter 之后 494 行）与上游 `788e125` **逐字节一致**，只有 frontmatter 是本地的。后续 upstream 更新可以直接 diff 正文。
+判断规则(暂时靠 description 兜):**要证据契约和 Obsidian 输出走 pyrojewel,其余走本 skill。**
 
-`assets/`、`references/`、`scripts/`、`docs/`、`examples/` 均为上游原样。已丢弃上游的仓库治理文件（`.github/`、`CONTRIBUTING.md`、`CODE_OF_CONDUCT.md`、`SECURITY.md`、`README.md`、`.gitignore`），保留 `LICENSE` 和 `CHANGELOG.md` 用于溯源。
+## 本地 patch 日志
 
-本次同步是从 git 对象（`git show 788e125:`）提取的，**不是**从 `02_claudeSkill/beamer-academic/` 工作区拷贝的——该工作区因挂载盘 unlink 权限限制停留在 v1.0，HEAD 却已指向 v1.5，直接 `cp` 会拿到旧版。
+正文(SKILL.md frontmatter 之后 494 行)目前仍与上游逐字节一致。**主题已分叉一个 patch。**
 
-## ⚠ 已知上游 bug（v1.5，未修）
+### [P1] 2026-08-17 — 修封面三处失效守卫
 
-### 封面三个 `\ifx...\empty` 守卫全部失效
-
-`assets/beamerthemeAcademic.sty` 第 147/158/161 行：
+`assets/beamerthemeAcademic.sty`,上游 147/158/161 行:
 
 ```latex
-\ifx\themelogo\empty\else  ... \fi   % line 147
-\ifx\supervisor\empty\else ... \fi   % line 158
-\ifx\major\empty\else      ... \fi   % line 161
+\ifx\themelogo\empty\else  ... \fi
+\ifx\supervisor\empty\else ... \fi
+\ifx\major\empty\else      ... \fi
 ```
 
-三者都用 `\newcommand` 声明（129/131/141 行）。`\newcommand` 生成的是 **`\long` 宏**，而 `\empty` 不是 `\long`。`\ifx` 比较含前缀的完整 meaning，所以这三个判断**永远为假**，跳过分支永远走不到。
+三者均由 `\newcommand` 声明。`\newcommand` 生成 **`\long` 宏**,`\empty` 不是 `\long`,而 `\ifx` 比较含前缀的完整 meaning ⇒ 三个判断**永远为假**,跳过分支永远走不到。
 
-**实测后果**（默认封面，未设 logo/supervisor/major）：
+上游实测后果(默认封面,未设 logo/supervisor/major):
 
-1. `\includegraphics{}` 收到空文件名 → `! LaTeX Error: File `' not found.`
-   在 `-halt-on-error` 下直接中断编译（SKILL.md Phase 4 的部分编译命令带这个 flag）
-2. 「指导教师」「专业」两行标签照常打印，值是空的
+1. 空文件名进 `\includegraphics` ⇒ `! LaTeX Error: File `' not found.`,在 `-halt-on-error` 下**中断编译**
+2. 空的「指导教师」「专业」标签行照常打印
 
-复现：任意 `.tex` 只 `\usepackage{beamerthemeAcademic}` + `\titlepage`，不设 logo。
-
-### 修复（已验证可用，本地未施加）
-
-`etoolbox` 已经被主题 `\RequirePackage`，直接用 `\ifdefempty`：
+改为 etoolbox 的 `\ifdefempty`(该包主题已 `\RequirePackage`):
 
 ```latex
-\ifdefempty{\themelogo}{}{%  ... }    % 对应 \fi 改成 }
-\ifdefempty{\supervisor}{}{% ... }
-\ifdefempty{\major}{}{%      ... }
+\ifdefempty{\themelogo}{}{%  ... }%
+\ifdefempty{\supervisor}{}{% ... }%
+\ifdefempty{\major}{}{%      ... }%
 ```
 
-验证结果：空文件名错误从 1 降到 0，多余标签行消失，封面正常输出。
+双向验证通过:未设时 0 错误且标签行消失;`\setsupervisor{Prof X}\setmajor{EE}` 时正常打印。
 
-主题本身在别处（`\insertframesubtitle` 守卫、`\thanksframe`）已经正确使用了 `\ifstrempty`，所以这三处属于内部不一致，适合作为 upstream PR 提交。
+同一份主题在别处(`\insertframesubtitle` 守卫、`\thanksframe`)已经正确使用 `\ifstrempty`,所以这三处是上游内部不一致。**值得提 upstream PR**——提了之后本 patch 可以撤掉。
 
-**本地暂不修改**，以保持与上游的干净 diff。若要实际使用本 skill 出片，先施加上述修复，或始终通过 `\setlogo{}`/`\setsupervisor{}`/`\setmajor{}` 显式赋非空值绕开。
+`examples/transformer/beamerthemeAcademic.sty` 是 `assets/` 的副本,已同步。改主题时记得两份一起改。
+
+## upstream 同步流程
+
+上游仓库在 `02_claudeSkill/beamer-academic/`(remote `Faust-Donf/beamer-academic`)。
+
+**⚠ 不要 `cp` 工作区。** 该工作区受挂载盘 unlink 权限限制,`git pull` 会失败,历史上用 `git update-ref` 绕过,导致 **HEAD 指向新版但工作区文件停在旧版**。2026-08-17 首次迁入时工作区是 v1.0 而 HEAD 已是 v1.5。
+
+正确做法是从 commit 对象提取:
+
+```bash
+cd /path/to/02_claudeSkill/beamer-academic
+git fetch origin && NEW=$(git rev-parse origin/main)
+git archive "$NEW" | tar -x -C /tmp/ba_new
+```
+
+然后:
+
+1. `diff` 正文确认上游改了什么(本地正文未分叉,应该是干净 diff)
+2. 覆盖 `assets/` `references/` `scripts/` `docs/` `examples/`
+3. **重新施加上面的 patch 日志**(逐条检查是否已被上游修掉;修掉的就删掉对应条目)
+4. 保留本地 frontmatter(name/version/description/trigger/local_notes)
+5. 丢弃上游的仓库治理文件:`.github/`、`README.md`、`CONTRIBUTING.md`、`CODE_OF_CONDUCT.md`、`SECURITY.md`、`.gitignore`
+6. 跑下面的验证
+7. 更新本文件的 patch 日志和 `references/skill-source-map.md`
+
+本次保留的上游文件:`SKILL.md`、`assets/`、`references/`、`scripts/`、`docs/`、`examples/`、`LICENSE`、`CHANGELOG.md`。
+
+## 验证
+
+```bash
+# 主题冒烟测试(不需要中文环境)
+cd /tmp && cp {skill}/assets/beamerthemeAcademic.sty .
+cat > t.tex <<'EOF'
+\documentclass[aspectratio=169,10pt]{beamer}
+\usepackage{beamerthemeAcademic}
+\title{T}\author{A}\institute{I}\date{D}
+\begin{document}\begin{frame}[plain]\titlepage\end{frame}\end{document}
+EOF
+xelatex -interaction=nonstopmode t.tex
+grep -c "File \`' not found" t.log   # 必须是 0
+pdfinfo t.pdf | grep "Page size"     # 必须 453.54 x 255.12 pts = 16:9
+```
+
+组件存在性检查:
+
+```bash
+for c in statementframe statrow hyporow headrow setcoverlabels setlogo; do
+  grep -c "newcommand{\\\\$c}" assets/beamerthemeAcademic.sty
+done
+grep -n "beamer@centeredfalse\|hrule height" assets/beamerthemeAcademic.sty
+```
 
 ## 环境依赖
 
-VM 内 `xelatex` 可用，但 **`texlive-lang-chinese` 缺失**（`ctexhook.sty` 找不到），因此 `examples/transformer/defense.tex` 在本 VM 编译不过——该样例依赖 `xeCJK` + `Heiti SC`/`STFangsong` 字体。主题本身（Latin-only 冒烟测试）编译通过：6 页，453.54×255.12 pt = 16:9。
+VM 内 `xelatex` 可用,但 **`texlive-lang-chinese` 缺失**(`ctexhook.sty` 找不到),所以 `examples/transformer/defense.tex` 在本 VM 编译不过——它依赖 `xeCJK` + `Heiti SC`/`STFangsong`。主题本身 Latin-only 测试通过(6 页,453.54×255.12 pt = 16:9)。
 
-出中文片需先装：
+出中文片先装:
 
 ```bash
 sudo apt install texlive-xetex texlive-lang-chinese texlive-fonts-recommended
 ```
 
-字体名按本机可用值替换（如 `AR PL UMing CN`，参考 `zuhui-beammer` 的 TeX 头部）。
+字体名换成本机可用值(如 `AR PL UMing CN`)。
 
-## 值得吸收到另两个 skill 的点
+## 已删除的 zuhui-beammer(如需取回)
 
-评估记录见 2026-08-17 会话。简要：
+2026-08-17 删除。上游 v1.5 完全没有、随 zuhui 一起放弃的四项能力:
 
-- **主题层可直接抄**：`\beamer@centeredfalse`（顶对齐，修 Beamer 默认 `c` 把余高塞进标题与正文之间）、标题线用 `\hrule height 1.15pt` 而非 `\rule`（后者会当段落多吐一行空白）
-- **组件**：`\statrow`（三个大数字，适合 ENOB/DNL/步数）、`\keybox` 左竖条版
-- **纪律**：`references/writing-style.md` 的标题红旗和措辞红旗清单值得吸收；但 `itemize` 全面禁令是为 35–50 页答辩校准的，**不建议**照搬到 7–12 页的 `zuhui-beammer`
-- **反向**：`zuhui-beammer` 的 `page_manifest.tsv` 证据契约（source/location、interpretation、boundary、evidence_status）上游完全没有，答辩场合价值更高，应反向补进 `pyrojewel-beamer-academic`
+- `page_manifest.tsv` 证据契约(`source_id/location`、`interpretation`、`boundary`、`evidence_status` 四态含 `unknown`)
+- 语义化配色(red=raw/error、green=corrected、blue=ideal,强制配图例)
+- `zuhuicode` 代码块(Verilog-A/MATLAB/Python)
+- `pdftoppm` 栅格化视觉 QA + 数值硬门(正文 ≥8pt、表格 ≥7.6pt、图注 ≥7pt)
+
+取回方式:
+
+```bash
+git show 0e128a2:skills/zuhui-beammer/SKILL.md
+git checkout 0e128a2 -- skills/zuhui-beammer   # 整目录恢复
+```
+
+其中前两项若日后要补,`pyrojewel-beamer-academic` 已有自己的证据契约可参考。

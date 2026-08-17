@@ -1,24 +1,31 @@
 ---
 name: beamer-academic
-version: 1.5-upstream
+version: 1.5+pyrojewel.1
 description: >
-  Upstream beamer-academic v1.5 (Faust-Donf), kept pristine for comparison against
-  pyrojewel-beamer-academic. Generates academic Beamer slides from a thesis/paper
-  (PDF, Word, or LaTeX source). 13-layout registry, 5 color schemes, anti-AI writing
-  discipline, interactive editing loop. White canvas, top-aligned, thin rules,
-  full-bleed section dividers with circled numerals.
-  Use ONLY when explicitly invoked by name ("beamer-academic", "上游 beamer", "原版 beamer").
-  For normal 答辩/学术 PPT requests use pyrojewel-beamer-academic; for ADC/circuit
-  group meetings use zuhui-beammer.
+  Academic Beamer slide generator (local fork of Faust-Donf/beamer-academic v1.5).
+  Builds slides from a thesis/paper (PDF, Word, or LaTeX source) via a 13-layout
+  registry, 5 color schemes, anti-AI writing discipline, and an interactive editing
+  loop. White canvas, top-aligned body, thin accent rules, full-bleed section
+  dividers with circled numerals.
+  Use for 开题/会议/conference talks and general academic reporting, or whenever
+  invoked by name. For thesis-defense work that needs the evidence contract and
+  Obsidian weekly output, use pyrojewel-beamer-academic instead.
 trigger:
   - "beamer-academic"
+  - "开题PPT"
+  - "会议报告"
+  - "conference PPT"
+  - "conference talk slides"
   - "上游 beamer"
   - "原版 beamer"
-  - "upstream beamer"
 local_notes: |
-  Body below is byte-identical to upstream 788e125 so future syncs stay clean diffs.
-  Only this frontmatter is local. Deliberately NOT claiming the generic triggers
-  ("beamer", "答辩PPT", "学术报告") — those belong to pyrojewel-beamer-academic.
+  Maintained local fork, not a pristine mirror. Base: upstream 788e125 (v1.5).
+  SKILL.md body is still byte-identical to upstream; the theme has diverged by
+  one patch (cover guard fix, [P1]). See LOCAL-NOTES.md for the patch log and
+  the upstream-sync procedure.
+  Trigger space is split with pyrojewel-beamer-academic: that skill keeps the
+  defense-side words (答辩PPT / 答辩 / 论文PPT). Residual overlap on the generic
+  "beamer" / "学术报告" is a known, unresolved routing ambiguity — see LOCAL-NOTES.
 ---
 
 # Beamer Academic

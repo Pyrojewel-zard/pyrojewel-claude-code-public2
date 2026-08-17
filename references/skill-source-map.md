@@ -32,7 +32,7 @@
 | `pyrojewel-paper-qa` | `skills/pyrojewel-paper-qa/skill.md` | Flow 1 | `active` | `ljg-skills` | `ljg-qa` 改编 | worker2 | 跟踪问题设计方法；本地对齐输出优先 |
 | `pyrojewel-paper-flow` | `skills/pyrojewel-paper-flow/SKILL.md` | Flow 1 | `adopted` | self-built + local composition | 编排 `zotero-pdf-parse -> paper -> river -> qa -> beamer` | worker2 | 不看单一 upstream；按主链变化手工维护 |
 | `pyrojewel-beamer-academic` | `skills/pyrojewel-beamer-academic/SKILL.md` | Flow 1 / 11 | `adopted` | `beamer-academic` + `guizang-ppt-skill` | 上游 beamer + 本地版式改造 | worker2 | 跟踪上游 LaTeX/模板更新；版式规则本地优先 |
-| `zuhui-beammer` | `skills/zuhui-beammer/SKILL.md` | Flow 11 | `adopted` | local derivative of `pyrojewel-beamer-academic` + `ADC_Calibration.pdf` | 独立 `beamerthemeZuhuiBeammer.sty`；复用父 skill 工作流与证据/QA 契约，不加载父主题 | lead | 本地维护；仅在父 skill 工作流或 ADC 参考版式发生实质变化时手工评估 |
+| `zuhui-beammer` | ~~`skills/zuhui-beammer/`~~（已删除） | Flow 11 | `removed` | local derivative of `pyrojewel-beamer-academic` + `ADC_Calibration.pdf` | 2026-08-17 删除，改由 `beamer-academic` 承担该场景。上游 v1.5 完全没有、随之放弃的四项：`page_manifest.tsv` 证据契约、语义化配色（red/green/blue）、`zuhuicode` 代码块、`pdftoppm` 视觉 QA 硬门 | — | 不再维护；取回：`git checkout 0e128a2 -- skills/zuhui-beammer` |
 | `analyze-results` | `skills/analyze-results/skill.md` | Flow 4 | `adopted` | `Auto-claude-code-research-in-sleep` | 原样迁移 | worker3 | 看上游是否有方法/输出结构更新 |
 | `experiment-plan` | `skills/experiment-plan/skill.md` | Flow 2 / 4 | `adopted` | `Auto-claude-code-research-in-sleep` | 原样迁移 | worker3 | 跟踪 claim-driven planning 更新 |
 | `paper-compile` | `skills/paper-compile/skill.md` | Flow 4 / 5 | `adopted` | `Auto-claude-code-research-in-sleep` | 原样迁移 | worker3 | 跟踪编译/修错流程更新 |
@@ -70,7 +70,7 @@
 | `arxiv` | `skills/arxiv/skill.md` | Flow 2 support | `adopted` | `Auto-claude-code-research-in-sleep` | 已迁入；shared-references 引用改为当前项目路径 | lead | 跟踪下载/检索 helper 解析链 |
 | `render-html` | `skills/render-html/skill.md` | Flow 2 support | `adopted` | `Auto-claude-code-research-in-sleep` | 已迁入；脚本与模板一并落地；shared-references 引用改为当前项目路径 | lead | 跟踪 HTML 渲染脚本与模板更新 |
 | `pyrojewel-academic-ppt` | `.claude/skills/pyrojewel-academic-ppt/` | Flow 11 | `superseded` | local legacy | 被 `pyrojewel-beamer-academic` 替代 | worker2 | 不再同步 |
-| `beamer-academic` | `skills/beamer-academic/SKILL.md` | Flow 11 | `reference-only` | `beamer-academic` | 2026-08-17 从 upstream `788e125` (v1.5) 原样迁入，用于与 `pyrojewel-beamer-academic` 对比；SKILL.md 正文逐字节一致，仅 frontmatter 本地化（不占用通用触发词）；已知上游 bug 见 `skills/beamer-academic/LOCAL-NOTES.md` | lead | 正文可直接 diff 上游；不接入主 flow，仅作对照和吸收来源 |
+| `beamer-academic` | `skills/beamer-academic/SKILL.md` | Flow 11 | `active` | `beamer-academic` | 2026-08-17 从 upstream `788e125` (v1.5) 迁入，同日转为**维护中的本地 fork**（`1.5+pyrojewel.1`）。承接开题/会议/conference talk 及通用学术汇报。SKILL.md 正文仍与上游逐字节一致；主题已分叉 1 个 patch（[P1] 封面守卫 `\ifx...\empty` → `\ifdefempty`）。patch 日志与同步流程见 `skills/beamer-academic/LOCAL-NOTES.md` | lead | 从 commit 对象提取（**禁止 cp 工作区**，见 LOCAL-NOTES）；覆盖后重新施加 patch 日志并保留本地 frontmatter |
 | `guizang-ppt-skill` | external repo only | Flow 11 | `reference-only` | `guizang-ppt-skill` | 版式规则来源 | worker2 | 只分析版式/渲染经验 |
 | `scientific-thinking-literature-review` | `skills/scientific-thinking-literature-review/SKILL.md` | ECC legacy | `reference-only` | `ECC` | 历史导入 | worker1 | 默认不继续演化 |
 | `deep-research` | `skills/deep-research/SKILL.md` | ECC legacy | `reference-only` | `ECC` | 历史导入 | worker1 | 仅作参考 |
@@ -288,3 +288,25 @@
 **⚠ 发现上游 bug（v1.5，本地未修）：** 封面三个守卫 `\ifx\themelogo\empty` / `\ifx\supervisor\empty` / `\ifx\major\empty`（sty 147/158/161 行）永远为假——`\newcommand` 生成 `\long` 宏而 `\empty` 非 `\long`，`\ifx` 比较含前缀的 meaning。后果：默认封面触发 `! LaTeX Error: File `' not found.`（`-halt-on-error` 下中断），且空的「指导教师」「专业」标签行照常打印。修复方案（已实测：错误 1→0，多余行消失）是改用主题已 `\RequirePackage` 的 etoolbox `\ifdefempty`。为保持与上游干净 diff，**本地暂不施加**；详见 `skills/beamer-academic/LOCAL-NOTES.md`。适合作为 upstream PR。
 
 **后续待办：** ①主题层修复（`\beamer@centeredfalse` + `\hrule`）抄进 `zuhui-beammer`，并修其 `\setbeamertemplate{frametitle}{}` 被清空导致漏写 `\zuhuiframetitle` 就静默无标题的隐患；②`writing-style.md` 红旗清单吸收进另两个 skill，但 `itemize` 禁令不照搬到 7–12 页组会线；③反向把 `zuhui-beammer` 的 `page_manifest.tsv` 证据契约补进 `pyrojewel-beamer-academic`。
+
+### 2026-08-17 — 删除 zuhui-beammer，beamer-academic 转正式维护
+
+**决策：** 用户评估对比结论后决定简化 beamer 线——删掉 `zuhui-beammer`，把 `beamer-academic` 从 `reference-only` 转为正式维护的本地 fork，与 `pyrojewel-beamer-academic` 并存两条线。ADC 专属能力**不抢救**，靠 git 历史保留。
+
+**变更：**
+
+| 项 | 处理 |
+|---|---|
+| `skills/zuhui-beammer/` | `git rm -r` 删除（8 个文件）。状态改 `removed`。取回：`git checkout 0e128a2 -- skills/zuhui-beammer` |
+| `skills/beamer-academic/` | `reference-only` → `active`，版本 `1.5-upstream` → `1.5+pyrojewel.1` |
+| trigger 划分 | 本 skill 取 `beamer-academic`/`开题PPT`/`会议报告`/`conference PPT`；`pyrojewel-beamer-academic` 保留 `答辩PPT`/`答辩`/`论文PPT` |
+
+**随之放弃的四项能力**（上游 v1.5 完全没有）：`page_manifest.tsv` 证据契约（含 `evidence_status` 四态）、语义化配色（red=raw / green=corrected / blue=ideal + 强制图例）、`zuhuicode` 代码块、`pdftoppm` 栅格化视觉 QA + 数值硬门。
+
+**⚠ 施加本地 patch [P1]：** 转为维护版后修掉上游封面 bug。`assets/beamerthemeAcademic.sty` 147/158/161 行三个守卫 `\ifx\themelogo\empty` / `\ifx\supervisor\empty` / `\ifx\major\empty` 永远为假——`\newcommand` 生成 `\long` 宏而 `\empty` 非 `\long`，`\ifx` 比较含前缀 meaning。后果：默认封面报 `! LaTeX Error: File `' not found.`（`-halt-on-error` 下中断），且空的「指导教师」「专业」标签行照常打印。改用 etoolbox `\ifdefempty`（主题已 `\RequirePackage`）。
+
+双向验证通过：未设 supervisor/major/logo 时 0 错误且标签行消失；`\setsupervisor{Prof X}\setmajor{EE}` 时正常打印。`examples/transformer/` 内的主题副本已同步。此 patch 适合提 upstream PR，合并后可撤。
+
+**⚠ 遗留路由歧义：** `pyrojewel-beamer-academic` 的 trigger 仍持有 `beamer`、`学术 PPT`、`学术报告`、`academic slides`、`paper presentation`、`beamer presentation` 等通用词，与本 skill 有重叠。本次未擅自收窄其 trigger。暂靠两边 description 区分（要证据契约 + Obsidian 输出走 pyrojewel，其余走 beamer-academic），彻底解决需后续决定是否收窄。
+
+**push 状态：** 待 push（VM 无 SSH key）。
