@@ -70,7 +70,7 @@
 | `arxiv` | `skills/arxiv/skill.md` | Flow 2 support | `adopted` | `Auto-claude-code-research-in-sleep` | 已迁入；shared-references 引用改为当前项目路径 | lead | 跟踪下载/检索 helper 解析链 |
 | `render-html` | `skills/render-html/skill.md` | Flow 2 support | `adopted` | `Auto-claude-code-research-in-sleep` | 已迁入；脚本与模板一并落地；shared-references 引用改为当前项目路径 | lead | 跟踪 HTML 渲染脚本与模板更新 |
 | `pyrojewel-academic-ppt` | `.claude/skills/pyrojewel-academic-ppt/` | Flow 11 | `superseded` | local legacy | 被 `pyrojewel-beamer-academic` 替代 | worker2 | 不再同步 |
-| `beamer-academic` | external repo only | Flow 11 | `reference-only` | `beamer-academic` | 上游模板来源 | worker2 | 只分析 upstream 变更是否值得吸收 |
+| `beamer-academic` | `skills/beamer-academic/SKILL.md` | Flow 11 | `reference-only` | `beamer-academic` | 2026-08-17 从 upstream `788e125` (v1.5) 原样迁入，用于与 `pyrojewel-beamer-academic` 对比；SKILL.md 正文逐字节一致，仅 frontmatter 本地化（不占用通用触发词）；已知上游 bug 见 `skills/beamer-academic/LOCAL-NOTES.md` | lead | 正文可直接 diff 上游；不接入主 flow，仅作对照和吸收来源 |
 | `guizang-ppt-skill` | external repo only | Flow 11 | `reference-only` | `guizang-ppt-skill` | 版式规则来源 | worker2 | 只分析版式/渲染经验 |
 | `scientific-thinking-literature-review` | `skills/scientific-thinking-literature-review/SKILL.md` | ECC legacy | `reference-only` | `ECC` | 历史导入 | worker1 | 默认不继续演化 |
 | `deep-research` | `skills/deep-research/SKILL.md` | ECC legacy | `reference-only` | `ECC` | 历史导入 | worker1 | 仅作参考 |
@@ -267,3 +267,24 @@
 **push 状态：** 无需 commit/push（pyrojewel_claude_code 无变更）。
 
 **备注：** 本会话 VM 无 SSH key（`~/.ssh/` 不存在），所有 origin SSH 操作不可用。`Auto-claude-code-research-in-sleep` 和 `beamer-academic` 通过临时切 origin 为 HTTPS 完成拉取。挂载盘 git 受 `unlink` 权限限制，`beamer-academic` 用 `git update-ref HEAD origin/main` workaround 更新 HEAD，`ljg-skills` 和 `virtuoso` 通过 `rm -f .git/*.lock` 清理遗留锁文件后再完成 merge。
+
+### 2026-08-17 — beamer-academic v1.5 迁入为独立对照 skill
+
+**动机：** 2026-08-17 日常同步发现 `beamer-academic` 上游发布 v1.5（顶对齐细线版）。评估后确认上游在主题工程、版式库（13 版式 registry）、反 AI 写作纪律上强于本地 `pyrojewel-beamer-academic`，但在证据可追溯性和语义化配色上完全空白——后两项恰是 `zuhui-beammer`（ADC 组会线）的核心。结论：**吸收而非替换**，先原样迁入作对照。
+
+**落地：** `skills/beamer-academic/`（新建，`reference-only`）
+
+| 项 | 处理 |
+|---|---|
+| 提取方式 | `git archive 788e125`（**不是** cp 工作区——工作区因挂载盘 unlink 权限停在 v1.0，HEAD 已是 v1.5） |
+| SKILL.md | 正文 494 行与上游逐字节一致；仅 frontmatter 本地化 |
+| 触发词 | 故意只保留显式指名（`beamer-academic`/`上游 beamer`/`原版 beamer`），**不占用** `beamer`/`答辩PPT`/`学术报告`——那些归 `pyrojewel-beamer-academic` |
+| 保留文件 | `SKILL.md`、`assets/`、`references/`、`scripts/`、`docs/`、`examples/`、`LICENSE`、`CHANGELOG.md` |
+| 丢弃文件 | `.github/`、`README.md`、`CONTRIBUTING.md`、`CODE_OF_CONDUCT.md`、`SECURITY.md`、`.gitignore`（仓库治理，非 skill 内容） |
+| 路径适配 | 无需——该 skill 不依赖 `shared-references/`，无 `REVIEWER_MODEL`，无机器绝对路径 |
+
+**验证：** v1.5 标记齐全（`\beamer@centeredfalse`、`\hrule height 1.15pt`、`\statrow`/`\hyporow`/`\statementframe`/`\headrow`/`\setcoverlabels`/`\setlogo`）；主题 Latin-only 冒烟测试编译通过，6 页 453.54×255.12 pt = 16:9。`examples/transformer/defense.tex` 在本 VM 编译不过，因 `texlive-lang-chinese` 缺失（`ctexhook.sty`），非主题缺陷。
+
+**⚠ 发现上游 bug（v1.5，本地未修）：** 封面三个守卫 `\ifx\themelogo\empty` / `\ifx\supervisor\empty` / `\ifx\major\empty`（sty 147/158/161 行）永远为假——`\newcommand` 生成 `\long` 宏而 `\empty` 非 `\long`，`\ifx` 比较含前缀的 meaning。后果：默认封面触发 `! LaTeX Error: File `' not found.`（`-halt-on-error` 下中断），且空的「指导教师」「专业」标签行照常打印。修复方案（已实测：错误 1→0，多余行消失）是改用主题已 `\RequirePackage` 的 etoolbox `\ifdefempty`。为保持与上游干净 diff，**本地暂不施加**；详见 `skills/beamer-academic/LOCAL-NOTES.md`。适合作为 upstream PR。
+
+**后续待办：** ①主题层修复（`\beamer@centeredfalse` + `\hrule`）抄进 `zuhui-beammer`，并修其 `\setbeamertemplate{frametitle}{}` 被清空导致漏写 `\zuhuiframetitle` 就静默无标题的隐患；②`writing-style.md` 红旗清单吸收进另两个 skill，但 `itemize` 禁令不照搬到 7–12 页组会线；③反向把 `zuhui-beammer` 的 `page_manifest.tsv` 证据契约补进 `pyrojewel-beamer-academic`。
