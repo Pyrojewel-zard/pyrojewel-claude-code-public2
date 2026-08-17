@@ -244,3 +244,26 @@
 **push 状态：** 无需 commit/push（pyrojewel_claude_code 无变更）。
 
 **备注：** 本会话 VM 无 SSH key（`~/.ssh/` 不存在），所有 origin SSH 操作不可用。环境变量带 `https_proxy=http://172.16.10.254:7897`（当前不可达），HTTPS 访问 GitHub 需 `unset` 代理变量后直连。四仓库均通过 HTTPS 完成验证，无需 workaround。
+
+### 2026-08-17 — 日常同步（无 skill 变更）
+
+**上游仓库更新：**
+
+| 仓库 | 同步方式 | 结果 | 新 commit |
+|------|---------|------|----------|
+| `Auto-claude-code-research-in-sleep` | HTTPS pull（origin 临时切 HTTPS，SSH key 缺失） | ✅ 已最新 `0c65f8b` | 0 |
+| `ljg-skills` | `git fetch upstream` + merge（解决 11 个文件冲突，保留本地改编） | ✅ `35025c3`→`e496e28` | 13 |
+| `beamer-academic` | HTTPS fetch + workaround（`git update-ref HEAD origin/main`，`unlink` 权限受限） | ✅ `92f0fa9`→`788e125` | 1 |
+| `virtuoso-bridge-lite` | `git fetch upstream` + merge（自动合入，无冲突） | ✅ `5d52326`→`70b41f8` | 3 |
+
+**ljg-skills merge 处理：** 11 个文件冲突（ljg-blind/ljg-book/ljg-paper/ljg-push/ljg-qa/ljg-roundtable/ljg-structure），全部为「本地 markdown 迁移 + 路径对齐」vs「上游 Org 版方法论更新」冲突。按规则保留本地改编（`git checkout --ours`）。上游新增 v1.17.87-v1.17.97 批量同步（ljg-paper 新增精细阅读基线/概念缺口账本，与本地 pyrojewel-paper 已有能力一致）。fork 未 push（SSH key 缺失）。
+
+**beamer-academic 更新：** 主题 v1.5 顶对齐细线版（`assets/beamerthemeAcademic.sty` + SKILL.md 版式规则更新），章节分隔页从 outline 改为满版色+圆圈序号。本地 `pyrojewel-beamer-academic` 按「版式规则本地优先」原则未自动同步，需人工评估是否吸收部分风格变化。
+
+**virtuoso 更新：** 3 个 commit 均为 README/docs 更新（移除 OOS Metrics badge + 流量统计），无 bridge API 或 SKILL.md 变更，无需同步。
+
+**同步到当前项目的 skill：** 无（四仓库变更均不涉及当前项目已采用 skill 的文件变更）。
+
+**push 状态：** 无需 commit/push（pyrojewel_claude_code 无变更）。
+
+**备注：** 本会话 VM 无 SSH key（`~/.ssh/` 不存在），所有 origin SSH 操作不可用。`Auto-claude-code-research-in-sleep` 和 `beamer-academic` 通过临时切 origin 为 HTTPS 完成拉取。挂载盘 git 受 `unlink` 权限限制，`beamer-academic` 用 `git update-ref HEAD origin/main` workaround 更新 HEAD，`ljg-skills` 和 `virtuoso` 通过 `rm -f .git/*.lock` 清理遗留锁文件后再完成 merge。
