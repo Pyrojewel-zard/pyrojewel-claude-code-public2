@@ -24,3 +24,7 @@ skills/zotero-manager/.env
 skills/vision-batch-read/.env
 skills/*/.env
 .env
+
+# Python cache
+__pycache__/
+*.pyc

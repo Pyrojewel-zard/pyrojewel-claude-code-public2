@@ -1,0 +1,32 @@
+[
+  {
+    "id": "adc-pdf-style-extraction",
+    "prompt": "根据 ADC_Calibration.pdf 生成 7 页技术组会 PPT，沿用现有 pyrojewel-beamer-academic 的证据与 QA 要求，但严格复现 PDF 的白底、红线、来源栏和左文右图结构。",
+    "expected_constraints": [
+      "white canvas with red rule accents",
+      "source citation on each evidence page",
+      "do not default to navy/gold cards",
+      "equation, circuit figure, and interpretation remain distinct"
+    ]
+  },
+  {
+    "id": "adc-behavioral-model-results",
+    "prompt": "把 Lee84 电荷重分配、Verilog-A 行为级实现和 raw/corrected transfer curves 编成组会 PPT。保留公式、代码、图注和数值来源，并说明校准前后的曲线语义。",
+    "expected_constraints": [
+      "use technical two-column evidence layouts",
+      "code must be readable and labeled as excerpt",
+      "curve colors require an explicit legend",
+      "reported values must retain source locations"
+    ]
+  },
+  {
+    "id": "adc-fast-delivery-pressure",
+    "prompt": "时间很紧，先做一版看起来像 ADC_Calibration.pdf 的 PPT；可以少写 QA，但不要使用大面积深蓝横幅、金色圆角卡片或无来源的 ENOB/误差结论。",
+    "expected_constraints": [
+      "speed pressure does not waive evidence or PDF QA",
+      "red/white style remains the default",
+      "unsupported numbers are marked unknown or removed",
+      "final output still includes compile and visual checks"
+    ]
+  }
+]

@@ -32,6 +32,7 @@
 | `pyrojewel-paper-qa` | `skills/pyrojewel-paper-qa/skill.md` | Flow 1 | `active` | `ljg-skills` | `ljg-qa` 改编 | worker2 | 跟踪问题设计方法；本地对齐输出优先 |
 | `pyrojewel-paper-flow` | `skills/pyrojewel-paper-flow/SKILL.md` | Flow 1 | `adopted` | self-built + local composition | 编排 `zotero-pdf-parse -> paper -> river -> qa -> beamer` | worker2 | 不看单一 upstream；按主链变化手工维护 |
 | `pyrojewel-beamer-academic` | `skills/pyrojewel-beamer-academic/SKILL.md` | Flow 1 / 11 | `adopted` | `beamer-academic` + `guizang-ppt-skill` | 上游 beamer + 本地版式改造 | worker2 | 跟踪上游 LaTeX/模板更新；版式规则本地优先 |
+| `zuhui-beammer` | `skills/zuhui-beammer/SKILL.md` | Flow 11 | `adopted` | local derivative of `pyrojewel-beamer-academic` + `ADC_Calibration.pdf` | 独立 `beamerthemeZuhuiBeammer.sty`；复用父 skill 工作流与证据/QA 契约，不加载父主题 | lead | 本地维护；仅在父 skill 工作流或 ADC 参考版式发生实质变化时手工评估 |
 | `analyze-results` | `skills/analyze-results/skill.md` | Flow 4 | `adopted` | `Auto-claude-code-research-in-sleep` | 原样迁移 | worker3 | 看上游是否有方法/输出结构更新 |
 | `experiment-plan` | `skills/experiment-plan/skill.md` | Flow 2 / 4 | `adopted` | `Auto-claude-code-research-in-sleep` | 原样迁移 | worker3 | 跟踪 claim-driven planning 更新 |
 | `paper-compile` | `skills/paper-compile/skill.md` | Flow 4 / 5 | `adopted` | `Auto-claude-code-research-in-sleep` | 原样迁移 | worker3 | 跟踪编译/修错流程更新 |
@@ -226,3 +227,20 @@
 **pyrojewel-claude_code 项目侧：** `pyrojewel-paper`（研究者向，Zotero/paper_overview 集成）本次不同步——其阅读协议已含概念缺口账本/三重检验/最小模型三查，是精细阅读基线的来源；新框架的叙事引擎与研究者向定位不符。fork 对齐版作为方法论参考保留，后续如需可选择性吸收证据纪律表述。
 
 **push 状态：** ljg-skills fork 已 push（`3777618..3210fa9`）；pyrojewel-claude_code 本次仅此日志。
+
+### 2026-08-13 — 日常同步（无变更）
+
+**上游仓库更新：**
+
+| 仓库 | 同步方式 | 结果 | 新 commit |
+|------|---------|------|----------|
+| `Auto-claude-code-research-in-sleep` | HTTPS fetch（绕代理，SSH key 缺失） | ✅ 已最新 `e12e07c` | 0 |
+| `ljg-skills` | HTTPS fetch upstream（绕代理） | ✅ 已最新 `3210fa9` | 0 |
+| `beamer-academic` | HTTPS fetch（绕代理） | ✅ 已最新 `92f0fa9` | 0 |
+| `virtuoso-bridge-lite` | HTTPS fetch upstream（绕代理） | ✅ 已最新 `5d52326` | 0 |
+
+**同步到当前项目的 skill：** 无（四仓库均无新 commit）。
+
+**push 状态：** 无需 commit/push（pyrojewel_claude_code 无变更）。
+
+**备注：** 本会话 VM 无 SSH key（`~/.ssh/` 不存在），所有 origin SSH 操作不可用。环境变量带 `https_proxy=http://172.16.10.254:7897`（当前不可达），HTTPS 访问 GitHub 需 `unset` 代理变量后直连。四仓库均通过 HTTPS 完成验证，无需 workaround。

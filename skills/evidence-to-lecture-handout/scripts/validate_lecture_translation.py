@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate the bilingual lecture-record contract before rendering a PDF."""
+"""Validate language-aware lecture/tutorial records before rendering a PDF."""
 
 from __future__ import annotations
 
@@ -22,14 +22,20 @@ FORBIDDEN_ZH = (
 )
 
 
-def validate_note(note: dict[str, Any]) -> list[str]:
+def note_language_mode(note: dict[str, Any]) -> str:
+    mode = str(note.get("languageMode") or "bilingual").strip().lower()
+    return mode if mode in {"zh-only", "bilingual"} else "bilingual"
+
+
+def validate_note(note: dict[str, Any], language_mode: str | None = None) -> list[str]:
     slide = note.get("slide", "?")
     zh = str(note.get("scriptZh") or "").strip()
     en = str(note.get("englishProcessed") or "").strip()
+    mode = language_mode or note_language_mode(note)
     errors: list[str] = []
     if not zh:
         errors.append(f"slide {slide}: empty Chinese lecture script")
-    if not en:
+    if mode == "bilingual" and not en:
         errors.append(f"slide {slide}: empty English lecture script")
     cjk = len(re.findall(r"[\u4e00-\u9fff]", zh))
     latin = len(re.findall(r"[A-Za-z]", zh))
@@ -37,7 +43,7 @@ def validate_note(note: dict[str, Any]) -> list[str]:
         errors.append(f"slide {slide}: Chinese script has too little Chinese text ({cjk})")
     if latin > max(80, cjk * 0.7):
         errors.append(f"slide {slide}: Chinese script is dominated by Latin text (cjk={cjk}, latin={latin})")
-    if len(en) >= 300 and len(zh) < max(80, len(en) * 0.18):
+    if mode == "bilingual" and len(en) >= 300 and len(zh) < max(80, len(en) * 0.18):
         errors.append(
             f"slide {slide}: Chinese script is too compressed for the English scope "
             f"(zh={len(zh)}, en={len(en)})"
@@ -49,10 +55,17 @@ def validate_note(note: dict[str, Any]) -> list[str]:
     repeated = {sentence for sentence in sentences if sentences.count(sentence) >= 2}
     if repeated:
         errors.append(f"slide {slide}: repeated boilerplate sentence in Chinese script")
-    if "…" in en or "..." in en:
+    if mode == "bilingual" and ("…" in en or "..." in en):
         errors.append(f"slide {slide}: English lecture script is truncated")
-    if "与该页时间窗" in en or "完整代表帧" in en:
+    if mode == "bilingual" and ("与该页时间窗" in en or "完整代表帧" in en):
         errors.append(f"slide {slide}: evidence-template text leaked into English script")
+    if mode == "zh-only":
+        if note.get("scriptZhMode") != "original-zh-edited":
+            errors.append(f"slide {slide}: zh-only note must use scriptZhMode=original-zh-edited")
+        if en:
+            errors.append(f"slide {slide}: zh-only note must not contain English lecture script")
+    elif note.get("scriptZhMode") not in {None, "translation-of-english"}:
+        errors.append(f"slide {slide}: bilingual note must use scriptZhMode=translation-of-english")
     return errors
 
 
@@ -61,15 +74,21 @@ def validate_notes(path: Path) -> list[str]:
     if not isinstance(value, list):
         return [f"{path}: authored notes must be a JSON array"]
     errors: list[str] = []
+    language_modes = {note_language_mode(note) for note in value if isinstance(note, dict)}
+    if not language_modes:
+        return [f"{path}: authored notes contain no note objects"]
+    if len(language_modes) != 1:
+        errors.append(f"{path}: mixed languageMode values: {sorted(language_modes)}")
+    mode = next(iter(language_modes)) if len(language_modes) == 1 else "bilingual"
     for note in value:
         if not isinstance(note, dict):
             errors.append("authored note is not an object")
             continue
-        errors.extend(validate_note(note))
+        errors.extend(validate_note(note, mode))
     return errors
 
 
-def validate_qna(path: Path) -> list[str]:
+def validate_qna(path: Path, language_mode: str = "bilingual") -> list[str]:
     value = json.loads(path.read_text(encoding="utf-8"))
     if not isinstance(value, list):
         return [f"{path}: authored Q&A must be a JSON array"]
@@ -84,7 +103,11 @@ def validate_qna(path: Path) -> list[str]:
                 errors.append(f"{qid}: {field} is not a Chinese lecture answer")
             if "本段按原始问答时间窗完整归档" in text:
                 errors.append(f"{qid}: Q&A evidence template leaked into {field}")
-        if isinstance(item, dict) and ("…" in str(item.get("englishProcessed") or "") or "..." in str(item.get("englishProcessed") or "")):
+        if language_mode == "bilingual" and isinstance(item, dict) and not str(item.get("englishProcessed") or "").strip():
+            errors.append(f"{qid}: bilingual Q&A is missing English text")
+        if language_mode == "zh-only" and isinstance(item, dict) and str(item.get("englishProcessed") or "").strip():
+            errors.append(f"{qid}: zh-only Q&A must not contain English text")
+        if language_mode == "bilingual" and isinstance(item, dict) and ("…" in str(item.get("englishProcessed") or "") or "..." in str(item.get("englishProcessed") or "")):
             errors.append(f"{qid}: English Q&A is truncated")
     return errors
 
@@ -95,8 +118,10 @@ def main() -> int:
     parser.add_argument("--qna", type=Path)
     args = parser.parse_args()
     errors = validate_notes(args.notes)
+    notes_value = json.loads(args.notes.read_text(encoding="utf-8"))
+    mode = note_language_mode(notes_value[0]) if isinstance(notes_value, list) and notes_value and isinstance(notes_value[0], dict) else "bilingual"
     if args.qna:
-        errors.extend(validate_qna(args.qna))
+        errors.extend(validate_qna(args.qna, mode))
     if errors:
         print("\n".join(errors))
         return 1

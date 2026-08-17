@@ -1,0 +1,14 @@
+# zuhui-beammer presentation defaults
+theme: "beamerthemeZuhuiBeammer.sty"
+aspect_ratio: "169"
+font_size: "10pt"
+figure_paths:
+  - "materials/figures/"
+  - "./"
+watermark: ""
+source_reference: "ADC_Calibration.pdf"
+semantic_colors:
+  primary: "zuhui-red"
+  corrected: "zuhui-green"
+  ideal: "zuhui-blue"
+  body: "zuhui-ink"

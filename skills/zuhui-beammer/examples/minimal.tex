@@ -1,0 +1,96 @@
+\documentclass[aspectratio=169,10pt]{beamer}
+
+\usepackage{xeCJK}
+\IfFontExistsTF{Noto Sans CJK SC}{%
+  \setCJKmainfont{Noto Sans CJK SC}%
+  \setCJKsansfont{Noto Sans CJK SC}%
+  \setCJKmonofont{Noto Sans CJK SC}%
+}{%
+  \setCJKmainfont{AR PL UMing CN}%
+  \setCJKsansfont{AR PL UMing CN}%
+  \setCJKmonofont{AR PL UMing CN}%
+}
+\usepackage{amsmath,amssymb,booktabs,tikz}
+\usepackage{../assets/beamerthemeZuhuiBeammer}
+
+\title{ADC 数字校准}
+\subtitle{Charge redistribution, behavioral modeling, and calibration evidence}
+\author{Zuhui Group Meeting}
+\institute{ADC / mixed-signal circuit research}
+\date{2026年8月}
+\graphicspath{{../materials/figures/}{./}}
+
+\begin{document}
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+\section{Lee 84}
+\begin{frame}
+  \zuhuiframetitle{Lee 84：基于电荷重分配的误差测量}{[1] Lee \& Hodges, IEEE TCAS, 1983, p.188--190}
+  \begin{columns}[T]
+    \begin{column}{0.43\textwidth}
+      \zuhuisectionbar{校准思想}
+      \begin{itemize}
+        \item CDAC 失配使实际 bit weight 偏离理想值。
+        \item 通过电荷重分配测量残差电压，再递推提取单 bit error。
+      \end{itemize}
+      \[
+        V_{XN}=2V_{CN}
+      \]
+      \zuhuiconclusion{残差电压把电容失配映射成可测量的误差。}
+    \end{column}
+    \begin{column}{0.47\textwidth}
+      \begin{center}
+        \begin{tikzpicture}[font=\scriptsize, node distance=0.35cm]
+          \node[draw=zuhui-gray, minimum width=1.55cm, minimum height=0.55cm] (dac) {CDAC};
+          \node[draw=zuhui-red, right=0.4cm of dac, minimum width=1.55cm, minimum height=0.55cm] (res) {residual};
+          \node[draw=zuhui-blue, right=0.4cm of res, minimum width=1.55cm, minimum height=0.55cm] (cmp) {comparator};
+          \draw[->,zuhui-red,line width=0.8pt] (dac) -- (res);
+          \draw[->,zuhui-red,line width=0.8pt] (res) -- (cmp);
+          \node[below=0.35cm of res, text=zuhui-gray] {$V_{XN}$ residual after charge split};
+        \end{tikzpicture}
+      \end{center}
+      \zuhuifigcap{结构示意：右侧流程只表达证据关系，不替代原论文电路图。}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}[fragile]
+  \zuhuiframetitle{行为级实现：残差递推与代码证据}{Verilog-A excerpt; equations reconstructed from source}
+  \begin{columns}[T]
+    \begin{column}{0.41\textwidth}
+      \zuhuisectionbar{递推关系}
+      \[
+        V_{eN}=\frac{1}{2}\left(V_{XN}-\sum_{i=N+1}^{M}V_{ei}\right)
+      \]
+      \small 高位到低位递推，最后根据 raw code 中置 1 的 bit 累加校准量。变量、单位和适用条件必须随公式解释。
+    \end{column}
+    \begin{column}{0.51\textwidth}
+      \begin{zuhuicode}
+vx4 = vref*(c4-c3-c2-c1b-c1a);
+ve4 = 0.5 * vx4;
+ve3 = 0.5 * (vx3 - ve4);
+      \end{zuhuicode}
+      \zuhuifigcap{代码摘录：代码是实现证据，需标注语言、范围和是否为完整实现。}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}
+  \zuhuiframetitle{校准前后：raw、corrected 与 ideal 的语义对照}{Simulation result; values and curves require source location}
+  \begin{center}
+    \begin{tikzpicture}[x=1.0cm,y=1.0cm]
+      \draw[->,zuhui-gray] (0,0) -- (8.4,0) node[right] {input};
+      \draw[->,zuhui-gray] (0,0) -- (0,3.5) node[above] {code};
+      \draw[zuhui-blue,line width=1.0pt] (0,0) -- (2,1) -- (4,2) -- (6,3) -- (8,4);
+      \draw[zuhui-red,line width=1.0pt] (0,0.2) -- (2,1.2) -- (4,1.7) -- (6,3.3) -- (8,3.8);
+      \draw[zuhui-green,line width=1.0pt] (0,0.05) -- (2,1.02) -- (4,2.02) -- (6,3.01) -- (8,4.02);
+    \end{tikzpicture}
+  \end{center}
+  \zuhuiresultlegend{$v_{raw}$ / mismatch}{$v_{corr}$ / calibrated}{$v_{ideal}$ / reference}
+  \zuhuiconclusion{颜色必须绑定变量与校准指标。}
+\end{frame}
+
+\end{document}

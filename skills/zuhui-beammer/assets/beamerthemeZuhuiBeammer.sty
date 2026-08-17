@@ -1,0 +1,205 @@
+% ============================================================
+% Zuhui Beammer — ADC / circuit group-meeting Beamer theme
+% Derived from the pyrojewel-beamer-academic workflow, not its
+% visual theme. The visual reference is ADC_Calibration.pdf.
+% ============================================================
+\ProvidesPackage{beamerthemeZuhuiBeammer}[2026/08/15 Zuhui ADC Group Meeting Theme]
+
+\RequirePackage{tikz}
+\RequirePackage{graphicx}
+\RequirePackage{xcolor}
+\RequirePackage{booktabs}
+\RequirePackage{listings}
+\RequirePackage{array}
+\usetikzlibrary{positioning}
+
+% ------------------------------------------------------------
+% Visual tokens: white canvas, red rules, technical ink.
+% Values are configurable approximations of the supplied PDF;
+% keep semantic roles stable when tuning the palette.
+% ------------------------------------------------------------
+\definecolor{zuhui-red}{RGB}{192,0,0}
+\definecolor{zuhui-red-light}{RGB}{244,220,220}
+\definecolor{zuhui-ink}{RGB}{28,28,28}
+\definecolor{zuhui-gray}{RGB}{92,92,92}
+\definecolor{zuhui-grid}{RGB}{218,218,218}
+\definecolor{zuhui-blue}{RGB}{30,92,170}
+\definecolor{zuhui-green}{RGB}{0,145,85}
+\definecolor{zuhui-code-bg}{RGB}{247,249,252}
+\definecolor{zuhui-code-blue}{RGB}{22,78,150}
+\definecolor{zuhui-code-comment}{RGB}{80,118,80}
+
+\colorlet{zuhui-primary}{zuhui-red}
+\colorlet{zuhui-body}{zuhui-ink}
+
+% ------------------------------------------------------------
+% Beamer defaults
+% ------------------------------------------------------------
+\setbeamercolor{normal text}{fg=zuhui-ink,bg=white}
+\setbeamercolor{structure}{fg=zuhui-red}
+\setbeamercolor{alerted text}{fg=zuhui-red}
+\setbeamercolor{title}{fg=zuhui-ink}
+\setbeamercolor{frametitle}{fg=zuhui-ink,bg=white}
+\setbeamercolor{headline}{fg=zuhui-gray,bg=white}
+\setbeamercolor{footline}{fg=zuhui-gray,bg=white}
+\setbeamercolor{caption name}{fg=zuhui-red}
+\setbeamercolor{item}{fg=zuhui-red}
+\setbeamercolor{enumerate item}{fg=zuhui-red}
+\setbeamerfont{normal text}{size=\fontsize{9.4pt}{11.3pt}\selectfont}
+\setbeamerfont{title}{size=\fontsize{23pt}{28pt}\selectfont,series=\mdseries}
+\setbeamerfont{frametitle}{size=\fontsize{15pt}{18pt}\selectfont,series=\bfseries}
+\setbeamerfont{footline}{size=\fontsize{7pt}{8pt}\selectfont}
+\setlength{\emergencystretch}{1em}
+% Allow only the sub-1pt box rounding produced by Beamer's output chrome;
+% larger content/layout overflow remains visible and must be fixed.
+\setlength{\hfuzz}{0.8pt}
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{frametitle}{}
+
+% Red square hierarchy, matching the PDF's section bullets.
+\setbeamertemplate{itemize item}{%
+  \raisebox{0.18ex}{\color{zuhui-red}\rule{0.58ex}{0.58ex}}%
+}
+\setbeamertemplate{itemize subitem}{%
+  \raisebox{0.2ex}{\color{zuhui-red}\rule{0.42ex}{0.42ex}}%
+}
+\setbeamertemplate{enumerate item}{%
+  \raisebox{0.1ex}{\color{zuhui-red}\rule{0.55ex}{0.55ex}}%
+}
+
+% ------------------------------------------------------------
+% Configurable identity marks
+% ------------------------------------------------------------
+\newcommand{\zuhuiwatermark}{}
+\newcommand{\setzuhuiwatermark}[1]{\renewcommand{\zuhuiwatermark}{#1}}
+
+% Top chrome stays intentionally quiet: the frame title carries the
+% source block, while the headline only provides a short red rule.
+\setbeamertemplate{headline}{%
+  \leavevmode
+  \begin{beamercolorbox}[wd=\paperwidth,ht=0.52cm,dp=0.05cm,leftskip=0.55cm,rightskip=0.55cm]{headline}%
+    \color{zuhui-red}\rule{0.52\paperwidth}{1.2pt}%
+    \hfill
+    {\color{zuhui-gray}\fontsize{5.4pt}{6.5pt}\selectfont\insertsectionhead}%
+  \end{beamercolorbox}%
+}
+
+\setbeamertemplate{footline}{%
+  \leavevmode
+  \begin{beamercolorbox}[wd=\paperwidth,ht=0.30cm,dp=0.08cm,leftskip=0.55cm,rightskip=0.55cm]{footline}%
+    \color{zuhui-red-light}\rule{\dimexpr\linewidth-1.15cm\relax}{0.45pt}%
+    \hfill
+    {\color{zuhui-gray}\usebeamerfont{footline}\zuhuiwatermark\hspace{0.32cm}\insertframenumber}%
+  \end{beamercolorbox}%
+}
+
+% Minimal title page: no dark banner, no decorative card.
+\setbeamertemplate{title page}{%
+  \vbox to 0.82\paperheight{
+    \vspace*{0.72cm}
+    \begin{center}
+      \color{zuhui-red}\rule{0.84\paperwidth}{1.4pt}\par
+      \vspace{1.05cm}
+      {\usebeamerfont{title}\usebeamercolor[fg]{title}\inserttitle\par}
+      \ifx\insertsubtitle\empty\else
+        \vspace{0.32cm}{\color{zuhui-gray}\small\insertsubtitle\par}
+      \fi
+      \vfill
+      {\color{zuhui-gray}\small\insertauthor\par}
+      \vspace{0.12cm}{\color{zuhui-gray}\scriptsize\insertinstitute\par}
+      \vspace{0.12cm}{\color{zuhui-gray}\scriptsize\insertdate\par}
+      \vspace{0.58cm}
+      \color{zuhui-red-light}\rule{0.84\paperwidth}{0.45pt}
+    \end{center}
+  }
+}
+
+% ------------------------------------------------------------
+% PDF-shaped page primitives
+% ------------------------------------------------------------
+% Every evidence frame should call this once. #2 is the source/location
+% string, intentionally visible at the upper-right of the title row.
+\newcommand{\zuhuiframetitle}[2]{%
+  \noindent
+  \begin{minipage}[t]{0.64\linewidth}
+    {\usebeamerfont{frametitle}\color{zuhui-ink}#1\par}
+  \end{minipage}%
+  \hfill
+  \begin{minipage}[t]{0.27\linewidth}
+    \raggedleft\color{zuhui-gray}\fontsize{5.3pt}{6.3pt}\selectfont #2
+  \end{minipage}
+  \par\vspace{0.06cm}
+  \noindent\begin{tikzpicture}
+    \draw[zuhui-red,line width=1.1pt] (0,0) -- (0.52\linewidth,0);
+    \draw[zuhui-red-light,line width=0.45pt] (0.52\linewidth,0) -- (\linewidth,0);
+  \end{tikzpicture}
+  \vspace{0.08cm}
+}
+
+\newcommand{\zuhuisectionbar}[1]{%
+  \vspace{0.04cm}
+  \noindent\tikz[baseline=-0.45ex]{\fill[zuhui-red] (0,0) rectangle (0.65ex,0.65ex);}
+  \hspace{0.35em}{\color{zuhui-red}\bfseries #1}\par
+  \vspace{0.04cm}
+}
+
+\newcommand{\zuhuifigcap}[1]{%
+  \par\vspace{0.04cm}
+  {\color{zuhui-gray}\fontsize{7pt}{8.2pt}\selectfont\textbullet\ #1}\par
+}
+
+\newcommand{\zuhuifigure}[2][4.6cm]{%
+  \begin{center}
+    \includegraphics[height=#1,width=\linewidth,keepaspectratio]{#2}
+  \end{center}
+}
+
+\newcommand{\zuhuicodebox}[1]{%
+  \begin{beamercolorbox}[wd=\linewidth,sep=5pt]{normal text}
+    \colorbox{zuhui-code-bg}{\parbox{0.96\linewidth}{%
+      \ttfamily\fontsize{7.0pt}{8.4pt}\selectfont\color{zuhui-code-blue}#1}}
+  \end{beamercolorbox}
+}
+
+\lstdefinestyle{zuhui-code}{%
+  basicstyle=\ttfamily\fontsize{7.0pt}{8.4pt}\selectfont\color{zuhui-code-blue},
+  keywordstyle=\color{zuhui-red},
+  commentstyle=\color{zuhui-code-comment},
+  stringstyle=\color{zuhui-green},
+  backgroundcolor=\color{zuhui-code-bg},
+  frame=single,
+  rulecolor=\color{zuhui-grid},
+  framerule=0.35pt,
+  columns=fullflexible,
+  keepspaces=true,
+  breaklines=true,
+  showstringspaces=false
+}
+\lstnewenvironment{zuhuicode}{\lstset{style=zuhui-code}}{}
+
+% Semantic legend: raw/error = red, corrected = green, ideal/oracle = blue.
+\newcommand{\zuhuiresultlegend}[3]{%
+  \begin{center}
+    \scriptsize
+    \tikz[baseline=-0.4ex]{\fill[zuhui-red] (0,0) rectangle (0.7ex,0.7ex);}\ #1
+    \hspace{0.85em}
+    \tikz[baseline=-0.4ex]{\fill[zuhui-green] (0,0) rectangle (0.7ex,0.7ex);}\ #2
+    \hspace{0.85em}
+    \tikz[baseline=-0.4ex]{\fill[zuhui-blue] (0,0) rectangle (0.7ex,0.7ex);}\ #3
+  \end{center}
+}
+
+\newcommand{\zuhuiquote}[1]{%
+  \begin{flushleft}
+    \color{zuhui-gray}\itshape\small
+    \vrule width 1.5pt\hspace{0.65em}\parbox{0.91\linewidth}{#1}
+  \end{flushleft}
+}
+
+\newcommand{\zuhuiconclusion}[1]{%
+  \vspace{0.10cm}
+  \noindent\color{zuhui-red}\rule{0.8cm}{1.0pt}\hspace{0.55em}%
+  {\color{zuhui-ink}\bfseries #1}\par
+}
+
+\endinput

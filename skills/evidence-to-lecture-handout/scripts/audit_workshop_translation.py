@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Audit every workshop handout before accepting bilingual lecture records."""
+"""Audit every workshop handout before accepting language-aware records."""
 
 from __future__ import annotations
 
@@ -36,10 +36,15 @@ def audit_handout(root: Path) -> dict[str, object]:
     qna_path = root / "authored-qna.json"
     notes = json.loads(notes_path.read_text(encoding="utf-8"))
     qna = json.loads(qna_path.read_text(encoding="utf-8"))
+    first_note = notes[0] if isinstance(notes, list) and notes else {}
+    language_mode = MODULE.note_language_mode(first_note) if isinstance(first_note, dict) else "bilingual"
     errors = MODULE.validate_notes(notes_path)
-    errors.extend(MODULE.validate_qna(qna_path))
+    errors.extend(MODULE.validate_qna(qna_path, language_mode))
     body_errors: list[str] = []
-    for relative in ("handout.md", "handout/handout.tex", "lecture-script.zh.md", "lecture-script.en.md"):
+    required_files = ["handout.md", "handout/handout.tex", "lecture-script.zh.md"]
+    if language_mode == "bilingual":
+        required_files.append("lecture-script.en.md")
+    for relative in required_files:
         path = root / relative
         if not path.is_file():
             body_errors.append(f"missing {relative}")
@@ -62,6 +67,7 @@ def audit_handout(root: Path) -> dict[str, object]:
     errors.extend(pdf_errors)
     return {
         "talk": root.parent.name,
+        "languageMode": language_mode,
         "pages": len(notes),
         "qna": len(qna),
         "translationPass": not errors,
@@ -80,10 +86,10 @@ def main() -> int:
     results = [audit_handout(root) for root in sorted(args.root.glob("talk-*/lecture-handout"))]
     args.json.parent.mkdir(parents=True, exist_ok=True)
     args.json.write_text(json.dumps(results, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    lines = ["# Workshop 双语讲演录全量审计", "", "| Talk | 页数 | Q&A | 翻译校验 | PDF | 错误数 |", "|---|---:|---:|---|---|---:|"]
+    lines = ["# Workshop 讲演录全量审计", "", "| Talk | 语言 | 页数 | Q&A | 校验 | PDF | 错误数 |", "|---|---|---:|---:|---|---|---:|"]
     for result in results:
         lines.append(
-            f"| {result['talk']} | {result['pages']} | {result['qna']} | "
+            f"| {result['talk']} | {result['languageMode']} | {result['pages']} | {result['qna']} | "
             f"{'PASS' if result['translationPass'] else 'FAIL'} | "
             f"{'present' if result['pdfPresent'] else 'missing'} | {len(result['errors'])} |"
         )

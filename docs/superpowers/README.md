@@ -15,6 +15,13 @@ docs/superpowers/
 
 | Plan | Date | Status | File |
 |------|------|--------|------|
+| zuhui-beammer implementation | 2026-08-15 | completed | [plans/2026-08-15-zuhui-beammer.md](plans/2026-08-15-zuhui-beammer.md) |
+
+### Active Specs
+
+| Spec | Date | Status | File |
+|------|------|--------|------|
+| zuhui-beammer design | 2026-08-15 | completed | [specs/2026-08-15-zuhui-beammer-design.md](specs/2026-08-15-zuhui-beammer-design.md) |
 
 _No active plans._
 
