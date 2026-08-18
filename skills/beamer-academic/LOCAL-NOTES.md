@@ -2,7 +2,7 @@
 
 **状态:** `active`(维护中的本地 fork,不是原样镜像)
 **Base:** `Faust-Donf/beamer-academic` @ `788e125` (v1.5, 2026-08-17)
-**当前版本:** `1.5+pyrojewel.1`
+**当前版本:** `1.5+pyrojewel.2`
 **迁入 / 转维护:** 2026-08-17
 
 ## 定位与路由
@@ -22,7 +22,7 @@
 
 ## 本地 patch 日志
 
-正文(SKILL.md frontmatter 之后 494 行)目前仍与上游逐字节一致。**主题已分叉一个 patch。**
+正文(SKILL.md frontmatter 之后已加入本地 reproduction profile)。**主题与布局已分叉。**
 
 ### [P1] 2026-08-17 — 修封面三处失效守卫
 
@@ -52,6 +52,17 @@
 双向验证通过:未设时 0 错误且标签行消失;`\setsupervisor{Prof X}\setmajor{EE}` 时正常打印。
 
 同一份主题在别处(`\insertframesubtitle` 守卫、`\thanksframe`)已经正确使用 `\ifstrempty`,所以这三处是上游内部不一致。**值得提 upstream PR**——提了之后本 patch 可以撤掉。
+
+### [P2] 2026-08-18 — 论文算法复现汇报模式
+
+`SKILL.md` 新增 `report_type: reproduction`：每篇论文 2--5 页，固定覆盖
+overview、algorithm-derivation、paper-code-map、reproduction-result；布局参考和
+`references/reproduction-contract.md` 固定论文原图、示意重绘、当前复现图及
+`file:function` 的证据边界。
+
+`assets/beamerthemeAcademic.sty` 与 `examples/transformer/beamerthemeAcademic.sty`
+同步改为白底紧凑 `\sectiondivider`，删除默认满版纯色章节转换效果，并增加
+`listings`、`\codeentry`、`\statuslabel`、`\paperstep`。两个主题副本必须保持一致。
 
 `examples/transformer/beamerthemeAcademic.sty` 是 `assets/` 的副本,已同步。改主题时记得两份一起改。
 

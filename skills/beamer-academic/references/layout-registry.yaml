@@ -25,10 +25,104 @@ layouts:
     slots:
       - chapters     # 章节列表，每项含 {number, title, keywords[]}
 
+  - id: paper-overview
+    name: 论文算法概览
+    file: paper-overview.tex
+    when: >
+      reproduction 模式下每篇论文的第一张内容页。左侧说明研究问题、论文贡献、
+      假设和适用范围，右侧放一张大尺寸论文原图或示意重绘图。
+    max_per_paper: 1
+    slots:
+      - paper_id
+      - citation
+      - left_text
+      - source_figure
+      - source_caption
+      - claim_boundary
+
+  - id: algorithm-derivation
+    name: 算法推导页
+    file: algorithm-derivation.tex
+    when: >
+      reproduction 模式下展示核心公式、辅助函数、求解变量和算法步骤。左栏写推导链，
+      右栏放不超过两个核心公式或流程图，页内必须说明公式在实现中的对象。
+    max_per_paper: 1
+    slots:
+      - paper_equation_or_algorithm
+      - assumptions
+      - derivation_text
+      - equations
+      - solver_object
+      - source_caption
+
+  - id: paper-code-map
+    name: 论文—代码对应页
+    file: paper-code-map.tex
+    when: >
+      reproduction 模式下连接论文算法和仓库实现。左栏固定显示论文步骤/公式编号，
+      右栏显示 file:function、关键参数、最小代码片段和实现状态。
+    max_per_paper: 1
+    slots:
+      - paper_steps
+      - equation_refs
+      - code_path
+      - code_function
+      - code_excerpt
+      - parameters
+      - implementation_status
+      - implementation_note
+
+  - id: reproduction-result
+    name: 复现结果页
+    file: reproduction-result.tex
+    when: >
+      reproduction 模式下展示当前代码/数据运行得到的结果。左栏写频段、数据划分、指标和
+      判定，右栏放 S 参数拟合、误差、极点零点或电路回代图。
+    max_per_paper: 1
+    slots:
+      - run_id
+      - dataset_or_split
+      - frequency_band
+      - metric
+      - decision
+      - reproduction_figure
+      - reproduction_caption
+      - evidence_level
+
+  - id: pole-zero-circuit
+    name: 极点—零点与电路页
+    file: pole-zero-circuit.tex
+    when: >
+      需要把有理模型的极点/零点与感性器件的等效电路或物理寄生联系起来时使用；
+      不是把每一个 residue 直接当成电路元件。
+    max_per_paper: 1
+    slots:
+      - physical_interpretation
+      - pole_zero_text
+      - pole_zero_figure
+      - circuit_figure
+      - circuit_return_error
+      - non_claim
+
+  - id: method-comparison
+    name: 方法对照页
+    file: method-comparison.tex
+    when: >
+      各方法已经分别完成论文—代码—结果闭环后，用于对照拟合目标、约束、数据需求、
+      复杂度和当前证据等级；不能用一张表替代各方法的独立复现页。
+    max_per_presentation: 1
+    slots:
+      - methods
+      - fitting_object
+      - constraints
+      - complexity
+      - evidence
+      - decision
+
   - id: section-divider
     name: 章节分隔页
     file: section-divider.tex
-    when: "每章开头的过渡页。全色底+圆圈序号+章标题。用于视觉节奏分隔。"
+    when: "legacy 模式的章节过渡页；reproduction 模式仅允许白底、细线和紧凑编号，不使用满版色。"
     position: chapter_start
     slots:
       - chapter_number  # 中文数字（一、二、三...）
@@ -49,13 +143,14 @@ layouts:
     name: 左文右图
     file: text-left-image-right.tex
     when: >
-      文字描述为主，配合1-2张说明性图片。文字解释概念或方法，
-      图片起辅助说明作用。适合：数据来源说明+数据截图、方法描述+示意图。
+      文字描述为主，配合一张可读的大图。默认左栏约38--44%，右栏约56--62%；
+      适合数据来源说明+数据图、方法描述+流程图，禁止把关键图压缩成装饰性缩略图。
     slots:
       - title        # 页标题
       - chapnote     # 对应论文章节标注（可选）
       - left_text    # 左侧文字（120-180字）
-      - images       # 右侧图片列表 [{path, caption}]
+      - image        # 右侧单张大图 {path, caption, source_type}
+      - source_type  # paper-original | generated | reproduction
 
   - id: image-left-text-right
     name: 左图右文
@@ -130,7 +225,7 @@ layouts:
     slots:
       - title        # 页标题
       - summary      # 上一章结论概括（50-80字）
-      - questions    # 引出的问题/下一步方向（itemize，2-3条）
+      - questions    # 引出的问题/下一步方向（enumerate，2-3条）
 
   - id: list
     name: 列表页
@@ -180,7 +275,12 @@ layouts:
 # 版式选型优先级规则（供AI在Step 2使用）
 # =============================================================
 selection_rules:
-  - "每章第一页必须是 section-divider"
+  - "reproduction 模式按 paper-overview → algorithm-derivation → paper-code-map → reproduction-result 选择，每篇论文共2-5页"
+  - "reproduction 模式不强制 section-divider，不使用满版纯色页，也不以 transition 作为论文间默认过渡"
+  - "reproduction 模式内容页默认左38--44%、右56--62%，右侧只放一张可读大图或结构化复合图"
+  - "reproduction 模式的 paper-code-map 必须同时出现论文步骤/公式、file:function、实现状态"
+  - "reproduction 模式的 reproduction-result 必须出现数据/运行范围、指标、判定和结果图来源"
+  - "每章第一页必须是 section-divider（legacy defense/proposal/conference 模式）"
   - "含有核心公式/模型定义的内容优先用 formula 版式"
   - "含有多行数据对比的内容优先用 table 版式"
   - "图片信息量大（多面板、热力图）时用 full-image"
@@ -214,3 +314,10 @@ report_types:
     required_pages: [cover, thanks]
     typical_length: 15-25
     closing_text: "欢迎提问"
+
+  reproduction:
+    required_pages: [cover, thanks]
+    required_per_paper: [paper-overview, algorithm-derivation, paper-code-map, reproduction-result]
+    pages_per_paper: 2-5
+    section_divider: compact-white-optional
+    closing_text: "欢迎讨论复现边界与后续验证"

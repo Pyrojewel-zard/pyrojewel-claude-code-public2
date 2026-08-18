@@ -1,6 +1,6 @@
 % ============================================================
 % Academic Beamer Theme
-% 白底、细线、满版章节页。不绑学校。
+% 白底、细线、紧凑章节头。不绑学校。
 %
 % LOCAL FORK — pyrojewel_claude_code
 % Base: Faust-Donf/beamer-academic @ 788e125 (v1.5, 2026-08-17)
@@ -9,6 +9,8 @@
 %        \newcommand 生成 \long 宏，\empty 非 \long，\ifx 比较含前缀
 %        meaning 故永远为假：空 logo 触发 "File `' not found"，
 %        supervisor/major 空标签行照常打印。etoolbox 已 RequirePackage。
+%   [P2] 2026-08-18  reproduction profile: sectiondivider compact-white;
+%        add code-entry/status labels and bounded code listings.
 % ============================================================
 \ProvidesPackage{beamerthemeAcademic}[2026/08/17 Academic Beamer Theme v1.5+pyrojewel.1]
 
@@ -17,6 +19,7 @@
 \RequirePackage{etoolbox}
 \RequirePackage{xkeyval}
 \RequirePackage{colortbl}
+\RequirePackage{listings}
 
 % ---------- 配色 ----------
 \definecolor{academic-blue}{RGB}{26, 58, 92}
@@ -29,6 +32,9 @@
 \definecolor{lightline}{RGB}{200, 200, 200}
 \definecolor{lightbg}{RGB}{238, 242, 246}
 \definecolor{inkcolor}{RGB}{34, 34, 34}
+\definecolor{codebg}{RGB}{246, 248, 250}
+\definecolor{codeframe}{RGB}{205, 211, 218}
+\definecolor{codecomment}{RGB}{96, 110, 125}
 
 \colorlet{accentcolor}{academic-blue}
 \colorlet{accentdark}{academic-blue}
@@ -80,6 +86,43 @@
 \setbeamerfont{footline}{size=\fontsize{7pt}{9pt}\selectfont}
 \setbeamerfont{block title}{size=\normalsize, series=\bfseries}
 \setbeamerfont{section in toc}{series=\bfseries}
+
+% ---------- Reproduction report primitives ----------
+% Code is evidence: keep it short enough to read and always pair it with a path.
+\lstdefinestyle{academiccode}{%
+  backgroundcolor=\color{codebg},
+  frame=single,
+  rulecolor=\color{codeframe},
+  framerule=0.35pt,
+  basicstyle=\ttfamily\scriptsize,
+  keywordstyle=\color{accentcolor}\bfseries,
+  commentstyle=\color{codecomment}\itshape,
+  stringstyle=\color{academic-green},
+  numbers=left,
+  numberstyle=\tiny\color{textgray},
+  numbersep=5pt,
+  xleftmargin=1.8em,
+  framexleftmargin=1.8em,
+  keepspaces=true,
+  breaklines=true,
+  showstringspaces=false,
+  columns=fullflexible
+}
+\lstset{style=academiccode}
+
+\newcommand{\codeentry}[1]{%
+  \noindent\colorbox{accentlight}{\strut\hspace{0.35em}%
+    {\ttfamily\scriptsize\color{accentdark}\detokenize{#1}}%
+    \hspace{0.35em}}\par}
+
+\newcommand{\statuslabel}[1]{%
+  \noindent\fcolorbox{accentcolor}{white}{%
+    \strut\hspace{0.35em}{\scriptsize\sffamily\bfseries\color{accentcolor}#1}%
+    \hspace{0.35em}}\par}
+
+\newcommand{\paperstep}[2]{%
+  \noindent{\color{accentcolor}\bfseries\scriptsize #1}\quad
+  {\small #2}\par}
 
 \setbeamertemplate{itemize item}{\color{accentcolor}\raisebox{0.18ex}{\small\textbullet}}
 \setbeamertemplate{itemize subitem}{\color{accentcolor}\raisebox{0.18ex}{\scriptsize\textbullet}}
@@ -177,17 +220,18 @@
   \vspace{0.55cm}%
 }
 
-% 章节页：满版色 + 圆圈序号
+% 章节页：白底 + 细强调线 + 紧凑编号。
+% 旧版满版色章节页不再作为默认输出，尤其不用于 reproduction 单元之间。
 \newcommand{\sectiondivider}[2]{%
   \begin{frame}[plain]
-    \begin{tikzpicture}[remember picture, overlay]
-      \fill[accentcolor] (current page.north west) rectangle (current page.south east);
-      \node[circle, draw=white, line width=1.15pt, minimum size=1.85cm,
-            text=white, font=\sffamily\fontsize{30pt}{36pt}\selectfont\bfseries]
-            at ([yshift=0.55cm]current page.center) {#1};
-      \node[white, font=\sffamily\fontsize{22pt}{28pt}\selectfont\bfseries]
-            at ([yshift=-1.35cm]current page.center) {#2};
-    \end{tikzpicture}
+    \vspace*{0.78cm}
+    {\color{accentcolor}\rule{\textwidth}{1.2pt}}\par
+    \vspace{0.28cm}
+    {\color{accentcolor}\sffamily\fontsize{20pt}{25pt}\selectfont\bfseries
+      #1\quad #2}\par
+    \vspace{0.18cm}
+    {\color{textgray}\small 论文算法复现单元}\par
+    \vfill
   \end{frame}
 }
 
@@ -203,8 +247,8 @@
 \newcommand{\keybox}[1]{%
   \par\vspace{0.18cm}%
   \noindent
-  \begin{tikzpicture}
-    \node[fill=accentlight, inner sep=8pt, inner xsep=11pt,
+    \begin{tikzpicture}
+    \node[fill=accentlight, inner sep=6pt, inner xsep=5pt,
           text width=0.92\linewidth, align=left, font=\small] (kb) {#1};
     \draw[accentcolor, line width=2.6pt] (kb.north west) -- (kb.south west);
   \end{tikzpicture}

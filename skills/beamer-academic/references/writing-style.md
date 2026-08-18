@@ -161,6 +161,71 @@ tikz overlay for large figure + `\figcap{}`
 \end{frame}
 ```
 
+## Reproduction profile: one paper, one evidence chain
+
+The reproduction profile is not a shortened literature review. Every paper unit
+must move from a paper claim to a code entry and then to a current-run result.
+Write the page as a connected argument:
+
+```text
+论文在什么假设下提出什么算法
+→ 公式/步骤在实现中对应哪个矩阵、求解器或函数
+→ 当前数据和频段上得到什么图和指标
+→ 哪些内容仍是最小映射、项目扩展或未验证边界
+```
+
+Use these labels verbatim in the slides when applicable:
+
+- `paper-faithful`：按论文范围实现并核对全文；
+- `formula-mapped-minimal`：只实现公式的最小映射，不等同于端到端复现；
+- `project-extension`：项目自定义的连续性、无源性、等效电路或调度扩展；
+- `not-reproduced`：完成论文解读，但没有足够实现或验证证据。
+
+### Pattern 7: 论文步骤 + 代码入口 + 结果图
+
+Use a 40/60 two-column page. The left side states the paper step, equation
+number, parameter mapping, and one interpretation. The right side shows the
+exact `file:function`, an 8--16 line code excerpt, or the result figure; do not
+use a screenshot of a full editor window.
+
+```latex
+\begin{frame}
+  \frametitle{论文算法如何落到当前代码}
+  \begin{columns}[T,onlytextwidth]
+    \column{0.40\textwidth}
+    \small
+    \textbf{论文步骤 2：固定极点后的残差求解}\par
+    由论文式 (8) 得到线性最小二乘对象；这里的未知量是残差和常数项，
+    不是新的极点。\par\smallskip
+    \statuslabel{formula-mapped-minimal}
+
+    \column{0.60\textwidth}
+    \codeentry{scripts/vf.py:fit_fixed_poles}
+    \vskip0.06cm
+    {{CODE_EXCERPT}}
+    \figcap{代码入口；结果图另在下一页给出，避免把实现和结果混为一谈}
+  \end{columns}
+\end{frame}
+```
+
+### Pattern 8: 复现结果必须写清边界
+
+结果页左侧至少写出频段、端口对象、数据划分或样本范围、指标和判定；
+右侧只放一个可读的 S 参数、误差、极点零点或电路回代图。图注写清
+`dataset/run` 与绘图脚本；“曲线看起来接近”不能替代指标。
+
+### Source labels
+
+Use a short caption suffix for every right-side figure:
+
+```text
+论文原图：Fig. 2, Gustavsen & Semlyen (1999)
+示意重绘：Python script, no measured data
+当前复现：RUN-..., dataset/holdout ..., plot script ...
+```
+
+The label is part of the evidence chain, not a decorative footnote.
+
 ---
 
 ## Rhythm Rule

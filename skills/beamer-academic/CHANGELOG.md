@@ -11,7 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - 主题 v1.5：去掉实心页眉，标题改下划线，底栏加进度条
 - 封面改为校名 + 标题下单线；致谢去掉 THANK YOU 复读
 - 结论框改为左边一条色；表格提供 `\headrow` / `\rowaccent`
-- 新页型：`\statementframe`、`\statrow`、`\hyporow`；章节页仍用满版色 + 圆圈
+- 新页型：`\statementframe`、`\statrow`、`\hyporow`
+- 新增 `reproduction` 模式：每篇论文 2--5 页，覆盖算法推导、论文—代码对应和复现结果
+- 新增 `paper-overview`、`algorithm-derivation`、`paper-code-map`、`reproduction-result`、`pole-zero-circuit`、`method-comparison` 版式
+- 章节页改为白底紧凑强调线；主题增加 `listings`、`\codeentry`、`\statuslabel`、`\paperstep`
 
 ## [1.4.0] - 2026-05-22
 

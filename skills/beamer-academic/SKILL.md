@@ -3,10 +3,11 @@ name: beamer-academic
 version: 1.5+pyrojewel.1
 description: >
   Academic Beamer slide generator (local fork of Faust-Donf/beamer-academic v1.5).
-  Builds slides from a thesis/paper (PDF, Word, or LaTeX source) via a 13-layout
-  registry, 5 color schemes, anti-AI writing discipline, and an interactive editing
-  loop. White canvas, top-aligned body, thin accent rules, full-bleed section
-  dividers with circled numerals.
+  Builds slides from a thesis/paper (PDF, Word, or LaTeX source) via a standard
+  layout registry plus reproduction-specific layouts
+  registry, a paper-reproduction profile, 5 color schemes, anti-AI writing
+  discipline, and an interactive editing loop. White canvas, top-aligned body,
+  thin accent rules, compact section headers, and evidence-aware two-column pages.
   Use for 开题/会议/conference talks and general academic reporting, or whenever
   invoked by name. For thesis-defense work that needs the evidence contract and
   Obsidian weekly output, use pyrojewel-beamer-academic instead.
@@ -16,13 +17,15 @@ trigger:
   - "会议报告"
   - "conference PPT"
   - "conference talk slides"
+  - "论文复现汇报"
+  - "算法复现PPT"
   - "上游 beamer"
   - "原版 beamer"
 local_notes: |
   Maintained local fork, not a pristine mirror. Base: upstream 788e125 (v1.5).
-  SKILL.md body is still byte-identical to upstream; the theme has diverged by
-  one patch (cover guard fix, [P1]). See LOCAL-NOTES.md for the patch log and
-  the upstream-sync procedure.
+  SKILL.md is a local fork with a reproduction-report profile; the theme has
+  diverged by the cover guard fix and the compact-section/figure-code patches.
+  See LOCAL-NOTES.md for the patch log and the upstream-sync procedure.
   Trigger space is split with pyrojewel-beamer-academic: that skill keeps the
   defense-side words (答辩PPT / 答辩 / 论文PPT). Residual overlap on the generic
   "beamer" / "学术报告" is a known, unresolved routing ambiguity — see LOCAL-NOTES.
@@ -107,11 +110,36 @@ Check for `config.yaml` in current directory:
 Required user info (ask if not in config):
 - Institution name and department
 - Author name, supervisor, major
-- Report type: `defense` | `proposal` | `conference`
+- Report type: `defense` | `proposal` | `conference` | `reproduction`
 - Color preference: `blue` | `red` | `green` | `purple` | `teal`
 - Time limit (minutes): affects page count and content density
 - Language: thesis language vs. PPT language (e.g., 英文论文 → 中文PPT)
 - **Chapnote preference**: "每页要不要显示'对应论文 §X.X'的标注？"（some users find it helpful for committee, others find it cluttered）
+
+#### Reproduction profile
+
+When `report_type: reproduction` is selected, or the user explicitly asks for
+a paper-algorithm reproduction report, switch from thesis-chapter planning to
+a paper-unit contract. Confirm the paper list, full-text/source status, code
+entry points, datasets or run IDs, and evidence ceiling before drafting slides.
+Each paper becomes a 2--5 page unit:
+
+```text
+overview              problem, contribution, source figure, and scope
+algorithm-derivation  core equations, assumptions, and solver steps
+paper-code-map        paper step/formula ↔ file:function ↔ implementation state
+reproduction-result   measured validation, or explicitly labelled migration design when not reproduced
+optional-boundary     equivalent circuit, failure case, or paper/project gap
+```
+
+The four non-optional roles are `overview`, `algorithm-derivation`,
+`paper-code-map`, and `reproduction-result`. A fifth page is added only when it
+clarifies physical interpretation or a material boundary. Do not force every
+paper to five pages.
+
+For this profile, the generated deck must use the fields documented in
+`references/reproduction-contract.md`: `paper_id`, citation and Zotero keys,
+source status, code entry, dataset/run, evidence level, and claim boundary.
 
 ### 0.5 Language Strategy
 
@@ -195,6 +223,15 @@ This ensures:
 - Do NOT invent arbitrary chapter divisions that don't match the thesis logic
 - The PPT chapter structure should feel natural to someone who has read the thesis
 
+#### 2.0R Reproduction unit principle
+
+For `report_type: reproduction`, the paper list is the primary structure. Do not
+insert a generic chapter divider before every paper. The first page of each paper
+unit should already state the paper, algorithm question, and evidence boundary;
+use a compact white section header only when the unit needs an explicit visual
+marker. The unit order is `overview → algorithm-derivation → paper-code-map →
+reproduction-result`, followed by the optional boundary page.
+
 ### 2.1 First Pass: Structure Proposal
 
 After reading the thesis, propose the high-level structure directly in conversation:
@@ -275,16 +312,31 @@ Only after final confirmation, save the approved structure to `outline.md` for P
 
 ### Layout Selection Rules (used in 2.2 per-page assignment)
 
-1. Each chapter start → `section-divider`
-2. Core formula/model definition → `formula`
-3. Multi-row data comparison → `table`
-4. High-information figure (multi-panel, heatmap) → `full-image`
-5. Text-primary with supporting figure → `text-left-image-right`
-6. Figure-primary with interpretation → `image-left-text-right`
-7. Pure concept/background → `text-only`
-8. Chapter-end with clear conclusion → `conclusion-box`
-9. Between chapters → `transition`
-10. Parallel bullet points → `list`
+For `reproduction`, use this priority before the generic thesis rules:
+
+1. `paper-overview` — problem/contribution plus one large source or schematic figure
+2. `algorithm-derivation` — left narrative/assumptions, right formula or algorithm flow
+3. `paper-code-map` — paper steps on the left, code entry and status on the right
+4. `reproduction-result` — metrics and decision on the left, measured/reproduced figure on the right; a `not-reproduced` unit may use a clearly labelled migration-validation design figure
+5. `pole-zero-circuit` — physical interpretation and equivalent-circuit return path
+6. `method-comparison` — compare fitting methods only after each method has its own evidence
+
+The default content geometry is 38--44% for the left explanation and 56--62%
+for the right evidence. A right-side figure should be one readable figure or
+one structured composite, not a row of tiny decorative thumbnails.
+
+For other report types, retain the generic rules:
+
+7. Each chapter start → `section-divider`
+8. Core formula/model definition → `formula`
+9. Multi-row data comparison → `table`
+10. High-information figure (multi-panel, heatmap) → `full-image`
+11. Text-primary with supporting figure → `text-left-image-right`
+12. Figure-primary with interpretation → `image-left-text-right`
+13. Pure concept/background → `text-only`
+14. Chapter-end with clear conclusion → `conclusion-box`
+15. Between chapters → `transition`
+16. Parallel bullet points → `list`
 
 ### Rhythm Constraints
 
@@ -301,9 +353,32 @@ Only after final confirmation, save the approved structure to `outline.md` for P
    - Fill slots with thesis content + extracted materials
 4. Close with `\end{document}`.
 
-### Critical: Section Divider = 满版色 + 圆圈序号
+### Critical: Section Divider and reproduction units
 
-每章开头用 `\sectiondivider{1}{章标题}`（圆圈里用阿拉伯数字，中文「一」在圆里像减号）。目录只在第 2 页出现一次。
+Legacy `defense`, `proposal`, and `conference` decks may use
+`\sectiondivider{1}{章标题}`. In `reproduction`, the same macro is rendered as a
+white-background compact header with a thin accent rule; it must not create a
+full-page color field. The paper title and unit role should carry the section
+identity, so a dedicated divider is optional. The table of contents appears at
+most once when the selected report type needs it.
+
+### Critical: Paper algorithm ↔ implementation ↔ result
+
+Every reproduction paper unit must make the following correspondence explicit:
+
+```text
+paper equation/step → repository file:function and parameters → run/data → plotted result → boundary
+```
+
+The `paper-code-map` page must show the paper step or equation number, the exact
+`file:function` entry, the implementation state (`paper-faithful`,
+`formula-mapped-minimal`, `project-extension`, or `not-reproduced`), and a short
+code excerpt. The `reproduction-result` page must name the frequency band,
+split/holdout or sample scope, metric, and data/script source when a run exists.
+For `not-reproduced`, it must instead state that no runner/holdout exists and
+label the right-side figure as a migration-validation design. A paper figure is
+source evidence; a generated schematic is labelled `示意重绘`; neither one is a
+measured reproduction result.
 
 ### Critical: TOC Page Format
 
@@ -362,9 +437,15 @@ Core rules:
 | Page structure | COMBINE multiple elements (see writing-style.md) |
 | `\itemize` | BANNED |
 
-### Section Divider (Enforced)
+For `reproduction`, apply an additional capacity rule: each paper uses 2–5
+pages, every page has one explicit claim, and the four required roles cannot be
+replaced by a generic conclusion or transition page.
 
-Every chapter boundary MUST use `\sectiondivider{1}{章标题}`（圆圈用 1/2/3）。
+### Section Divider (Legacy only)
+
+Every chapter boundary in legacy thesis modes may use
+`\sectiondivider{1}{章标题}`. In reproduction mode, do not insert a full-bleed
+divider and do not use a transition page merely to separate papers.
 
 ### Anti-AI Title & Content Check
 
@@ -424,6 +505,20 @@ After compilation, check `defense.log` for these common layout issues:
 - For `full-image`: use **only** tikz overlay positioning, no surrounding text except `\figcap`
 - For `formula`: max 2 equations, with `\vskip0.1cm` spacing between
 - Never put more than 3 `\vskip` commands in one frame (sign of overstuffing)
+
+For a reproduction deck, run the structural validator before visual review:
+
+```bash
+python scripts/validate_reproduction_deck.py \
+  --tex presentation.tex \
+  --manifest materials/reproduction_manifest.yaml \
+  --pdf presentation.pdf
+```
+
+The validator checks the four required roles per paper, the 2–5 page range,
+the presence of a `file:function` code entry and implementation status, result
+figure paths, and the absence of the old full-bleed divider contract. A clean
+LaTeX log is necessary but does not replace this evidence check.
 
 **If overlap detected in compiled PDF** (user reports "P7图文重叠了"):
 1. Identify the frame in `.tex`
@@ -513,11 +608,13 @@ Add `\note{}` blocks to each frame in `.tex` with the speaker notes content.
 
 ## Reference Files
 
-- `references/layouts.md` — All 13 layout skeletons with slot definitions and LaTeX code
+- `references/layouts.md` — Standard and reproduction layout skeletons with slot definitions and LaTeX code
 - `references/tex-header.md` — Standard .tex file preamble template
 - `references/layout-registry.yaml` — Layout selection rules in structured format
+- `references/reproduction-contract.md` — Paper-unit metadata, page roles, source labels, and claim boundaries
 
 ## Assets
 
 - `assets/beamerthemeAcademic.sty` — Beamer theme file (copied to user project)
 - `assets/config.yaml` — Configuration template (copied to user project)
+- `scripts/validate_reproduction_deck.py` — Structural and source checks for reproduction decks

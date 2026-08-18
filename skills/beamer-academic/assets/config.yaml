@@ -25,7 +25,7 @@ color_scheme: "blue"
 # ============================================================
 # 报告类型
 # ============================================================
-# 可选: defense (答辩) | proposal (开题) | conference (会议报告)
+# 可选: defense (答辩) | proposal (开题) | conference (会议报告) | reproduction (论文算法复现)
 report_type: "defense"
 
 # ============================================================
@@ -47,6 +47,25 @@ generation:
   time_limit: 20              # 报告时间（分钟），影响每页文字量
   aspect_ratio: "43"          # 43 (4:3) | 169 (16:9)
   font_size: "10pt"           # 10pt | 11pt | 12pt
+
+# ============================================================
+# 论文复现模式（仅 report_type: reproduction 使用）
+# ============================================================
+reproduction:
+  papers_per_unit: "2-5"      # 每篇论文的页数范围，按算法复杂度决定
+  preferred_layout: "text-left-image-right"
+  section_divider: "compact-white"
+  require_paper_code_map: true
+  require_reproduction_result: true
+  required_roles:
+    - overview
+    - algorithm-derivation
+    - paper-code-map
+    - reproduction-result
+  source_dirs:
+    paper_originals: "materials/figures/paper-originals"
+    generated: "materials/figures/generated"
+    reproduction: "materials/figures/reproduction"
 
 # ============================================================
 # 编译设置

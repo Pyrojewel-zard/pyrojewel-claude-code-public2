@@ -25,8 +25,16 @@ Standard preamble for generated Beamer files. Fill placeholders from `config.yam
 \usepackage{array}
 \usepackage{hyperref}
 \usepackage{tikz}
+\usepackage{listings}
 \usepackage{pifont}
 \usetikzlibrary{arrows.meta, positioning, calc}
+
+% ---------- Reproduction profile ----------
+% 内容页默认左40%叙述/右60%证据；代码只展示8--16行关键片段。
+% beamerthemeAcademic 提供 academiccode、\codeentry、\statuslabel、\paperstep。
+\lstset{style=academiccode}
+\newcommand{\reprocaption}[2]{%
+  \figcap{#1；来源类型：#2}}
 
 \setlength{\emergencystretch}{2em}
 \graphicspath{{materials/figures/}{./}}

@@ -1,6 +1,7 @@
 # Layout Library
 
-13 professional page layouts for academic Beamer slides.
+Standard academic page layouts plus six dedicated layouts for paper-algorithm
+reproduction reports.
 Each section contains the LaTeX skeleton and slot definitions for one layout type.
 
 ## Table of Contents
@@ -21,6 +22,12 @@ Each section contains the LaTeX skeleton and slot definitions for one layout typ
 14. [statement](#statement) — 金句页
 15. [stats](#stats) — 三个数
 16. [hypothesis](#hypothesis) — 三列短句
+17. [paper-overview](#paper-overview) — 论文算法概览
+18. [algorithm-derivation](#algorithm-derivation) — 算法推导
+19. [paper-code-map](#paper-code-map) — 论文—代码对应
+20. [reproduction-result](#reproduction-result) — 复现结果
+21. [pole-zero-circuit](#pole-zero-circuit) — 极点—零点与等效电路
+22. [method-comparison](#method-comparison) — 方法对照
 
 ---
 
@@ -73,11 +80,264 @@ Each section contains the LaTeX skeleton and slot definitions for one layout typ
 
 ---
 
+## paper-overview
+
+```latex
+% Layout: paper-overview (论文算法概览)
+% Profile: reproduction; one paper unit, page 1 of 2--5
+% Left: problem/contribution/scope. Right: one large source or schematic figure.
+%
+% Slots:
+%   {{PAPER_ID}}          - 论文 ID 或 Zotero itemKey
+%   {{CITATION}}          - 作者、年份、题目/期刊简写
+%   {{LEFT_TEXT}}         - 一个论点，约100--150字
+%   {{SOURCE_FIGURE}}     - 一张原图或示意重绘图
+%   {{SOURCE_CAPTION}}    - 图号、来源类型和本页作用
+%   {{CLAIM_BOUNDARY}}    - 本页不声称的内容
+
+% repro-paper: {{PAPER_ID}}
+% repro-role: overview
+\begin{frame}
+  \frametitle{{{CITATION}}：论文到底解决什么问题？}
+  \begin{columns}[T, onlytextwidth]
+    \column{0.40\textwidth}
+    \vskip0.12cm
+    \small
+    {{LEFT_TEXT}}
+    \vskip0.18cm
+    \keybox{{{CLAIM_BOUNDARY}}}
+
+    \column{0.60\textwidth}
+    \vskip0.02cm
+    \includegraphics[width=\linewidth, height=0.64\textheight, keepaspectratio]{{{SOURCE_FIGURE}}}
+    \figcap{{{SOURCE_CAPTION}}}
+  \end{columns}
+\end{frame}
+```
+
+---
+
+## algorithm-derivation
+
+```latex
+% Layout: algorithm-derivation (算法推导)
+% Profile: reproduction; page 2 of 2--5
+% Left: assumptions and derivation chain. Right: <=2 equations or one flow.
+%
+% Slots:
+%   {{PAPER_ID}}                 - 论文 ID
+%   {{EQUATION_OR_ALGORITHM}}    - 论文公式/算法编号
+%   {{ASSUMPTIONS}}              - 可检验假设
+%   {{DERIVATION_TEXT}}          - 推导链
+%   {{EQUATIONS}}                - 一或两个核心公式
+%   {{SOLVER_OBJECT}}            - 代码中实际构造/求解的对象
+%   {{SOURCE_CAPTION}}           - 论文公式/图号或示意重绘
+
+% repro-paper: {{PAPER_ID}}
+% repro-role: algorithm-derivation
+\begin{frame}
+  \frametitle{算法推导：{{EQUATION_OR_ALGORITHM}}}
+  \begin{columns}[T, onlytextwidth]
+    \column{0.40\textwidth}
+    \vskip0.12cm
+    \small
+    \textbf{假设}\par
+    {{ASSUMPTIONS}}
+    \vskip0.14cm
+    \textbf{推导链}\par
+    {{DERIVATION_TEXT}}
+    \vskip0.14cm
+    \textbf{实现对象}\par
+    {{SOLVER_OBJECT}}
+
+    \column{0.60\textwidth}
+    \vskip0.03cm
+    \begin{minipage}{\linewidth}
+      \small
+      {{EQUATIONS}}
+    \end{minipage}
+    \figcap{{{SOURCE_CAPTION}}}
+  \end{columns}
+\end{frame}
+```
+
+---
+
+## paper-code-map
+
+```latex
+% Layout: paper-code-map (论文—代码对应)
+% Profile: reproduction; page 3 of 2--5
+% Left: paper steps/equation references. Right: exact file:function and short code.
+%
+% Slots:
+%   {{PAPER_ID}}              - 论文 ID
+%   {{PAPER_STEPS}}           - 论文算法步骤
+%   {{EQUATION_REFS}}         - 公式/算法编号
+%   {{CODE_PATH}}             - 仓库相对路径
+%   {{CODE_FUNCTION}}         - 函数名/入口
+%   {{CODE_EXCERPT}}          - 8--16行关键代码
+%   {{PARAMETERS}}            - 参数映射
+%   {{IMPLEMENTATION_STATUS}} - paper-faithful 等状态
+%   {{IMPLEMENTATION_NOTE}}   - 当前实现边界
+
+% repro-paper: {{PAPER_ID}}
+% repro-role: paper-code-map
+\begin{frame}
+  \frametitle{论文步骤如何落到代码}
+  \begin{columns}[T, onlytextwidth]
+    \column{0.40\textwidth}
+    \vskip0.10cm
+    \small
+    \textbf{论文步骤 / 公式}\par
+    {{PAPER_STEPS}}
+    \vskip0.12cm
+    \textbf{对应位置}\par
+    {{EQUATION_REFS}}
+    \vskip0.12cm
+    \textbf{参数映射}\par
+    {{PARAMETERS}}
+    \vskip0.15cm
+    \statuslabel{{{IMPLEMENTATION_STATUS}}}
+    \par\smallskip
+    {{IMPLEMENTATION_NOTE}}
+
+    \column{0.60\textwidth}
+    \vskip0.02cm
+    \codeentry{{{CODE_FUNCTION}}}
+    {\scriptsize\path{{{CODE_PATH}:{CODE_FUNCTION}}}}\par
+    \vskip0.08cm
+    {{CODE_EXCERPT}}
+  \end{columns}
+\end{frame}
+```
+
+---
+
+## reproduction-result
+
+```latex
+% Layout: reproduction-result (复现结果)
+% Profile: reproduction; page 4 of 2--5
+% Left: scope/metric/decision. Right: one measured or reproduced result figure.
+%
+% Slots:
+%   {{PAPER_ID}}             - 论文 ID
+%   {{RUN_ID}}               - run ID
+%   {{DATASET_OR_SPLIT}}     - dataset/holdout/screening
+%   {{FREQUENCY_BAND}}       - 频率范围和端口对象
+%   {{METRIC}}               - 指标和数值
+%   {{DECISION}}             - 当前判定
+%   {{REPRODUCTION_FIGURE}}  - reproduction 目录中的图
+%   {{REPRODUCTION_CAPTION}} - 数据与脚本来源
+%   {{EVIDENCE_LEVEL}}       - 证据等级
+
+% repro-paper: {{PAPER_ID}}
+% repro-role: reproduction-result
+\begin{frame}
+  \frametitle{复现结果：论文方法在当前对象上是否成立？}
+  \begin{columns}[T, onlytextwidth]
+    \column{0.40\textwidth}
+    \vskip0.10cm
+    \small
+    \textbf{运行范围}\par {{RUN_ID}}\\{{DATASET_OR_SPLIT}}
+    \vskip0.12cm
+    \textbf{频段/端口}\par {{FREQUENCY_BAND}}
+    \vskip0.12cm
+    \textbf{评价指标}\par {{METRIC}}
+    \vskip0.12cm
+    \keybox{{{{DECISION}}}}
+    \vskip0.08cm
+    {\scriptsize\color{textgray}证据等级：{{EVIDENCE_LEVEL}}}
+
+    \column{0.60\textwidth}
+    \vskip0.02cm
+    \includegraphics[width=\linewidth, height=0.64\textheight, keepaspectratio]{{{REPRODUCTION_FIGURE}}}
+    \figcap{{{REPRODUCTION_CAPTION}}}
+  \end{columns}
+\end{frame}
+```
+
+---
+
+## pole-zero-circuit
+
+```latex
+% Layout: pole-zero-circuit (极点—零点与等效电路)
+% Profile: reproduction; optional page 5
+%
+% Slots:
+%   {{PAPER_ID}}             - 论文 ID
+%   {{PHYSICAL_INTERPRETATION}} - 左侧物理解释
+%   {{POLE_ZERO_TEXT}}       - 极点/零点和频段关系
+%   {{POLE_ZERO_FIGURE}}     - 极点零点图
+%   {{CIRCUIT_FIGURE}}       - 等效电路和 S 参数回代图
+%   {{CIRCUIT_RETURN_ERROR}} - 回代误差/边界
+%   {{NON_CLAIM}}            - 不把 residue 直接当元件的边界
+
+% repro-paper: {{PAPER_ID}}
+% repro-role: optional-boundary
+\begin{frame}
+  \frametitle{极点/零点如何回到感性器件的等效电路？}
+  \begin{columns}[T, onlytextwidth]
+    \column{0.40\textwidth}
+    \small
+    {{PHYSICAL_INTERPRETATION}}
+    \vskip0.12cm
+    {{POLE_ZERO_TEXT}}
+    \vskip0.12cm
+    \keybox{{{{NON_CLAIM}}}}
+
+    \column{0.60\textwidth}
+    \includegraphics[width=\linewidth, height=0.29\textheight, keepaspectratio]{{{POLE_ZERO_FIGURE}}}
+    \figcap{极点/零点图；来源：当前拟合脚本}
+    \vskip0.08cm
+    \includegraphics[width=\linewidth, height=0.29\textheight, keepaspectratio]{{{CIRCUIT_FIGURE}}}
+    \figcap{等效电路回代；误差：{{CIRCUIT_RETURN_ERROR}}}
+  \end{columns}
+\end{frame}
+```
+
+---
+
+## method-comparison
+
+```latex
+% Layout: method-comparison (方法对照)
+% Profile: reproduction; one presentation-level comparison after individual units.
+%
+% Slots:
+%   {{METHODS}}       - 方法名称
+%   {{FITTING_OBJECT}} - 拟合对象
+%   {{CONSTRAINTS}}   - 极点/无源/连续性约束
+%   {{COMPLEXITY}}    - 复杂度和数据需求
+%   {{EVIDENCE}}      - 当前证据等级
+%   {{DECISION}}      - 方法选择判断
+
+\begin{frame}
+  \frametitle{方法如何选择：拟合对象、约束与证据}
+  \small
+  \begin{center}
+    \begin{tabular}{@{}p{0.18\textwidth}p{0.18\textwidth}p{0.22\textwidth}p{0.17\textwidth}p{0.16\textwidth}@{}}
+      \toprule
+      \textbf{方法} & \textbf{拟合对象} & \textbf{约束} & \textbf{复杂度} & \textbf{证据} \\
+      \midrule
+      {{METHODS}} \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+  \vskip0.18cm
+  \keybox{{{DECISION}}}
+\end{frame}
+```
+
+---
+
 ## section-divider
 
 ```latex
 % Layout: section-divider (章节分隔页)
-% 使用场景: 每章开头，全色底+序号圆圈+章标题
+% 使用场景: legacy 模式的章节开头；reproduction 中仅作可选白底紧凑章节头
 %
 % Slots:
 %   {{CHAPTER_NUMBER}} - 中文数字（一、二、三...）
@@ -121,41 +381,31 @@ Each section contains the LaTeX skeleton and slot definitions for one layout typ
 
 ```latex
 % Layout: text-left-image-right (左文右图)
-% 使用场景: 文字描述为主，配合1-2张说明性图片
+% 使用场景: 文字描述为主，配合一张可读的大图
 %
 % Slots:
 %   {{TITLE}}       - 页标题
 %   {{CHAPNOTE}}    - 对应论文章节标注（可选）
-%   {{LEFT_TEXT}}   - 左侧文字（120-180字，可含多段）
-%   {{IMAGES}}      - 右侧图片区域（1-2张图+figcap）
+%   {{LEFT_TEXT}}   - 左侧文字（100-150字，可含一个公式）
+%   {{IMAGE}}       - 右侧单张大图
+%   {{CAPTION}}     - 图号、来源类型和本页作用
 %
-% 布局: 左50% 文字 | 右50% 图片
+% reproduction 默认布局: 左40% 文字 | 右60% 图片
 
 \begin{frame}
   \frametitle{{{TITLE}}}
   {{CHAPNOTE_LINE}}
   \begin{columns}[T, onlytextwidth]
-    \column{0.50\textwidth}
+    \column{0.40\textwidth}
     \vskip0.15cm
     {{LEFT_TEXT}}
 
-    \column{0.50\textwidth}
+    \column{0.60\textwidth}
     \vskip0.05cm
-    {{IMAGES}}
+    \includegraphics[width=\linewidth, height=0.64\textheight, keepaspectratio]{{{IMAGE}}}
+    \figcap{{{CAPTION}}}
   \end{columns}
 \end{frame}
-
-% --- IMAGES 区域示例 ---
-% 单张图:
-%   \includegraphics[width=\linewidth, height=5.5cm, keepaspectratio]{image.png}
-%   \figcap{图说文字}
-%
-% 双张图（上下排列）:
-%   \includegraphics[width=\linewidth, height=3.4cm, keepaspectratio]{img1.png}
-%   \figcap{图说1}
-%   \vskip0.20cm
-%   \includegraphics[width=\linewidth, height=3.4cm, keepaspectratio]{img2.png}
-%   \figcap{图说2}
 ```
 
 ---
@@ -392,7 +642,7 @@ Each section contains the LaTeX skeleton and slot definitions for one layout typ
 % Slots:
 %   {{TITLE}}     - 页标题（如 "从H1到H2：为何...？"）
 %   {{SUMMARY}}   - 上一章结论概括（50-80字）
-%   {{QUESTIONS}} - 引出的问题/下一步方向（itemize格式，2-3条）
+%   {{QUESTIONS}} - 引出的问题/下一步方向（enumerate格式，2-3条）
 %
 % 结构: 先总结→再提问→引出下一章
 
@@ -412,10 +662,10 @@ Each section contains the LaTeX skeleton and slot definitions for one layout typ
 %   既然形态多样性是丰富度变化的领先信号，那么\alert{是什么驱动了形态边界本身的变化}？
 %
 % --- QUESTIONS 示例 ---
-%   \begin{itemize}\setlength\itemsep{0.4em}
+%   \begin{enumerate}\setlength\itemsep{0.4em}
 %     \item \textbf{短期外源冲击 (H2)}\,——\,环境扰动是否在形态边界上留下结构性变点？
 %     \item \textbf{长期内在约束 (H3)}\,——\,演化轨迹为何能够回归而非持续恶化？
-%   \end{itemize}
+%   \end{enumerate}
 ```
 
 ---
@@ -456,12 +706,12 @@ Each section contains the LaTeX skeleton and slot definitions for one layout typ
 %           将经验叙事推进为\alert{可检验的统计命题};
 %   \end{enumerate}
 %
-% --- ITEMS 示例（itemize 风格，适合局限/展望）---
-%   \begin{itemize}\setlength\itemsep{0.4em}
+% --- ITEMS 示例（enumerate 风格，适合局限/展望）---
+%   \begin{enumerate}\setlength\itemsep{0.4em}
 %     \item 化石记录不完整，FAD/LAD 存在时间不确定性;
 %     \item 主分析样本量有限 ($N=21$)，受小样本约束;
 %     \item 分类学替代树以林奈层级近似系统发育关系。
-%   \end{itemize}
+%   \end{enumerate}
 ```
 
 ---
@@ -520,4 +770,3 @@ Each section contains the LaTeX skeleton and slot definitions for one layout typ
 ```
 
 ---
-
