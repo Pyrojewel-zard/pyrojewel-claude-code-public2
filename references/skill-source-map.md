@@ -1,7 +1,7 @@
 # Skill Source Map
 
 **Project:** `pyrojewel_claude_code`
-**Last Updated:** 2026-08-11T00:00:00+08:00
+**Last Updated:** 2026-08-18T00:00:00+08:00
 **Purpose:** 维护当前项目内 skill 的来源、所属 flow、当前状态、同步策略，作为后续 upstream 更新分析的唯一总表。
 
 ---
@@ -30,6 +30,7 @@
 | `pyrojewel-paper` | `skills/pyrojewel-paper/skill.md` | Flow 1 | `active` | `ljg-skills` | `ljg-paper` 改编 | worker2 | 跟踪上游结构性改动；本地输出协议优先 |
 | `pyrojewel-paper-river` | `skills/pyrojewel-paper-river/skill.md` | Flow 1 | `active` | `ljg-skills` | `ljg-paper-river` 改编 | worker2 | 跟踪上游溯源方法；本地图片/路径策略优先 |
 | `pyrojewel-paper-qa` | `skills/pyrojewel-paper-qa/skill.md` | Flow 1 | `active` | `ljg-skills` | `ljg-qa` 改编 | worker2 | 跟踪问题设计方法；本地对齐输出优先 |
+| `pyrojewel-deep-paper` | `skills/pyrojewel-deep-paper/SKILL.md` | Flow 1 | `adopted` | `ljg-skills` | 改编 `ljg-read`(伴读碰撞) + `ljg-qa`(Q-A 链)，交互改为 Claude AskUserQuestion 多选批量提问；吃 ljg-paper 初读笔记+原文，深读结果追加进原笔记 | worker2 | 跟踪 ljg-read/ljg-qa 的方法论变化；AskUserQuestion 批量交互与「追加进原笔记」为本地铁律 |
 | `pyrojewel-paper-flow` | `skills/pyrojewel-paper-flow/SKILL.md` | Flow 1 | `adopted` | self-built + local composition | 编排 `zotero-pdf-parse -> paper -> river -> qa -> beamer` | worker2 | 不看单一 upstream；按主链变化手工维护 |
 | `pyrojewel-beamer-academic` | `skills/pyrojewel-beamer-academic/SKILL.md` | Flow 1 / 11 | `adopted` | `beamer-academic` + `guizang-ppt-skill` | 上游 beamer + 本地版式改造 | worker2 | 跟踪上游 LaTeX/模板更新；版式规则本地优先 |
 | `zuhui-beammer` | ~~`skills/zuhui-beammer/`~~（已删除） | Flow 11 | `removed` | local derivative of `pyrojewel-beamer-academic` + `ADC_Calibration.pdf` | 2026-08-17 删除，改由 `beamer-academic` 承担该场景。上游 v1.5 完全没有、随之放弃的四项：`page_manifest.tsv` 证据契约、语义化配色（red/green/blue）、`zuhuicode` 代码块、`pdftoppm` 视觉 QA 硬门 | — | 不再维护；取回：`git checkout 0e128a2 -- skills/zuhui-beammer` |
