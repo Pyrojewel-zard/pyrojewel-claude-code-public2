@@ -2,7 +2,7 @@
 
 **状态:** `active`(维护中的本地 fork,不是原样镜像)
 **Base:** `Faust-Donf/beamer-academic` @ `788e125` (v1.5, 2026-08-17)
-**当前版本:** `1.5+pyrojewel.2`
+**当前版本:** `1.6+pyrojewel.2`
 **迁入 / 转维护:** 2026-08-17
 
 ## 定位与路由
@@ -65,6 +65,23 @@ overview、algorithm-derivation、paper-code-map、reproduction-result；布局�
 `listings`、`\codeentry`、`\statuslabel`、`\paperstep`。两个主题副本必须保持一致。
 
 `examples/transformer/beamerthemeAcademic.sty` 是 `assets/` 的副本,已同步。改主题时记得两份一起改。
+
+### [P3] 2026-08-19 — 单篇论文阅读汇报模式
+
+`SKILL.md` 新增 `paper-reading` profile，输入可来自用户已有的 `ljg-paper`
+笔记及其 `pyrojewel-deep-paper` 追加内容；只有论文时先走 `ljg-read`。单篇论文
+内容页上限为4页，默认顺序是概览、理论/推导—论文图、证据—结果图、QA/困惑点。
+
+新增 `references/paper-reading-contract.md`，规定先生成并展示 `outline.md`，用户
+确认后才允许生成 LaTeX。新增四个阅读汇报版式，统一将会议/年份、主题、作者或
+课题组放入 subtitle 层，正文默认左理论/解读、右一张可读论文图。
+
+### [P4] 2026-08-19 — implementation-report 分工
+
+计划读取、代码现状分析和 Mermaid 语义工作流已拆到同项目的
+`skills/implementation-report/`，流程图视觉由 `skills/diagram-design/` 重绘。
+本 skill 只消费 manifest 指定的 bundle/PNG；当涉及代码/复现时，先使用
+`workflow-overview`，再进入 `paper-code-map` 或结果页，避免代码单独占页。
 
 ## upstream 同步流程
 

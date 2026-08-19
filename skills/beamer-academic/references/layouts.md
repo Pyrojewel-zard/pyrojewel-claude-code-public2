@@ -1,7 +1,7 @@
 # Layout Library
 
-Standard academic page layouts plus six dedicated layouts for paper-algorithm
-reproduction reports.
+Standard academic page layouts plus dedicated layouts for paper-reading and
+paper-algorithm reproduction reports.
 Each section contains the LaTeX skeleton and slot definitions for one layout type.
 
 ## Table of Contents
@@ -22,12 +22,17 @@ Each section contains the LaTeX skeleton and slot definitions for one layout typ
 14. [statement](#statement) — 金句页
 15. [stats](#stats) — 三个数
 16. [hypothesis](#hypothesis) — 三列短句
-17. [paper-overview](#paper-overview) — 论文算法概览
-18. [algorithm-derivation](#algorithm-derivation) — 算法推导
-19. [paper-code-map](#paper-code-map) — 论文—代码对应
-20. [reproduction-result](#reproduction-result) — 复现结果
-21. [pole-zero-circuit](#pole-zero-circuit) — 极点—零点与等效电路
-22. [method-comparison](#method-comparison) — 方法对照
+17. [paper-reading-overview](#paper-reading-overview) — 单篇论文概览
+18. [paper-reading-theory-figure](#paper-reading-theory-figure) — 理论/推导—论文图
+19. [paper-reading-evidence](#paper-reading-evidence) — 证据—结果图
+20. [paper-reading-discussion](#paper-reading-discussion) — QA/困惑点讨论
+21. [workflow-overview](#workflow-overview) — 实现流程与当前状态
+22. [paper-overview](#paper-overview) — 论文算法概览
+23. [algorithm-derivation](#algorithm-derivation) — 算法推导
+24. [paper-code-map](#paper-code-map) — 论文—代码对应
+25. [reproduction-result](#reproduction-result) — 复现结果
+26. [pole-zero-circuit](#pole-zero-circuit) — 极点—零点与等效电路
+27. [method-comparison](#method-comparison) — 方法对照
 
 ---
 
@@ -75,6 +80,201 @@ Each section contains the LaTeX skeleton and slot definitions for one layout typ
   {{CHAPTERS}}
   \end{tabbing}
   }
+\end{frame}
+```
+
+---
+
+## paper-reading-overview
+
+```latex
+% Layout: paper-reading-overview (单篇论文概览)
+% Profile: paper-reading; page 1 of at most 4
+% The paper metadata stays in the subtitle layer; body is problem + one source figure.
+%
+% Slots:
+%   {{PAPER_META}}       - 会议/年份｜论文主题｜作者或课题组
+%   {{TITLE}}            - 本页内容标题
+%   {{LEFT_TEXT}}        - 问题、贡献、范围（约100--140字）
+%   {{SOURCE_FIGURE}}    - 论文原图或示意重绘
+%   {{SOURCE_CAPTION}}   - 图号、来源类型和本页作用
+%   {{NOTE_SOURCE}}      - 解读 / 原文 / provided-note 等来源标签
+%   {{CLAIM_BOUNDARY}}   - 本页不声称的内容
+
+\begin{frame}
+  \frametitle{{{TITLE}}}
+  \framesubtitle{{{PAPER_META}}}
+  \begin{columns}[T, onlytextwidth]
+    \column{0.40\textwidth}
+    \vskip0.10cm
+    \small
+    {{LEFT_TEXT}}
+    \vskip0.12cm
+    \keybox{{{CLAIM_BOUNDARY}}}
+    {\scriptsize\color{textgray}材料：{{NOTE_SOURCE}}}
+
+    \column{0.60\textwidth}
+    \vskip0.02cm
+    \includegraphics[width=\linewidth, height=0.60\textheight, keepaspectratio]{{{SOURCE_FIGURE}}}
+    \figcap{{{SOURCE_CAPTION}}}
+  \end{columns}
+\end{frame}
+```
+
+---
+
+## paper-reading-theory-figure
+
+```latex
+% Layout: paper-reading-theory-figure (理论/推导—论文图)
+% Profile: paper-reading; page 2 of at most 4
+% Left: theory/intuition and <=2 equations. Right: one matching paper figure.
+%
+% Slots:
+%   {{PAPER_META}}       - 会议/年份｜论文主题｜作者或课题组
+%   {{TITLE}}            - 本页内容标题
+%   {{THEORY_TEXT}}      - 理论直觉、假设和推导说明
+%   {{EQUATIONS}}        - 0--2 个核心公式
+%   {{FIGURE}}           - 电路/机制/方法图
+%   {{SOURCE_CAPTION}}   - 图号、来源类型和本页作用
+%   {{NOTE_SOURCE}}      - 解读 + 原文等来源标签
+
+\begin{frame}
+  \frametitle{{{TITLE}}}
+  \framesubtitle{{{PAPER_META}}}
+  \begin{columns}[T, onlytextwidth]
+    \column{0.40\textwidth}
+    \vskip0.08cm
+    \small
+    {{THEORY_TEXT}}
+    \vskip0.10cm
+    {{EQUATIONS}}
+    \vskip0.08cm
+    {\scriptsize\color{textgray}材料：{{NOTE_SOURCE}}}
+
+    \column{0.60\textwidth}
+    \vskip0.02cm
+    \includegraphics[width=\linewidth, height=0.62\textheight, keepaspectratio]{{{FIGURE}}}
+    \figcap{{{SOURCE_CAPTION}}}
+  \end{columns}
+\end{frame}
+```
+
+---
+
+## paper-reading-evidence
+
+```latex
+% Layout: paper-reading-evidence (证据—结果图)
+% Profile: paper-reading; page 3 of at most 4
+% Left: interpretation and evidence strength. Right: one result figure.
+%
+% Slots:
+%   {{PAPER_META}}       - 会议/年份｜论文主题｜作者或课题组
+%   {{TITLE}}            - 本页内容标题
+%   {{EVIDENCE_TEXT}}    - 指标、结果和证据强度
+%   {{FIGURE}}           - 仿真/测量/论文结果图
+%   {{SOURCE_CAPTION}}   - 图号、来源类型和本页作用
+%   {{EVIDENCE_LEVEL}}   - 论文直接测到 / 作者解释 / 读者推演
+%   {{NOTE_SOURCE}}      - 结果 + QA 等来源标签
+
+\begin{frame}
+  \frametitle{{{TITLE}}}
+  \framesubtitle{{{PAPER_META}}}
+  \begin{columns}[T, onlytextwidth]
+    \column{0.40\textwidth}
+    \vskip0.08cm
+    \small
+    {{EVIDENCE_TEXT}}
+    \vskip0.12cm
+    \keybox{证据等级：{{EVIDENCE_LEVEL}}}
+    {\scriptsize\color{textgray}材料：{{NOTE_SOURCE}}}
+
+    \column{0.60\textwidth}
+    \vskip0.02cm
+    \includegraphics[width=\linewidth, height=0.62\textheight, keepaspectratio]{{{FIGURE}}}
+    \figcap{{{SOURCE_CAPTION}}}
+  \end{columns}
+\end{frame}
+```
+
+---
+
+## paper-reading-discussion
+
+```latex
+% Layout: paper-reading-discussion (QA/困惑点讨论)
+% Profile: paper-reading; page 4 only when the note has QA, doubts, or a boundary.
+%
+% Slots:
+%   {{PAPER_META}}          - 会议/年份｜论文主题｜作者或课题组
+%   {{TITLE}}               - 本页内容标题
+%   {{TAKEAWAY_TEXT}}       - 读者自己的 takeaway / 判断
+%   {{CLAIM_BOUNDARY}}      - 论文证据能支持到哪里
+%   {{QA_OR_CONFUSIONS}}    - QA、困惑点、待验证问题
+%   {{NOTE_SOURCE}}         - QA / 困惑点 / 深读问答来源标签
+
+\begin{frame}
+  \frametitle{{{TITLE}}}
+  \framesubtitle{{{PAPER_META}}}
+  \begin{columns}[T, onlytextwidth]
+    \column{0.46\textwidth}
+    \vskip0.10cm
+    \small
+    \textbf{我的判断}\par
+    {{TAKEAWAY_TEXT}}
+    \vskip0.12cm
+    \keybox{{{CLAIM_BOUNDARY}}}
+
+    \column{0.54\textwidth}
+    \vskip0.10cm
+    \small
+    \textbf{QA / 困惑点}\par
+    {{QA_OR_CONFUSIONS}}
+    \vskip0.12cm
+    {\scriptsize\color{textgray}材料：{{NOTE_SOURCE}}}
+  \end{columns}
+\end{frame}
+```
+
+---
+
+## workflow-overview
+
+```latex
+% Layout: workflow-overview (实现流程与当前状态)
+% Profile: implementation-report / reproduction; before code or status pages.
+% The diagram is rendered from workflow.mmd; never replace it with a code dump.
+%
+% Slots:
+%   {{PAPER_META}}        - 会议/年份｜论文主题｜作者或课题组（可选）
+%   {{TITLE}}             - 本页标题
+%   {{WORKFLOW_FIGURE}}   - manifest.yaml 指定的 workflow.png
+%   {{CURRENT_STATE}}     - 已完成、进行中、阻塞/未知
+%   {{CLAIM_BOUNDARY}}    - 流程图不证明什么
+%   {{NEXT_ACTION}}       - 下一步最小验证
+%   {{REPORT_SOURCE}}     - manifest.yaml + implementation-report.md + workflow.mmd
+
+\begin{frame}
+  \frametitle{{{TITLE}}}
+  \framesubtitle{{{PAPER_META}}}
+    \includegraphics[width=\linewidth, height=0.53\textheight, keepaspectratio]{{{WORKFLOW_FIGURE}}}
+    \figcap{实现流程；由 diagram-design 重绘；来源：{{REPORT_SOURCE}}}
+  \vskip0.04cm
+  \begin{columns}[T, onlytextwidth]
+    \column{0.32\textwidth}
+    \scriptsize
+    \textbf{当前状态}\par
+    {{CURRENT_STATE}}
+    \column{0.34\textwidth}
+    \scriptsize
+    \textbf{边界}\par
+    {{CLAIM_BOUNDARY}}
+    \column{0.34\textwidth}
+    \scriptsize
+    \textbf{下一步}\par
+    {{NEXT_ACTION}}
+  \end{columns}
 \end{frame}
 ```
 
@@ -180,6 +380,10 @@ Each section contains the LaTeX skeleton and slot definitions for one layout typ
 %   {{PARAMETERS}}            - 参数映射
 %   {{IMPLEMENTATION_STATUS}} - paper-faithful 等状态
 %   {{IMPLEMENTATION_NOTE}}   - 当前实现边界
+%   {{PLAN_STEP}}             - 对应计划步骤
+%   {{INPUT_OUTPUT}}          - 输入 → 输出
+%   {{EVIDENCE}}              - 测试/运行/图/none
+%   {{NEXT_ACTION}}           - 下一步最小验证
 
 % repro-paper: {{PAPER_ID}}
 % repro-role: paper-code-map
@@ -209,6 +413,12 @@ Each section contains the LaTeX skeleton and slot definitions for one layout typ
     \vskip0.08cm
     {{CODE_EXCERPT}}
   \end{columns}
+  \vskip0.06cm
+  {\scriptsize
+    \textbf{计划：}{{PLAN_STEP}}\quad
+    \textbf{输入→输出：}{{INPUT_OUTPUT}}\quad
+    \textbf{证据：}{{EVIDENCE}}\quad
+    \textbf{下一步：}{{NEXT_ACTION}}\par}
 \end{frame}
 ```
 

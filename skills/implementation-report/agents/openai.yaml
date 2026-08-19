@@ -1,0 +1,4 @@
+interface:
+  display_name: "Implementation Report"
+  short_description: "Plan and code status reports with workflow diagrams"
+  default_prompt: "Read the project plan and code state, then produce a Mermaid workflow and implementation-status Markdown report."

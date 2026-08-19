@@ -1,34 +1,31 @@
 ---
 name: beamer-academic
-version: 1.5+pyrojewel.1
 description: >
-  Academic Beamer slide generator (local fork of Faust-Donf/beamer-academic v1.5).
-  Builds slides from a thesis/paper (PDF, Word, or LaTeX source) via a standard
-  layout registry plus reproduction-specific layouts
-  registry, a paper-reproduction profile, 5 color schemes, anti-AI writing
-  discipline, and an interactive editing loop. White canvas, top-aligned body,
-  thin accent rules, compact section headers, and evidence-aware two-column pages.
-  Use for 开题/会议/conference talks and general academic reporting, or whenever
-  invoked by name. For thesis-defense work that needs the evidence contract and
-  Obsidian weekly output, use pyrojewel-beamer-academic instead.
-trigger:
+  Use when generating a paper-reading or academic Beamer deck for a conference,
+  group meeting, or algorithm report, especially when the input includes a paper,
+  ljg-paper/ljg-read notes, pyrojewel-deep-paper notes, QA, reader questions, or
+  an implementation-report bundle with workflow/code-status artifacts.
+  Also use for 开题/会议/conference talks; for thesis-defense work that needs the
+  evidence contract and Obsidian weekly output, use pyrojewel-beamer-academic.
+metadata:
+  version: 1.6+pyrojewel.2
+  trigger:
   - "beamer-academic"
   - "开题PPT"
   - "会议报告"
   - "conference PPT"
   - "conference talk slides"
+  - "单篇论文组会PPT"
+  - "论文精读PPT"
+  - "阅读笔记排版"
   - "论文复现汇报"
   - "算法复现PPT"
   - "上游 beamer"
   - "原版 beamer"
-local_notes: |
-  Maintained local fork, not a pristine mirror. Base: upstream 788e125 (v1.5).
-  SKILL.md is a local fork with a reproduction-report profile; the theme has
-  diverged by the cover guard fix and the compact-section/figure-code patches.
-  See LOCAL-NOTES.md for the patch log and the upstream-sync procedure.
-  Trigger space is split with pyrojewel-beamer-academic: that skill keeps the
-  defense-side words (答辩PPT / 答辩 / 论文PPT). Residual overlap on the generic
-  "beamer" / "学术报告" is a known, unresolved routing ambiguity — see LOCAL-NOTES.
+  local_notes: |
+    Local fork of upstream 788e125 (v1.5), with paper-reading and reproduction
+    profiles plus local theme patches. See LOCAL-NOTES.md for patch and sync details.
+    pyrojewel-beamer-academic owns defense-side triggers (答辩PPT / 答辩 / 论文PPT).
 ---
 
 # Beamer Academic
@@ -110,11 +107,17 @@ Check for `config.yaml` in current directory:
 Required user info (ask if not in config):
 - Institution name and department
 - Author name, supervisor, major
-- Report type: `defense` | `proposal` | `conference` | `reproduction`
+- Report type: `defense` | `proposal` | `conference` | `paper-reading` | `reproduction`
 - Color preference: `blue` | `red` | `green` | `purple` | `teal`
 - Time limit (minutes): affects page count and content density
 - Language: thesis language vs. PPT language (e.g., 英文论文 → 中文PPT)
 - **Chapnote preference**: "每页要不要显示'对应论文 §X.X'的标注？"（some users find it helpful for committee, others find it cluttered）
+
+If the input is exactly one paper, one paper plus one reading note, or one
+reading note with an identifiable paper, infer `report_type: paper-reading`
+unless the user explicitly requests `defense`, `proposal`, `conference`, or
+`reproduction`. Do not make the user edit `config.yaml` just to activate this
+profile.
 
 #### Reproduction profile
 
@@ -140,6 +143,87 @@ paper to five pages.
 For this profile, the generated deck must use the fields documented in
 `references/reproduction-contract.md`: `paper_id`, citation and Zotero keys,
 source status, code entry, dataset/run, evidence level, and claim boundary.
+
+#### Paper-reading profile: 组会论文单元
+
+Use `report_type: paper-reading` when the task is to explain one paper for a
+group meeting or paper-reading session. This profile is different from
+`reproduction`: it does not require a code map or a measured reimplementation.
+It combines the paper with one normalized reading note.
+
+Input routing is explicit:
+
+1. If the user provides a note from `/ljg-paper`, use it as the first-pass
+   interpretation.
+2. If the same note has a `pyrojewel-deep-paper` section appended, treat that
+   append as the source for the reader's QA, doubts, and unresolved boundaries;
+   do not create a second competing note. The rough-read and deep-read outputs
+   are one shared note for this skill's input contract, not two slide sources.
+3. If the user provides only a paper, first use `ljg-read` to read it and turn
+   the resulting understanding into the normalized Markdown input before
+   drafting slides. If the user asks for a saved paper note rather than an
+   interactive companion read, use `/ljg-paper` first.
+4. Record the actual source in the draft plan as `provided-note`, `ljg-paper`,
+   `pyrojewel-deep-paper`, or `ljg-read`; never imply that a QA or measurement
+   exists when it is absent.
+
+The paper unit has at most **4 content pages per paper**, including an optional
+`workflow-overview` page when an implementation-report bundle is included. A
+shared deck cover does not count as a paper unit page; do not add a separate TOC
+for one paper by default. Without a workflow page, the default four-page
+contract is:
+
+| Page | Role | Left side | Right side |
+|------|------|-----------|------------|
+| 1 | `overview` | problem, contribution, scope | paper overview/circuit figure |
+| 2 | `theory-figure` | theory, mechanism, or short derivation | circuit/method figure |
+| 3 | `evidence` | result interpretation and evidence strength | result/simulation/measurement figure |
+| 4 | `discussion` | reader's takeaway and claim boundary | QA, confusion, or unresolved question |
+
+Pages 2--3 default to the group's preferred geometry: theory or interpretation
+on the left and one readable paper figure on the right. Page 4 is included only
+when the note contains QA, doubts, or a meaningful boundary; otherwise it is a
+compact conclusion page. Never pad a paper to four pages.
+
+When `workflow-overview` is needed inside a paper-reading unit, it consumes one
+of the four slots and must come before code/status content. Use at most three
+paper-role pages in that case; merge the discussion into the evidence page or
+omit it rather than creating a fifth page. The same counting rule applies to a
+workflow page inserted into a reproduction unit's `pages_per_paper` range.
+
+### Paper-reading Markdown gate
+
+For `paper-reading`, Phase 2 must create `outline.md` as a reviewable Markdown
+layout plan before any `.tex` generation. Show the plan in the conversation and
+stop. The plan must contain paper metadata, note/original-source paths, page
+roles, selected figures, the mapping of reading-note interpretation/QA/doubts,
+and the evidence boundary for each claim. Generate LaTeX only after the user
+explicitly approves the plan. A vague approval such as “继续” is sufficient
+only after the complete plan has been shown; do not silently skip the gate.
+
+### Implementation-report handoff
+
+When the requested deck includes code status, an implementation plan, or a
+reproduction workflow, use the `implementation-report` skill first. It owns
+plan intake, code-state analysis, Mermaid source, and workflow rendering.
+
+Expected bundle:
+
+```text
+materials/implementation-report/
+├── manifest.yaml
+├── implementation-report.md
+├── workflow.mmd
+├── workflow.html
+└── workflow.png
+```
+
+`beamer-academic` follows `manifest.yaml` and consumes the canonical PNG;
+`workflow.mmd` remains the semantic source and `workflow.html` the editable
+diagram-design source. It must not independently reinterpret planning files or
+replace the workflow with a code dump. If the bundle or manifest is missing,
+ask for it or route the task to `implementation-report` before drafting the
+slide outline.
 
 ### 0.5 Language Strategy
 
@@ -232,6 +316,14 @@ use a compact white section header only when the unit needs an explicit visual
 marker. The unit order is `overview → algorithm-derivation → paper-code-map →
 reproduction-result`, followed by the optional boundary page.
 
+#### 2.0P Paper-reading unit principle
+
+For `report_type: paper-reading`, the paper itself and its normalized reading
+note are the primary structure. Do not build thesis-style chapters. Draft one
+four-row Markdown plan using the roles `overview`, `theory-figure`, `evidence`,
+and `discussion`; remove a row when the note has no material for it. Keep the
+paper metadata in the title/subtitle layer, not inside the body paragraph.
+
 ### 2.1 First Pass: Structure Proposal
 
 After reading the thesis, propose the high-level structure directly in conversation:
@@ -255,6 +347,27 @@ After reading the thesis, propose the high-level structure directly in conversat
 > - "总页数控制在35页以内"
 
 Wait for user to confirm or adjust. Loop until structure is approved.
+
+For `paper-reading`, replace the multi-chapter proposal with this compact
+Markdown proposal and wait for explicit approval:
+
+```markdown
+# TMTT 2026｜噪声消除 LNA｜某组
+
+来源：`materials/notes/paper-note.md` + `materials/papers/paper.pdf`
+来源类型：`ljg-paper` + `pyrojewel-deep-paper`
+
+| 页 | 角色 | 标题 | 左侧 | 右侧 | 笔记来源 |
+|---|---|---|---|---|---|
+| 1 | overview | 为什么要做噪声消除 | 问题与贡献 | 论文电路图 | 解读 |
+| 2 | theory-figure | 噪声抵消怎样成立 | 小推导与直觉 | 机制图 | 解读+原文 |
+| 3 | evidence | 仿真/测量到底支持什么 | 指标与证据强度 | 结果图 | 结果+QA |
+| 4 | discussion | 这篇论文还留下什么问题 | 我的判断与边界 | QA/困惑点 | 深读问答 |
+```
+
+The plan is the contract for content generation. If a figure is missing, mark
+the right slot as `待补图` in Markdown and ask for it; do not replace it with a
+full-page screenshot or invent a result.
 
 ### 2.2 Second Pass: Per-Section Detail
 
@@ -302,7 +415,11 @@ After all chapters are individually approved, show a **complete summary** in con
 
 ### 2.4 Save to outline.md
 
-Only after final confirmation, save the approved structure to `outline.md` for Phase 3 reference. This file is for the AI's internal use — user has already approved everything in conversation.
+For legacy multi-chapter decks, save `outline.md` only after final confirmation.
+For `paper-reading`, write the draft `outline.md` before LaTeX generation so
+the user can review the exact page plan; after approval, mark it
+`status: approved` and use that same file as the Phase 3 contract. `outline.md`
+is the only planning artifact that may unlock generation.
 
 ### Why In-Conversation Instead of File
 
@@ -315,11 +432,27 @@ Only after final confirmation, save the approved structure to `outline.md` for P
 For `reproduction`, use this priority before the generic thesis rules:
 
 1. `paper-overview` — problem/contribution plus one large source or schematic figure
-2. `algorithm-derivation` — left narrative/assumptions, right formula or algorithm flow
-3. `paper-code-map` — paper steps on the left, code entry and status on the right
-4. `reproduction-result` — metrics and decision on the left, measured/reproduced figure on the right; a `not-reproduced` unit may use a clearly labelled migration-validation design figure
-5. `pole-zero-circuit` — physical interpretation and equivalent-circuit return path
-6. `method-comparison` — compare fitting methods only after each method has its own evidence
+2. `workflow-overview` — implementation-report workflow and current state; required before code pages when a code/plan bundle exists
+3. `algorithm-derivation` — left narrative/assumptions, right formula or algorithm flow
+4. `paper-code-map` — paper steps on the left, code entry and status on the right
+5. `reproduction-result` — metrics and decision on the left, measured/reproduced figure on the right; a `not-reproduced` unit may use a clearly labelled migration-validation design figure
+6. `pole-zero-circuit` — physical interpretation and equivalent-circuit return path
+7. `method-comparison` — compare fitting methods only after each method has its own evidence
+
+For `paper-reading`, use this priority before all generic rules:
+
+1. `paper-reading-overview` — problem/contribution plus one source figure
+2. `paper-reading-theory-figure` — theory or derivation on the left, mechanism/circuit figure on the right
+3. `paper-reading-evidence` — evidence interpretation on the left, result figure on the right
+4. `paper-reading-discussion` — reader takeaway and claim boundary on the left, QA/confusion panel on the right
+
+The profile is capped at 4 content pages per paper. Do not add a generic
+section divider or TOC to a one-paper unit unless the user requests it.
+
+If an implementation-report bundle is supplied to a paper-reading deck, put
+`workflow-overview` before any code or implementation-status content. The
+workflow page is an integration prelude, not a replacement for the paper's
+theory/evidence pages.
 
 The default content geometry is 38--44% for the left explanation and 56--62%
 for the right evidence. A right-side figure should be one readable figure or
@@ -342,7 +475,8 @@ For other report types, retain the generic rules:
 
 - No 3 consecutive pages with same layout
 - Each chapter uses at least 3 different layouts
-- Total: 35–50 pages (defense), 25–35 (proposal), 15–25 (conference)
+- Total: 35–50 pages (defense), 25–35 (proposal), 15–25 (conference),
+  and at most 4 content pages per paper (paper-reading)
 
 ## Phase 3: Content Generation
 
@@ -352,6 +486,10 @@ For other report types, retain the generic rules:
    - Load layout skeleton from `references/layouts.md` (find section by layout id)
    - Fill slots with thesis content + extracted materials
 4. Close with `\end{document}`.
+
+For `paper-reading`, the generation order is strict: read the approved
+`outline.md` → copy the paper figures → fill the four role layouts → compile.
+Do not generate a `.tex` file while the plan is still `status: draft`.
 
 ### Critical: Section Divider and reproduction units
 
@@ -379,6 +517,24 @@ For `not-reproduced`, it must instead state that no runner/holdout exists and
 label the right-side figure as a migration-validation design. A paper figure is
 source evidence; a generated schematic is labelled `示意重绘`; neither one is a
 measured reproduction result.
+
+When an implementation-report bundle exists, the first implementation page
+must show its rendered workflow and current state. Code excerpts remain
+secondary evidence and must carry the plan step, file/function, input/output,
+status, evidence, and next action from the bundle.
+
+### Critical: Reading note ↔ slide claim
+
+Every `paper-reading` page must label which material it uses:
+
+- `解读` — the normalized explanation from the reading note
+- `原文` — directly supported by the paper
+- `QA` — a question/answer from the note, not a new experimental result
+- `困惑点` — the reader's unresolved doubt or boundary
+
+Keep these separate. A reader's speculation belongs in `我的判断` or
+`困惑点`, not in the paper's contribution. If the note and original disagree,
+show the disagreement in the Markdown plan and preserve the claim boundary.
 
 ### Critical: TOC Page Format
 
@@ -440,6 +596,11 @@ Core rules:
 For `reproduction`, apply an additional capacity rule: each paper uses 2–5
 pages, every page has one explicit claim, and the four required roles cannot be
 replaced by a generic conclusion or transition page.
+
+For `paper-reading`, apply an additional capacity rule: each paper has at most
+four content pages, each row in `outline.md` has one page role and one primary
+claim, and the fourth page is omitted when there is no QA, confusion, or useful
+boundary to discuss.
 
 ### Section Divider (Legacy only)
 
@@ -519,6 +680,15 @@ The validator checks the four required roles per paper, the 2–5 page range,
 the presence of a `file:function` code entry and implementation status, result
 figure paths, and the absence of the old full-bleed divider contract. A clean
 LaTeX log is necessary but does not replace this evidence check.
+
+For a `paper-reading` deck, run a structural check before compilation:
+
+```bash
+rg -n "status: approved|paper-reading-(overview|theory-figure|evidence|discussion)" outline.md
+```
+
+Confirm that the paper has no more than four role rows, every page has a
+source label, and any QA/confusion page is traceable to the supplied note.
 
 **If overlap detected in compiled PDF** (user reports "P7图文重叠了"):
 1. Identify the frame in `.tex`
@@ -612,6 +782,7 @@ Add `\note{}` blocks to each frame in `.tex` with the speaker notes content.
 - `references/tex-header.md` — Standard .tex file preamble template
 - `references/layout-registry.yaml` — Layout selection rules in structured format
 - `references/reproduction-contract.md` — Paper-unit metadata, page roles, source labels, and claim boundaries
+- `references/paper-reading-contract.md` — Markdown-first plan and approval gate for single-paper reading decks
 
 ## Assets
 

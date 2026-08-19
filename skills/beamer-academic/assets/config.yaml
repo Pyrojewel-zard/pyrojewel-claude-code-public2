@@ -25,7 +25,8 @@ color_scheme: "blue"
 # ============================================================
 # 报告类型
 # ============================================================
-# 可选: defense (答辩) | proposal (开题) | conference (会议报告) | reproduction (论文算法复现)
+# 可选: defense (答辩) | proposal (开题) | conference (会议报告) |
+#       paper-reading (单篇论文组会) | reproduction (论文算法复现)
 report_type: "defense"
 
 # ============================================================
@@ -33,6 +34,7 @@ report_type: "defense"
 # ============================================================
 presentation:
   title: ""                   # 论文/报告标题
+  paper_meta: ""              # 会议/年份｜论文主题｜作者/课题组，例如 TMTT 2026｜噪声消除 LNA｜某组
   author: ""                  # 报告人姓名
   supervisor: ""              # 导师姓名+职称（开题/答辩需要）
   major: ""                   # 专业名称（开题/答辩需要）
@@ -42,11 +44,49 @@ presentation:
 # 生成参数
 # ============================================================
 generation:
-  target_pages: 40            # 目标页数（答辩建议35-50，开题25-35，会议15-25）
+  target_pages: 40            # 目标页数（paper-reading 忽略此值，按单篇最多4页）
   language: "zh"              # zh | en | bilingual
   time_limit: 20              # 报告时间（分钟），影响每页文字量
   aspect_ratio: "43"          # 43 (4:3) | 169 (16:9)
   font_size: "10pt"           # 10pt | 11pt | 12pt
+
+# ============================================================
+# ============================================================
+# 单篇论文阅读模式（仅 report_type: paper-reading 使用）
+# ============================================================
+paper_reading:
+  max_pages_per_paper: 4      # 单篇论文内容页硬上限；共享封面不计入论文单元
+  plan_file: "outline.md"     # 先生成并确认 Markdown，再允许生成 .tex
+  require_plan_approval: true
+  include_toc: false          # 单篇论文默认不加目录
+  show_paper_meta_on_pages: true
+  note_sources:               # 实际使用哪个就保留哪个，不要重复生成同一篇笔记
+    - provided-note
+    - ljg-paper
+    - pyrojewel-deep-paper
+    - ljg-read
+  default_roles:
+    - overview
+    - theory-figure
+    - evidence
+    - discussion
+  inputs:
+    original_paper: ""        # PDF / DOCX / TEX 路径
+    reading_note: ""           # ljg-paper 笔记；含 deep-paper 追加时仍是同一文件
+  figure_dirs:
+    paper_originals: "materials/figures/paper-originals"
+    generated: "materials/figures/generated"
+
+# ============================================================
+# 实现状态汇报输入（由 implementation-report 生成）
+# ============================================================
+implementation_report:
+  mode: "auto"               # auto | required | disabled
+  bundle_dir: "materials/implementation-report"
+  manifest: "materials/implementation-report/manifest.yaml"
+  require_workflow_before_code: true
+  workflow_layout: "workflow-overview"
+  diagram_preference: "mermaid"
 
 # ============================================================
 # 论文复现模式（仅 report_type: reproduction 使用）

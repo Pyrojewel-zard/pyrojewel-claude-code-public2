@@ -14,6 +14,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - 新页型：`\statementframe`、`\statrow`、`\hyporow`
 - 新增 `reproduction` 模式：每篇论文 2--5 页，覆盖算法推导、论文—代码对应和复现结果
 - 新增 `paper-overview`、`algorithm-derivation`、`paper-code-map`、`reproduction-result`、`pole-zero-circuit`、`method-comparison` 版式
+- 新增 `paper-reading` 模式：接收 `ljg-paper` / `pyrojewel-deep-paper` / `ljg-read` 阅读材料，单篇论文最多4页
+- 新增 Markdown-first `outline.md` 确认门槛，以及 `paper-reading-overview`、`paper-reading-theory-figure`、`paper-reading-evidence`、`paper-reading-discussion` 版式
+- 将计划/代码现状拆到 `implementation-report`；流程图由 `diagram-design` 从 Mermaid 语义源重绘，本 skill 通过 `workflow-overview` 消费 manifest 指定的 PNG
 - 章节页改为白底紧凑强调线；主题增加 `listings`、`\codeentry`、`\statuslabel`、`\paperstep`
 
 ## [1.4.0] - 2026-05-22

@@ -40,6 +40,85 @@ layouts:
       - source_caption
       - claim_boundary
 
+  - id: paper-reading-overview
+    name: 单篇论文概览
+    file: paper-reading-overview.tex
+    when: >
+      paper-reading 模式的第1页。标题层显示会议/年份、论文主题和作者或课题组；
+      左侧写问题、贡献和范围，右侧放一张论文原图或电路总览图。
+    max_per_paper: 1
+    slots:
+      - paper_meta
+      - title
+      - left_text
+      - source_figure
+      - source_caption
+      - note_source
+      - claim_boundary
+
+  - id: paper-reading-theory-figure
+    name: 理论/推导—论文图
+    file: paper-reading-theory-figure.tex
+    when: >
+      paper-reading 模式的理论页。默认左侧放理论直觉、关键假设和不超过两个公式，
+      右侧放与该解释直接对应的电路、机制或方法图。
+    max_per_paper: 1
+    slots:
+      - paper_meta
+      - title
+      - theory_text
+      - equations
+      - figure
+      - source_caption
+      - note_source
+
+  - id: paper-reading-evidence
+    name: 证据—结果图
+    file: paper-reading-evidence.tex
+    when: >
+      paper-reading 模式的结果页。左侧解释指标、结果和证据强度，右侧只放一张可读的
+      仿真、测量或论文结果图；不把读者推演写成论文实测结果。
+    max_per_paper: 1
+    slots:
+      - paper_meta
+      - title
+      - evidence_text
+      - figure
+      - source_caption
+      - evidence_level
+      - note_source
+
+  - id: paper-reading-discussion
+    name: QA/困惑点讨论页
+    file: paper-reading-discussion.tex
+    when: >
+      paper-reading 模式的第4页。左侧放读者自己的判断、边界和 takeaway，右侧放阅读笔记
+      中的 QA、困惑点或待验证问题；没有这些材料时改用紧凑结论页。
+    max_per_paper: 1
+    slots:
+      - paper_meta
+      - title
+      - takeaway_text
+      - claim_boundary
+      - qa_or_confusions
+      - note_source
+
+  - id: workflow-overview
+    name: 实现流程与当前状态
+    file: workflow-overview.tex
+    when: >
+      implementation-report 模式或 reproduction 模式中，任何代码/实现状态页之前的前置页。
+      上方放由 diagram-design 重绘的 slide-sized PNG，下方放当前状态、最大边界和下一步。
+    max_per_paper: 1
+    slots:
+      - paper_meta
+      - title
+      - workflow_figure
+      - current_state
+      - claim_boundary
+      - next_action
+      - report_source
+
   - id: algorithm-derivation
     name: 算法推导页
     file: algorithm-derivation.tex
@@ -71,6 +150,10 @@ layouts:
       - parameters
       - implementation_status
       - implementation_note
+      - plan_step
+      - input_output
+      - evidence
+      - next_action
 
   - id: reproduction-result
     name: 复现结果页
@@ -275,6 +358,13 @@ layouts:
 # 版式选型优先级规则（供AI在Step 2使用）
 # =============================================================
 selection_rules:
+  - "存在 implementation-report bundle 时，先用 workflow-overview，再进入任何代码或实现状态页"
+  - "workflow-overview 只呈现计划→代码→运行/测试→证据→边界，不展示代码墙"
+  - "workflow-overview 必须遵循 manifest.yaml，且同时有 workflow.mmd 与 diagram-design 生成的 workflow.png；缺失时标记待渲染，不伪造"
+  - "paper-reading 模式先输出 outline.md 并等待确认；未获 status: approved 不生成 .tex"
+  - "paper-reading 模式每篇最多4页，默认顺序为 paper-reading-overview → paper-reading-theory-figure → paper-reading-evidence → paper-reading-discussion"
+  - "paper-reading 内容页默认左侧理论/解读，右侧一张可读论文图；每页保留 note_source 与 claim boundary"
+  - "paper-reading 的 discussion 页只承接笔记中的 QA、困惑点和待验证边界，不伪造实验结果"
   - "reproduction 模式按 paper-overview → algorithm-derivation → paper-code-map → reproduction-result 选择，每篇论文共2-5页"
   - "reproduction 模式不强制 section-divider，不使用满版纯色页，也不以 transition 作为论文间默认过渡"
   - "reproduction 模式内容页默认左38--44%、右56--62%，右侧只放一张可读大图或结构化复合图"
@@ -315,9 +405,22 @@ report_types:
     typical_length: 15-25
     closing_text: "欢迎提问"
 
+  paper-reading:
+    required_pages: []
+    optional_pages: [cover, thanks]
+    pages_per_paper: 1-4
+    plan_file: outline.md
+    plan_approval_required: true
+    section_divider: false
+    toc: false
+    closing_text: "欢迎讨论论文中的机制、证据与疑问"
+
   reproduction:
     required_pages: [cover, thanks]
     required_per_paper: [paper-overview, algorithm-derivation, paper-code-map, reproduction-result]
+    conditional_pages:
+      - id: workflow-overview
+        when: "implementation-report bundle exists; place before paper-code-map and reproduction-result"
     pages_per_paper: 2-5
     section_divider: compact-white-optional
     closing_text: "欢迎讨论复现边界与后续验证"
