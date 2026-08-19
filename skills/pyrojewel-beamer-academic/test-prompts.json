@@ -1,0 +1,22 @@
+[
+  {
+    "id": 1,
+    "prompt": "帮我做论文调研PPT，论文是 attachmentKey=ABC123 的这篇 CFD-PE 频响极点展开的论文",
+    "expected": "两阶段流程：先生成完整内容MD（普通页180-240字论证段落；表格、公式、多图页按可读信息量核算；含公式、图片标注、页级证据契约和同目录page_manifest.tsv），用户确认后再生成beamer。MD文件名带'论文调研'type标签和日期前缀。beamer子目录包含.sty/图片资产/bupt-logo-white.png，用xelatex编译。无封面，直接进入内容页。编译后逐页复核排版，生成qa.md并运行pdfinfo/pdftotext/pdftoppm，检查未解释的Overfull/图片溢出/文字截断等问题并自动修复。"
+  },
+  {
+    "id": 2,
+    "prompt": "做组会PPT，这个内容和上周的频响极点展开是同一个课题的后续进展",
+    "expected": "先扫描周会文件夹已有文档，检测到上周的频响极点展开MD → 判断为同一主题 → append到已有文档末尾（---分隔），不新建文件。type标签用'组会'。beamer子目录用已有MD的文件名。"
+  },
+  {
+    "id": 3,
+    "prompt": "PPT编译完了，帮我检查一下排版有没有问题",
+    "expected": "逐页复核：打开PDF检查每页——Overfull vbox（内容溢出页面底部）、图片是否超出边界、文字是否被截断、公式是否完整显示；同时运行pdfinfo/pdftotext/pdftoppm并生成qa.md。发现问题后按结构拆分、调整图片高度、缩短标题或公式；不得优先靠缩小字号解决。修复后重新编译并再次检查，直到无未解释问题（主题宏<1pt例外须在QA中定位记录）。"
+  },
+  {
+    "id": 4,
+    "prompt": "根据一篇有长篇精读笔记的综述制作组会PPT，要求内容忠于原文，不要只堆图片",
+    "expected": "先生成严格制表符分隔的coverage_matrix.tsv，覆盖笔记全部二级/三级标题，并逐条映射章节到页面、claim类型和证据位置；页面序列至少包含causal_chain、case_boundary、synthesis_boundary。案例页固定写工作/对象/自动化边界/证据层级/未覆盖项；claim_type与page record统一使用reported/synthesized/project_result/unknown。"
+  }
+]
