@@ -19,7 +19,8 @@ argument-left-evidence-right
 ```
 
 Normal geometry is 40/60. The accepted range is 38--44% for the left column and
-56--62% for the right column.
+56--62% for the right column. Formula-heavy `theory-figure` pages should prefer
+44/56 when the extra derivation width materially improves readability.
 
 ## Never reverse columns for rhythm
 
@@ -43,11 +44,36 @@ Keep the semantic axis fixed and vary the internal composition instead:
 | page role | left-column rhythm | right-column rhythm |
 |---|---|---|
 | overview | anchor paragraph + mini argument spine | one overview/circuit figure |
-| theory-figure | mechanism paragraph + <=2 equations | one mechanism/circuit/method figure |
+| theory-figure | circuit context -> derivation chain -> physical meaning -> design implication | one mechanism/circuit figure with relevant device/path visible |
 | evidence | metric/result paragraph + evidence-level box | one result figure or structured composite |
 | discussion | judgment OR reading tension + boundary | QA/confusion/evidence-needed panel |
 
 This provides visual rhythm without changing the reader's spatial grammar.
+
+## Theory-page equation grammar
+
+A `theory-figure` page is not an equation dump. Its visual reading order should
+make the derivation inspectable during a group meeting:
+
+```text
+small-signal/circuit context
+-> starting relation
+-> one or two key reduction steps
+-> highlighted useful expression
+-> physical meaning / trade-off / design consequence
+```
+
+Use short aligned equations, arrows, or a compact derivation ladder. Define only
+the variables needed to understand the mechanism, but map those variables to the
+actual transistor/passive/bias/signal path.
+
+The right-side figure must show the circuit or mechanism needed to understand the
+equation. When useful, annotate the figure with the same variable names used in
+the derivation so the eye can move directly between equation and circuit.
+
+If this cannot remain readable in one page, split into two `theory-figure` pages.
+Remove the optional discussion page before shrinking equations, variable labels,
+or circuit details below presentation readability.
 
 ## Evidence-first sizing
 
@@ -58,6 +84,10 @@ normal presentation distance. If the figure cannot be read at 56--62% width:
 2. use a structured composite only when panels belong to one evidence chain;
 3. split the claim across pages if necessary;
 4. never shrink the figure just to preserve extra prose.
+
+For theory pages, equation readability is equally important: never reduce the
+font size merely to keep an optional paragraph, AI architecture detail, or
+discussion block on the same page.
 
 ## No fake symmetry
 
@@ -75,6 +105,15 @@ present. Recommended order on the left:
 claim / mechanism / interpretation
 -> evidence-strength or boundary box
 -> short provenance label
+```
+
+For `theory-figure`, use:
+
+```text
+claim
+-> derivation chain
+-> physical meaning / design implication
+-> equation provenance + validity boundary
 ```
 
 The right-side caption names the source figure and why it is shown.
