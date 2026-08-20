@@ -7,6 +7,16 @@ from pathlib import Path
 AXIS = "argument-left-evidence-right"
 ROLES = {"overview", "theory-figure", "evidence", "discussion", "workflow-overview"}
 BAD_JUDGMENT = ("我的判断", "读后一句话", "reader-judgment", "reader_judgment")
+EMPTY_VALUES = {"", "...", "-", "待补"}
+VAGUE_EQUATION_INSIGHT = {
+    "公式见论文",
+    "理论推导",
+    "公式推导",
+    "eq. (x)",
+    "eq.(x)",
+    "equation",
+    "derivation",
+}
 
 
 def parse_meta(text):
@@ -75,6 +85,7 @@ def validate_outline(path):
     required_headers = [
         ("role", "角色"),
         ("title", "标题"),
+        ("circuit/equation insight", "equation insight", "公式/电路理解", "公式理解"),
         ("provenance", "source", "来源", "笔记来源"),
         ("evidence boundary", "evidence-boundary", "boundary", "证据边界"),
         ("layout_axis", "layout-axis", "axis", "布局轴"),
@@ -95,15 +106,29 @@ def validate_outline(path):
         boundary = pick(row, "evidence boundary", "evidence-boundary", "boundary", "证据边界")
         axis = pick(row, "layout_axis", "layout-axis", "axis", "布局轴")
         mode = pick(row, "discussion_mode", "discussion-mode", "讨论模式")
+        equation_insight = pick(
+            row,
+            "circuit/equation insight",
+            "equation insight",
+            "公式/电路理解",
+            "公式理解",
+        )
         seen_roles.append(role)
         if role not in ROLES:
             errors.append(f"unknown role: {role}")
         if role != "workflow-overview" and axis != AXIS:
             errors.append(f"{role}: axis must be {AXIS}")
-        if source in {"", "...", "-", "待补"}:
+        if source in EMPTY_VALUES:
             errors.append(f"{role}: provenance/source is empty")
-        if boundary in {"", "...", "-", "待补"}:
+        if boundary in EMPTY_VALUES:
             errors.append(f"{role}: evidence boundary is empty")
+        if role == "theory-figure":
+            normalized_insight = equation_insight.strip().lower()
+            if equation_insight in EMPTY_VALUES or normalized_insight in VAGUE_EQUATION_INSIGHT:
+                errors.append(
+                    "theory-figure: circuit/equation insight must explain derivation, "
+                    "physical meaning, trade-off, and design implication"
+                )
         if role == "discussion" and note_status != "complete":
             joined = " ".join([title, mode, " ".join(row.values())])
             if any(token in joined for token in BAD_JUDGMENT):
