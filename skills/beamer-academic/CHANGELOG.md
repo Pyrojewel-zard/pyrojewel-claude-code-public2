@@ -26,6 +26,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 ### ♻️ Changed
 - `paper-reading-contract.md` 改为两阶段语义门：`ljg-read note -> reading-brief.md -> outline.md -> LaTeX`，不再允许从阅读笔记直接做弱摘要填栏
 - paper-reading 的通用 rhythm 规则改为栏内 composition 变化；`image-left-text-right` 在该 profile 中明确禁用
+- RFIC `theory-figure` 页面新增强制 `circuit/equation insight`：公式必须解释起点模型、假设、变量到电路的映射、物理意义、trade-off 与设计选择，而不是只摘录最终表达式
+- 公式是核心论证时允许使用两个 `theory-figure` 页面；优先移除可选 discussion 页，避免为了固定四角色而压缩关键电路推导
 
 ## [1.4.0] - 2026-05-22
 
