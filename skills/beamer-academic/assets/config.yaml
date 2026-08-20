@@ -26,7 +26,8 @@ color_scheme: "blue"
 # 报告类型
 # ============================================================
 # 可选: defense (答辩) | proposal (开题) | conference (会议报告) |
-#       paper-reading (单篇论文组会) | reproduction (论文算法复现)
+#       paper-reading (单篇论文组会) | reproduction (论文算法复现) |
+#       implementation-analysis (代码实现与结果分析)
 report_type: "defense"
 
 # ============================================================
@@ -63,7 +64,8 @@ paper_reading:
   note_sources:               # 实际使用哪个就保留哪个，不要重复生成同一篇笔记
     - provided-note
     - ljg-paper
-    - pyrojewel-deep-paper
+    - ljg-read
+    - ljg-qa
     - ljg-read
   default_roles:
     - overview
@@ -72,7 +74,7 @@ paper_reading:
     - discussion
   inputs:
     original_paper: ""        # PDF / DOCX / TEX 路径
-    reading_note: ""           # ljg-paper 笔记；含 deep-paper 追加时仍是同一文件
+    reading_note: ""           # ljg-paper 笔记；含 ljg-read/ljg-qa 追加时仍是同一文件
   figure_dirs:
     paper_originals: "materials/figures/paper-originals"
     generated: "materials/figures/generated"
@@ -86,7 +88,10 @@ implementation_report:
   manifest: "materials/implementation-report/manifest.yaml"
   require_workflow_before_code: true
   workflow_layout: "workflow-overview"
-  diagram_preference: "mermaid"
+  diagram_preference: "diagram-design"
+  diagram_spec: "materials/implementation-report/diagram/diagram-spec.yaml"
+  figure_manifest: "materials/implementation-report/figures/figure-manifest.yaml"
+  layout_qa: "materials/implementation-report/qa/layout-review.md"
 
 # ============================================================
 # 论文复现模式（仅 report_type: reproduction 使用）

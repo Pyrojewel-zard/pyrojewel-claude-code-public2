@@ -12,11 +12,11 @@
 | Skill | 用途 | 主要触发词 |
 |---|---|---|
 | `beamer-academic`(本 skill) | 开题、会议、conference talk、通用学术汇报 | `beamer-academic`、`开题PPT`、`会议报告`、`conference PPT` |
-| `pyrojewel-beamer-academic` | 答辩主线;带证据契约、coverage matrix、Obsidian 周会输出 | `答辩PPT`、`答辩`、`论文PPT` |
+| `beamer-academic` | 论文阅读、组会/会议汇报、复现和 Beamer PDF 编译 | `beamer-academic`、`论文精读PPT` |
 
 ### ⚠ 未解决的路由歧义
 
-`pyrojewel-beamer-academic` 的 trigger 列表里仍有 `beamer`、`学术 PPT`、`学术报告`、`academic slides`、`paper presentation`、`beamer presentation` 这些**通用词**。本 skill 没有去抢,但用户说「做个 beamer」时两边都可能被选中。彻底解决需要收窄 `pyrojewel-beamer-academic` 的 trigger——那是它的文件,本次没有擅自改。
+历史上曾存在另一套 `pyrojewel-beamer-academic` 通用 trigger，已从项目和运行时 skill 目录移除；当前统一使用 `beamer-academic`。
 
 判断规则(暂时靠 description 兜):**要证据契约和 Obsidian 输出走 pyrojewel,其余走本 skill。**
 
@@ -69,7 +69,7 @@ overview、algorithm-derivation、paper-code-map、reproduction-result；布局�
 ### [P3] 2026-08-19 — 单篇论文阅读汇报模式
 
 `SKILL.md` 新增 `paper-reading` profile，输入可来自用户已有的 `ljg-paper`
-笔记及其 `pyrojewel-deep-paper` 追加内容；只有论文时先走 `ljg-read`。单篇论文
+笔记及其 `ljg-read` / `ljg-qa` 追加内容；只有论文时先走 `ljg-paper`。单篇论文
 内容页上限为4页，默认顺序是概览、理论/推导—论文图、证据—结果图、QA/困惑点。
 
 新增 `references/paper-reading-contract.md`，规定先生成并展示 `outline.md`，用户
@@ -78,10 +78,11 @@ overview、algorithm-derivation、paper-code-map、reproduction-result；布局�
 
 ### [P4] 2026-08-19 — implementation-report 分工
 
-计划读取、代码现状分析和 Mermaid 语义工作流已拆到同项目的
-`skills/implementation-report/`，流程图视觉由 `skills/diagram-design/` 重绘。
-本 skill 只消费 manifest 指定的 bundle/PNG；当涉及代码/复现时，先使用
-`workflow-overview`，再进入 `paper-code-map` 或结果页，避免代码单独占页。
+计划读取、代码/运行结果分析、数据审计、公式、Python 图表和结构化 diagram brief
+已拆到同项目的 `skills/implementation-report/`，流程图由
+`skills/diagram-design/` 直接绘制。本 skill 只消费 manifest 指定的
+bundle/PNG；当涉及代码/复现时，先使用 `workflow-overview`，再进入
+`paper-code-map` 或结果页，避免代码单独占页。
 
 ## upstream 同步流程
 
@@ -162,4 +163,4 @@ git show 0e128a2:skills/zuhui-beammer/SKILL.md
 git checkout 0e128a2 -- skills/zuhui-beammer   # 整目录恢复
 ```
 
-其中前两项若日后要补,`pyrojewel-beamer-academic` 已有自己的证据契约可参考。
+其中前两项若日后要补,可直接在 `beamer-academic` 的证据契约中扩展。

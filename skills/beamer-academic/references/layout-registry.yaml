@@ -107,8 +107,8 @@ layouts:
     name: 实现流程与当前状态
     file: workflow-overview.tex
     when: >
-      implementation-report 模式或 reproduction 模式中，任何代码/实现状态页之前的前置页。
-      上方放由 diagram-design 重绘的 slide-sized PNG，下方放当前状态、最大边界和下一步。
+      implementation-report、implementation-analysis 或 reproduction 模式中，任何代码/实现状态页之前的前置页。
+      上方放由 diagram-design 直接绘制的 slide-sized PNG，下方放当前状态、最大边界和下一步。
     max_per_paper: 1
     slots:
       - paper_meta
@@ -360,7 +360,10 @@ layouts:
 selection_rules:
   - "存在 implementation-report bundle 时，先用 workflow-overview，再进入任何代码或实现状态页"
   - "workflow-overview 只呈现计划→代码→运行/测试→证据→边界，不展示代码墙"
-  - "workflow-overview 必须遵循 manifest.yaml，且同时有 workflow.mmd 与 diagram-design 生成的 workflow.png；缺失时标记待渲染，不伪造"
+  - "workflow-overview 必须遵循 manifest.yaml，且有 diagram/diagram-spec.yaml 与 diagram-design 生成的 workflow.png；缺失时标记待渲染，不伪造"
+  - "implementation-analysis 模式按 workflow-overview → plan/code-map → execution/evidence → result-analysis → theory-result-alignment → boundary/next-verification 排序"
+  - "implementation-analysis 的结果图必须在 figure-manifest.yaml 中有 source_data、script、claim、backend 和 aspect-ratio QA 记录"
+  - "所有 implementation-analysis 图片必须使用 width/height + keepaspectratio；比例不适配时改版式或拆页，不拉伸图片"
   - "paper-reading 模式先输出 outline.md 并等待确认；未获 status: approved 不生成 .tex"
   - "paper-reading 模式每篇最多4页，默认顺序为 paper-reading-overview → paper-reading-theory-figure → paper-reading-evidence → paper-reading-discussion"
   - "paper-reading 内容页默认左侧理论/解读，右侧一张可读论文图；每页保留 note_source 与 claim boundary"

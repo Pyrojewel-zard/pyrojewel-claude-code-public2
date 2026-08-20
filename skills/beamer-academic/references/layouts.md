@@ -243,23 +243,24 @@ Each section contains the LaTeX skeleton and slot definitions for one layout typ
 
 ```latex
 % Layout: workflow-overview (实现流程与当前状态)
-% Profile: implementation-report / reproduction; before code or status pages.
-% The diagram is rendered from workflow.mmd; never replace it with a code dump.
+% Profile: implementation-report / reproduction / implementation-analysis;
+% before code or status pages. The diagram is rendered by diagram-design from
+% diagram/diagram-spec.yaml; never replace it with a code dump.
 %
 % Slots:
 %   {{PAPER_META}}        - 会议/年份｜论文主题｜作者或课题组（可选）
 %   {{TITLE}}             - 本页标题
-%   {{WORKFLOW_FIGURE}}   - manifest.yaml 指定的 workflow.png
+%   {{WORKFLOW_FIGURE}}   - manifest.yaml 指定的 diagram/workflow.png
 %   {{CURRENT_STATE}}     - 已完成、进行中、阻塞/未知
 %   {{CLAIM_BOUNDARY}}    - 流程图不证明什么
 %   {{NEXT_ACTION}}       - 下一步最小验证
-%   {{REPORT_SOURCE}}     - manifest.yaml + implementation-report.md + workflow.mmd
+%   {{REPORT_SOURCE}}     - manifest.yaml + implementation-report.md + diagram-spec.yaml
 
 \begin{frame}
   \frametitle{{{TITLE}}}
   \framesubtitle{{{PAPER_META}}}
     \includegraphics[width=\linewidth, height=0.53\textheight, keepaspectratio]{{{WORKFLOW_FIGURE}}}
-    \figcap{实现流程；由 diagram-design 重绘；来源：{{REPORT_SOURCE}}}
+    \figcap{实现流程；由 diagram-design 绘制；来源：{{REPORT_SOURCE}}}
   \vskip0.04cm
   \begin{columns}[T, onlytextwidth]
     \column{0.32\textwidth}

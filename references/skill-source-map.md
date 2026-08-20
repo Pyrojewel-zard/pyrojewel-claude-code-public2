@@ -27,20 +27,20 @@
 
 | Skill | Local Path | Flow | Status | Source Repo | Source Path / Basis | Current Owner | Sync Strategy |
 |------|------------|------|--------|-------------|---------------------|---------------|---------------|
-| `pyrojewel-paper` | `skills/pyrojewel-paper/skill.md` | Flow 1 | `active` | `ljg-skills` | `ljg-paper` 改编 | worker2 | 跟踪上游结构性改动；本地输出协议优先 |
-| `pyrojewel-paper-river` | `skills/pyrojewel-paper-river/skill.md` | Flow 1 | `active` | `ljg-skills` | `ljg-paper-river` 改编 | worker2 | 跟踪上游溯源方法；本地图片/路径策略优先 |
-| `pyrojewel-paper-qa` | `skills/pyrojewel-paper-qa/skill.md` | Flow 1 | `active` | `ljg-skills` | `ljg-qa` 改编 | worker2 | 跟踪问题设计方法；本地对齐输出优先 |
-| `pyrojewel-deep-paper` | `skills/pyrojewel-deep-paper/SKILL.md` | Flow 1 | `adopted` | `ljg-skills` | 改编 `ljg-read`(伴读碰撞) + `ljg-qa`(Q-A 链)，交互改为 Claude AskUserQuestion 多选批量提问；吃 ljg-paper 初读笔记+原文，深读结果追加进原笔记 | worker2 | 跟踪 ljg-read/ljg-qa 的方法论变化；AskUserQuestion 批量交互与「追加进原笔记」为本地铁律 |
-| `pyrojewel-paper-flow` | `skills/pyrojewel-paper-flow/SKILL.md` | Flow 1 | `adopted` | self-built + local composition | 编排 `zotero-pdf-parse -> paper -> river -> qa -> beamer` | worker2 | 不看单一 upstream；按主链变化手工维护 |
-| `pyrojewel-beamer-academic` | `skills/pyrojewel-beamer-academic/SKILL.md` | Flow 1 / 11 | `adopted` | `beamer-academic` + `guizang-ppt-skill` | 上游 beamer + 本地版式改造 | worker2 | 跟踪上游 LaTeX/模板更新；版式规则本地优先 |
-| `implementation-report` | `skills/implementation-report/SKILL.md` | Flow 1 / 11 | `adopted` | local self-built | 计划→代码现状→Mermaid流程→状态报告；为 Beamer 提供可追溯的实现材料包 | lead | 不依赖外部上游；与 `beamer-academic` 的输入契约手工维护 |
-| `diagram-design` | `skills/diagram-design/SKILL.md` | Flow 1 / 11 | `adopted` | `cathrynlavery/diagram-design` | Mermaid/Draw.io 语义源 → editorial HTML/SVG/PNG 重绘；按 format/size/detail/audience 选择输出 | lead | 跟踪上游版本；本地仅维护与 `implementation-report` 的 handoff 适配 |
+| `ljg-paper` | external `ljg-skills/skills/ljg-paper/SKILL.md` | Flow 1 | `external-active` | `ljg-skills` | 上游原版初读 | worker2 | 直接跟踪 `/home/DataTransfer/Pyrojewel/code/02_claudeSkill/ljg-skills` |
+| `ljg-read` | external `ljg-skills/skills/ljg-read/SKILL.md` | Flow 1 | `external-active` | `ljg-skills` | 上游原版伴读 | worker2 | 直接跟踪 ljg-skills |
+| `ljg-qa` | external `ljg-skills/skills/ljg-qa/SKILL.md` | Flow 1 | `external-active` | `ljg-skills` | 上游原版问答链 | worker2 | 直接跟踪 ljg-skills |
+| `pyrojewel-paper-river` | `skills/pyrojewel-paper-river/SKILL.md` | Flow 1 | `active` | `ljg-skills` | 与上游版本保持一致 | worker2 | 以 ljg-skills 为唯一替换来源 |
+| `implementation-report` | `skills/implementation-report/SKILL.md` | Flow 1 / 4 / 11 | `adopted` | local self-built | 计划→代码/运行结果→数据审计→公式→Python图表→直接流程图→Beamer编译回读；为 Beamer 提供可追溯的实现材料包 | lead | 不依赖外部上游；与 `nature-data`、`nature-figure`、`formula-derivation`、`diagram-design`、`beamer-academic` 的输入契约手工维护 |
+| `diagram-design` | `skills/diagram-design/SKILL.md` | Flow 1 / 11 | `adopted` | `cathrynlavery/diagram-design` | 结构化 diagram brief → editorial HTML/SVG/PNG；按 format/size/detail/audience 选择输出 | lead | 跟踪上游版本；本地仅维护与 `implementation-report` 的 handoff 适配 |
 | `zuhui-beammer` | ~~`skills/zuhui-beammer/`~~（已删除） | Flow 11 | `removed` | local derivative of `pyrojewel-beamer-academic` + `ADC_Calibration.pdf` | 2026-08-17 删除，改由 `beamer-academic` 承担该场景。上游 v1.5 完全没有、随之放弃的四项：`page_manifest.tsv` 证据契约、语义化配色（red/green/blue）、`zuhuicode` 代码块、`pdftoppm` 视觉 QA 硬门 | — | 不再维护；取回：`git checkout 0e128a2 -- skills/zuhui-beammer` |
 | `analyze-results` | `skills/analyze-results/skill.md` | Flow 4 | `adopted` | `Auto-claude-code-research-in-sleep` | 原样迁移 | worker3 | 看上游是否有方法/输出结构更新 |
 | `experiment-plan` | `skills/experiment-plan/skill.md` | Flow 2 / 4 | `adopted` | `Auto-claude-code-research-in-sleep` | 原样迁移 | worker3 | 跟踪 claim-driven planning 更新 |
 | `paper-compile` | `skills/paper-compile/skill.md` | Flow 4 / 5 | `adopted` | `Auto-claude-code-research-in-sleep` | 原样迁移 | worker3 | 跟踪编译/修错流程更新 |
 | `dse-loop` | `skills/dse-loop/skill.md` | Flow 3 / 4 | `adopted` | `Auto-claude-code-research-in-sleep` | 原样迁移 | worker3 | 跟踪搜索策略更新 |
 | `formula-derivation` | `skills/formula-derivation/skill.md` | Flow 4 | `adopted` | `Auto-claude-code-research-in-sleep` | 原样迁移 | worker3 | 低频检查 |
+| `nature-data` | external runtime skill | Flow 4 / 11 | `external-active` | `nature-skills` | Nature-ready 数据可用性、source data、FAIR 和 provenance 审计；由 `implementation-report` full-analysis 强制调用 | lead | 运行时加载；如需纳入本仓库再按来源治理单独迁移 |
+| `nature-figure` | external runtime skill | Flow 4 / 11 | `external-active` | `nature-skills` | Nature-ready Python/R 科研图、figure contract、导出和视觉 QA；本 pipeline 选定 Python 时专用 | lead | 运行时加载；如需纳入本仓库再按来源治理单独迁移 |
 | `experiment-log-summarizer` | `skills/experiment-log-summarizer/skill.md` | Flow 4 | `adopted` | unknown | 原标 academic-skills 已核实磁盘无此仓库（2026-08-11）；`academic-research-skills` 亦无此 skill，来源不可核实 | worker3 | 无需同步外部源，作为本地 skill 维护 |
 | `benchmark-extractor` | `skills/benchmark-extractor/skill.md` | Flow 4 | `adopted` | unknown | 原标 academic-skills 已核实磁盘无此仓库（2026-08-11）；`academic-research-skills` 亦无此 skill，来源不可核实 | worker3 | 无需同步外部源，作为本地 skill 维护 |
 | `novelty-check` | `skills/novelty-check/skill.md` | Flow 2 / 4 | `adopted` | `Auto-claude-code-research-in-sleep` | 已做 `REVIEWER_MODEL` + `shared-references` 适配 | worker3 | 作为 P1 适配模板，优先跟踪 |
@@ -72,9 +72,9 @@
 | `wiki-research` | `skills/wiki-research/skill.md` | Flow 10 | `adopted` | local self-built | 本地自建 | worker2 | 不依赖外部上游 |
 | `arxiv` | `skills/arxiv/skill.md` | Flow 2 support | `adopted` | `Auto-claude-code-research-in-sleep` | 已迁入；shared-references 引用改为当前项目路径 | lead | 跟踪下载/检索 helper 解析链 |
 | `render-html` | `skills/render-html/skill.md` | Flow 2 support | `adopted` | `Auto-claude-code-research-in-sleep` | 已迁入；脚本与模板一并落地；shared-references 引用改为当前项目路径 | lead | 跟踪 HTML 渲染脚本与模板更新 |
-| `pyrojewel-academic-ppt` | `.claude/skills/pyrojewel-academic-ppt/` | Flow 11 | `superseded` | local legacy | 被 `pyrojewel-beamer-academic` 替代 | worker2 | 不再同步 |
-| `beamer-academic` | `skills/beamer-academic/SKILL.md` | Flow 11 | `active` | `beamer-academic` | 2026-08-17 从 upstream `788e125` (v1.5) 迁入，同日转为**维护中的本地 fork**；当前版本 `1.6+pyrojewel.2`。承接开题/会议/conference talk、论文阅读和通用学术汇报；实现状态/流程图由 `implementation-report` 提供。patch 日志与同步流程见 `skills/beamer-academic/LOCAL-NOTES.md` | lead | 从 commit 对象提取（**禁止 cp 工作区**，见 LOCAL-NOTES）；覆盖后重新施加 patch 日志并保留本地 frontmatter |
-| `guizang-ppt-skill` | external repo only | Flow 11 | `reference-only` | `guizang-ppt-skill` | 版式规则来源 | worker2 | 只分析版式/渲染经验 |
+| `pyrojewel-academic-ppt` | `.claude/skills/pyrojewel-academic-ppt/` | Flow 11 | `removed` | local legacy | 2026-08-19 删除，统一到 `beamer-academic` | worker2 | 不再同步 |
+| `beamer-academic` | `skills/beamer-academic/SKILL.md` | Flow 11 | `active` | `beamer-academic` | 2026-08-17 从 upstream `788e125` (v1.5) 迁入，同日转为**维护中的本地 fork**；当前版本 `1.6+pyrojewel.2`。承接开题/会议/conference talk、论文阅读、复现和 implementation-analysis；实现状态、图表和排版 QA 由 `implementation-report` 提供。patch 日志与同步流程见 `skills/beamer-academic/LOCAL-NOTES.md` | lead | 从 commit 对象提取（**禁止 cp 工作区**，见 LOCAL-NOTES）；覆盖后重新施加 patch 日志并保留本地 frontmatter |
+| `guizang-ppt-skill` | external repo only | Flow 11 | `reference-only` | `guizang-ppt-skill` | 历史版式参考 | worker2 | 只分析版式/渲染经验 |
 | `scientific-thinking-literature-review` | `skills/scientific-thinking-literature-review/SKILL.md` | ECC legacy | `reference-only` | `ECC` | 历史导入 | worker1 | 默认不继续演化 |
 | `deep-research` | `skills/deep-research/SKILL.md` | ECC legacy | `reference-only` | `ECC` | 历史导入 | worker1 | 仅作参考 |
 | `search-first` | `skills/search-first/SKILL.md` | ECC legacy | `reference-only` | `ECC` | 历史导入 | worker1 | 仅作参考 |
@@ -89,13 +89,13 @@
 
 | Source Repo | Primary Flows | What To Watch | Check Trigger | Decision Output |
 |------------|---------------|---------------|---------------|-----------------|
-| `ljg-skills` | Flow 1 | `ljg-paper`, `ljg-paper-river`, `ljg-qa` 方法论变化 | 论文阅读主线有质量问题，或 upstream 有显著更新 | 是否同步到 `pyrojewel-paper*` |
-| `beamer-academic` | Flow 1 / 11 | LaTeX 模板、编译脚本、字体/布局修复 | 需要更稳的编译链，或 upstream 新增关键版式 | 是否吸收到 `pyrojewel-beamer-academic` |
+| `ljg-skills` | Flow 1 | `ljg-paper`, `ljg-read`, `ljg-qa`, `pyrojewel-paper-river` 方法论变化 | 论文阅读主线有质量问题，或 upstream 有显著更新 | 是否直接更新外部来源或 river 副本 |
+| `beamer-academic` | Flow 1 / 11 | LaTeX 模板、编译脚本、字体/布局修复 | 需要更稳的编译链，或 upstream 新增关键版式 | 更新本地 `beamer-academic` |
 | `guizang-ppt-skill` | Flow 11 | 版式、结构密度、视觉层级规则 | PPT 版式需要增强 | 是否只吸收规则，不吸收动态渲染 |
 | `skill_manager` | Flow 1 / 9 / Meta | `zotero-pdf-parse` | Flow 1 入口不稳，或 skill_manager 有实用更新 | 是否迁入/更新本地 skill |
 | `Auto-claude-code-research-in-sleep` | Flow 2 / 4 / 5 | `idea-*`, `research-*`, `experiment-*`, `paper-*` | idea/experiment 主线要推进，或上游有方法改动 | 是否批量套模板适配 |
 | ~~`academic-skills`~~（已核实不存在） | Flow 2 / 4 / 6 / 7 | ~~轻量零依赖学术 skill~~ | ~~需要低成本补充 flow~~ | 2026-08-11 核实：磁盘无 `academic-skills` 仓库，`academic-research-skills` 亦无相关 skill，条目移除 |
-| `nature-skills` | Flow 5 / 11 | `nature-polishing`, `paper2ppt`, `figure` 等增强工具 | 写作或汇报线要增强 | 是否作为增强 skill 接入 |
+| `nature-skills` | Flow 4 / 5 / 11 | `nature-data`, `nature-figure`, `nature-polishing`, `paper2ppt` 等增强工具 | 实验分析、科研图或写作汇报线要增强 | 是否作为增强 skill 接入 |
 | `ECC` | Flow 3 | hooks, agents, rules | 框架稳定化或上游 runtime 经验更新 | 是否吸收 hook/rule 改进 |
 | `virtuoso-bridge-lite` | RF/EDA | `virtuoso` skill, bridge API, examples, references | upstream 发新 release 或新增 API | 是否同步到 `skills/virtuoso/` |
 
@@ -334,3 +334,26 @@
 **push 状态：** 待 push（VM 无 SSH key，`~/.ssh/` 不存在）。本地 commit 已就绪。
 
 **备注：** 本次会话 VM 无 SSH key。挂载盘 git merge 受 `Operation not permitted` 权限限制，通过 `GIT_INDEX_FILE=/tmp/...` workaround 完成 commit。`index.lock` 残留需用户手动清理或下次会话自动处理。
+
+### 2026-08-20 — 日常同步（无 skill 变更）
+
+**上游仓库更新：**
+
+| 仓库 | 同步方式 | 结果 | 新 commit |
+|------|---------|------|----------|
+| `Auto-claude-code-research-in-sleep` | HTTPS fetch（SSH key 缺失） | ✅ 已拉取 `0c65f8b`→`f4f20f9` | 2（docs/tests only） |
+| `ljg-skills` | `git fetch upstream` | ✅ 已拉取 `53565f3`→`edfe3f5`（v1.17.99/v1.17.100） | 2 |
+| `beamer-academic` | HTTPS fetch | ✅ 已最新（HEAD = `788e125`） | 0 |
+| `virtuoso-bridge-lite` | `git fetch upstream` | ✅ 已拉取 `70b41f8`→`1978a10`（v0.8.0） | 2 |
+
+**新 commit 内容分析：**
+- `Auto-claude-code-research-in-sleep`：`tests/test_copilot_*.py` + `docs/wechat_group.jpg`，不涉及任何 skill / shared-references / tools 文件
+- `ljg-skills`：v1.17.99/v1.17.100 同步 ljg-book/ljg-card 等 skill，但 ljg-paper/read/qa 为 external-active（直接跟踪外部路径，不复制进项目），无文件需同步
+- `virtuoso-bridge-lite`：v0.8.0 新增 spectre skill（项目未采用）+ stats/docs/测试更新；已采用的 `skills/virtuoso/` 未变更
+- `beamer-academic`：无新 commit
+
+**同步到当前项目的 skill：** 无（无 adopted skill 文件变更）。
+
+**push 状态：** 无需 push（pyrojewel_claude_code 无变更）。
+
+**备注：** 本次会话 VM 无 SSH key（`~/.ssh/` 不存在），仅 HTTPS fetch 可用。挂载盘 git merge/reset 均因 `Operation not permitted` 失败，改用 `git diff --name-only HEAD..<ref>` 分析变更范围，确认无 adopted skill 需同步。lock file 残留（`index.lock`、`ORIG_HEAD.lock`）无法手动清理，不影响后续会话（下次 fetch 会自动恢复）。

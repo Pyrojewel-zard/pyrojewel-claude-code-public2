@@ -22,12 +22,12 @@ This repository is a sanitized public copy.
 
 ## Zotero Markdown Storage
 
-Paper reading skills (`pyrojewel-paper`, `pyrojewel-paper-river`, `pyrojewel-beamer-academic`, `beamer-academic`) read papers from the Zotero markdown export directory.
+Paper reading skills (`ljg-paper`, `ljg-read`, `ljg-qa`, `pyrojewel-paper-river`, `beamer-academic`) read papers from the Zotero markdown export directory.
 
 - **Path**: `{zotero_markdown_path}` (set in `.claude/settings.json` env)
 - **Structure**: `{zotero_markdown_path}/{attachmentKey}/content.md` + `*_image*.jpeg` + `*.pdf`
-- **How to use**: Provide an `attachmentKey` (e.g., `222T4HRB`) to `/pyrojewel-paper` — it will find `content.md` and images under that directory
-- **Beamer images**: `/pyrojewel-beamer-academic` copies images from `{zotero_markdown_path}/{attachmentKey}/` into `materials/figures/`
+- **How to use**: Provide an `attachmentKey` (e.g., `222T4HRB`) to `/ljg-paper` — it will find `content.md` and images under that directory
+- **Beamer images**: `/beamer-academic` copies images from `{zotero_markdown_path}/{attachmentKey}/` into `materials/figures/`
 
 ## Upstream Skill Dependencies
 
@@ -40,15 +40,15 @@ Paper reading skills (`pyrojewel-paper`, `pyrojewel-paper-river`, `pyrojewel-bea
 | # | 上游仓库 | 本地磁盘路径 | 实际 remote | 依赖的本地 skill | 同步方式 |
 |---|---------|-------------|-------------|-----------------|---------|
 | 1 | `wanshuiyin/Auto-claude-code-research-in-sleep` | `02_claudeSkill/Auto-claude-code-research-in-sleep/` | `git@github.com:wanshuiyin/Auto-claude-code-research-in-sleep.git`（直连上游，无 fork） | `analyze-results`, `experiment-plan`, `paper-compile`, `dse-loop`, `formula-derivation`, `novelty-check`, `idea-discovery`, `idea-creator`, `research-review`, `research-refine-pipeline`, `research-lit`, `auto-review-loop`, `experiment-bridge`, `experiment-audit`, `experiment-queue`, `run-experiment`, `monitor-experiment`, `ablation-planner`, `result-to-claim`, `research-pipeline`, `vast-gpu`, `training-check`, `serverless-modal`, `arxiv`, `render-html` | `git fetch` + 手动适配 |
-| 2 | `lijigang/ljg-skills` | `02_claudeSkill/ljg-skills/` | origin `git@github.com:Pyrojewel-zard/ljg-skills.git` + upstream `https://github.com/lijigang/ljg-skills.git` | `pyrojewel-paper`, `pyrojewel-paper-river`, `pyrojewel-paper-qa` | `git fetch upstream && git merge upstream/main` → push origin |
-| 3 | `Faust-Donf/beamer-academic` | `02_claudeSkill/beamer-academic/` | `git@github.com:Faust-Donf/beamer-academic.git`（直连上游） | `beamer-academic`（本地 fork，有 patch）, `pyrojewel-beamer-academic` | `git fetch` + **从 commit 对象提取**（`git archive`）——该工作区受挂载盘 unlink 限制会停在旧版，禁止 `cp` 工作区；详见 `skills/beamer-academic/LOCAL-NOTES.md` |
+| 2 | `lijigang/ljg-skills` | `02_claudeSkill/ljg-skills/` | origin `git@github.com:Pyrojewel-zard/ljg-skills.git` + upstream `https://github.com/lijigang/ljg-skills.git` | `ljg-paper`, `ljg-read`, `ljg-qa`, `pyrojewel-paper-river` | `git fetch upstream && git merge upstream/main` → push origin |
+| 3 | `Faust-Donf/beamer-academic` | `02_claudeSkill/beamer-academic/` | `git@github.com:Faust-Donf/beamer-academic.git`（直连上游） | `beamer-academic`（本地 fork，有 patch） | `git fetch` + **从 commit 对象提取**（`git archive`）——详见 `skills/beamer-academic/LOCAL-NOTES.md` |
 | 4 | `Arcadia-1/virtuoso-bridge-lite` | `02_claudeSkill/virtuoso/` | origin `git@github.com:Pyrojewel-zard/virtuoso-bridge-lite.git` + upstream `https://github.com/Arcadia-1/virtuoso-bridge-lite.git` | `virtuoso` | `git fetch upstream` → merge |
 
 ### 低频 / 参考来源（不强制实时同步）
 
 | 仓库 | 本地磁盘路径 | 状态 | 说明 |
 |------|-------------|------|------|
-| `op7418/guizang-ppt-skill` | `02_claudeSkill/guizang-ppt-skill/` | reference-only | 仅被 `pyrojewel-beamer-academic` 吸收版式规则 |
+| `op7418/guizang-ppt-skill` | `02_claudeSkill/guizang-ppt-skill/` | reference-only | 仅作为历史版式参考 |
 | `sdyckjq-lab/llm-wiki-skill` | `02_claudeSkill/llm-wiki-skill/`（fork 自建，有 upstream） | 独立 wiki 线 | Karpathy wiki，与已剔除的 llm_wiki 不同 |
 | `Imbad0202/academic-research-skills` | `02_claudeSkill/academic-research-skills/` | reference | 磁盘存在，但与本地 `benchmark-extractor` / `experiment-log-summarizer` **无来源关系** |
 
@@ -100,15 +100,14 @@ Protected files: `.env`, credentials, `pyproject.toml`, `setup.cfg`, `conda-lock
 
 ### Paper Flow
 
-- `pyrojewel-paper`
+- `ljg-paper`
+- `ljg-read`
+- `ljg-qa`
 - `pyrojewel-paper-river`
-- `pyrojewel-paper-qa`
-- `pyrojewel-paper-flow`
 - `zotero-pdf-parse`
-- `implementation-report` — 计划→代码现状→Mermaid流程→证据边界；为 Beamer 提供实现汇报材料包
-- `diagram-design` — Mermaid/Draw.io → editorial HTML/SVG/PNG；由 `implementation-report` 调用进行流程图重绘
-- `pyrojewel-beamer-academic` — 答辩主线（证据契约 + Obsidian 周会输出）；trigger: `答辩PPT`/`答辩`/`论文PPT`
-- `beamer-academic` — 开题/会议/conference talk、论文阅读及通用学术汇报；本地 fork（`1.6+pyrojewel.2`）；实现状态页消费 `implementation-report` bundle
+- `implementation-report` — 计划→代码/运行结果→数据审计→公式→Python图表→diagram-design→Beamer编译回读；为 Beamer 提供实现汇报材料包
+- `diagram-design` — 直接根据结构化 diagram brief 绘制 editorial HTML/SVG/PNG；由 `implementation-report` 调用
+- `beamer-academic` — 论文阅读、组会/会议汇报、复现报告和 Beamer PDF 编译；本地 fork（`1.6+pyrojewel.2`）；实现状态页消费 `implementation-report` bundle
 
 > `zuhui-beammer`（ADC/电路组会线）已于 2026-08-17 删除，场景并入 `beamer-academic`。取回：`git checkout 0e128a2 -- skills/zuhui-beammer`
 
@@ -136,6 +135,8 @@ Protected files: `.env`, credentials, `pyproject.toml`, `setup.cfg`, `conda-lock
 - `vast-gpu` — Vast.ai GPU 管理
 - `serverless-modal` — Modal serverless GPU
 - `formula-derivation`
+- `nature-data` — full-analysis 数据、source data、FAIR 与 provenance 审计（runtime specialist）
+- `nature-figure` — full-analysis Python 科研图、导出与视觉 QA（runtime specialist）
 - `paper-compile`
 
 ### Meta / Maintenance

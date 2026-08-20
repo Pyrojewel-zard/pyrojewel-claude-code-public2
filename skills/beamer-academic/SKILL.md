@@ -3,10 +3,9 @@ name: beamer-academic
 description: >
   Use when generating a paper-reading or academic Beamer deck for a conference,
   group meeting, or algorithm report, especially when the input includes a paper,
-  ljg-paper/ljg-read notes, pyrojewel-deep-paper notes, QA, reader questions, or
-  an implementation-report bundle with workflow/code-status artifacts.
-  Also use for 开题/会议/conference talks; for thesis-defense work that needs the
-  evidence contract and Obsidian weekly output, use pyrojewel-beamer-academic.
+  ljg-paper/ljg-read notes, ljg-qa results, reader questions, or
+  an implementation-report bundle with code, result, theory, figure, and layout-QA artifacts.
+  Also use for 开题/会议/conference talks and paper-reading reports.
 metadata:
   version: 1.6+pyrojewel.2
   trigger:
@@ -25,12 +24,14 @@ metadata:
   local_notes: |
     Local fork of upstream 788e125 (v1.5), with paper-reading and reproduction
     profiles plus local theme patches. See LOCAL-NOTES.md for patch and sync details.
-    pyrojewel-beamer-academic owns defense-side triggers (答辩PPT / 答辩 / 论文PPT).
+    Defense-specific output is outside this skill; this skill owns the paper-reading
+    and academic-report PDF route.
 ---
 
 # Beamer Academic
 
-Generate publication-quality Beamer slides from an academic paper in one automated pipeline.
+Generate publication-quality Beamer slides from an academic paper or a
+manifest-backed implementation-analysis bundle in one automated pipeline.
 
 ## Pipeline Overview
 
@@ -42,7 +43,13 @@ Generate publication-quality Beamer slides from an academic paper in one automat
 
 ### 0.1 Locate Thesis File
 
-Search current directory for thesis in priority order:
+If `report_type: implementation-analysis` is selected, or the input contains
+`materials/implementation-report/manifest.yaml`, skip thesis discovery. Read the
+manifest first, verify the referenced plan/code/result/data/derivation/figure
+and diagram artifacts, and use those artifacts as the slide source. Do not
+invent a paper file or ask the user to provide one for this profile.
+
+For all other report types, search the current directory for a thesis in priority order:
 1. `.tex` (LaTeX source — best quality, figures/equations directly reusable)
 2. `.docx` (Word — good for text extraction, figures embedded)
 3. `.pdf` (PDF — acceptable but figure extraction may lose quality)
@@ -107,7 +114,7 @@ Check for `config.yaml` in current directory:
 Required user info (ask if not in config):
 - Institution name and department
 - Author name, supervisor, major
-- Report type: `defense` | `proposal` | `conference` | `paper-reading` | `reproduction`
+- Report type: `defense` | `proposal` | `conference` | `paper-reading` | `reproduction` | `implementation-analysis`
 - Color preference: `blue` | `red` | `green` | `purple` | `teal`
 - Time limit (minutes): affects page count and content density
 - Language: thesis language vs. PPT language (e.g., 英文论文 → 中文PPT)
@@ -144,6 +151,31 @@ For this profile, the generated deck must use the fields documented in
 `references/reproduction-contract.md`: `paper_id`, citation and Zotero keys,
 source status, code entry, dataset/run, evidence level, and claim boundary.
 
+#### Implementation-analysis profile
+
+Use `report_type: implementation-analysis` when the input is an
+`implementation-report` full-analysis bundle rather than a paper reproduction.
+Read `manifest.yaml` first and consume the existing artifacts; do not
+re-analyze the repository or rediscover the run.
+
+The default page order is:
+
+```text
+workflow-overview → plan/code-map → execution/evidence
+→ result-analysis → theory-result-alignment → boundary/next-verification
+```
+
+The workflow page consumes `diagram/diagram-spec.yaml` and the
+`diagram/workflow.html|png|svg` assets named by the manifest. Result pages
+consume only figure files with a `figure-manifest.yaml` record. Code snippets
+remain paired with their plan step, input/output, status, evidence, and next
+action.
+
+This profile has a mandatory compile/read-back loop. After XeLaTeX compilation,
+read the log and rendered pages, repair image scaling or page composition, and
+recompile for at most three iterations. A successful compile with distorted or
+unreadable figures is not a final pass.
+
 #### Paper-reading profile: 组会论文单元
 
 Use `report_type: paper-reading` when the task is to explain one paper for a
@@ -155,7 +187,7 @@ Input routing is explicit:
 
 1. If the user provides a note from `/ljg-paper`, use it as the first-pass
    interpretation.
-2. If the same note has a `pyrojewel-deep-paper` section appended, treat that
+2. If the same note has a `ljg-read` or `ljg-qa` section appended, treat that
    append as the source for the reader's QA, doubts, and unresolved boundaries;
    do not create a second competing note. The rough-read and deep-read outputs
    are one shared note for this skill's input contract, not two slide sources.
@@ -164,7 +196,7 @@ Input routing is explicit:
    drafting slides. If the user asks for a saved paper note rather than an
    interactive companion read, use `/ljg-paper` first.
 4. Record the actual source in the draft plan as `provided-note`, `ljg-paper`,
-   `pyrojewel-deep-paper`, or `ljg-read`; never imply that a QA or measurement
+   `ljg-read`, or `ljg-qa`; never imply that a QA or measurement
    exists when it is absent.
 
 The paper unit has at most **4 content pages per paper**, including an optional
@@ -193,6 +225,12 @@ workflow page inserted into a reproduction unit's `pages_per_paper` range.
 
 ### Paper-reading Markdown gate
 
+For `implementation-analysis`, create `outline.md` from the manifest and
+analysis artifacts. If the user has not already approved it, present the page
+order and wait for approval before generating `.tex`; record
+`status: approved` in the outline. Reuse an existing approved outline on
+resume.
+
 For `paper-reading`, Phase 2 must create `outline.md` as a reviewable Markdown
 layout plan before any `.tex` generation. Show the plan in the conversation and
 stop. The plan must contain paper metadata, note/original-source paths, page
@@ -203,9 +241,10 @@ only after the complete plan has been shown; do not silently skip the gate.
 
 ### Implementation-report handoff
 
-When the requested deck includes code status, an implementation plan, or a
-reproduction workflow, use the `implementation-report` skill first. It owns
-plan intake, code-state analysis, Mermaid source, and workflow rendering.
+When the requested deck includes code status, an implementation plan, result
+analysis, or a reproduction workflow, use the `implementation-report` skill
+first. It owns plan intake, code/run/evidence analysis, specialist handoffs,
+direct diagram rendering, and the compile/read-back contract.
 
 Expected bundle:
 
@@ -213,17 +252,24 @@ Expected bundle:
 materials/implementation-report/
 ├── manifest.yaml
 ├── implementation-report.md
-├── workflow.mmd
-├── workflow.html
-└── workflow.png
+├── plan-analysis.md
+├── code-analysis.md
+├── result-analysis.md
+├── data-availability.md
+├── DERIVATION_PACKAGE.md
+├── diagram/diagram-spec.yaml
+├── diagram/workflow.html
+├── diagram/workflow.png
+├── figures/figure-manifest.yaml
+└── slides/presentation.pdf
 ```
 
-`beamer-academic` follows `manifest.yaml` and consumes the canonical PNG;
-`workflow.mmd` remains the semantic source and `workflow.html` the editable
-diagram-design source. It must not independently reinterpret planning files or
-replace the workflow with a code dump. If the bundle or manifest is missing,
-ask for it or route the task to `implementation-report` before drafting the
-slide outline.
+`beamer-academic` follows `manifest.yaml` and consumes the canonical diagram
+PNG plus the figure manifest. `diagram-spec.yaml` is the semantic source for
+the direct `diagram-design` drawing. It must not independently reinterpret
+planning files or replace the workflow with a code dump. If the bundle or
+manifest is missing, ask for it or route the task to `implementation-report`
+before drafting the slide outline.
 
 ### 0.5 Language Strategy
 
@@ -355,7 +401,7 @@ Markdown proposal and wait for explicit approval:
 # TMTT 2026｜噪声消除 LNA｜某组
 
 来源：`materials/notes/paper-note.md` + `materials/papers/paper.pdf`
-来源类型：`ljg-paper` + `pyrojewel-deep-paper`
+来源类型：`ljg-paper` + `ljg-read` / `ljg-qa`
 
 | 页 | 角色 | 标题 | 左侧 | 右侧 | 笔记来源 |
 |---|---|---|---|---|---|
@@ -659,6 +705,14 @@ After compilation, check `defense.log` for these common layout issues:
 | Image overlaps text in columns | `\column` width sum > `\textwidth` | Ensure left + right column ≤ 1.0 |
 | tikz overlay covers text | `[remember picture, overlay]` node position wrong | Adjust `yshift`/`xshift` values |
 | Text runs below frame | Too many paragraphs | Cut to 150-200 chars or split page |
+
+For `implementation-analysis`, also render the compiled PDF pages to a
+temporary QA preview and inspect them visually. Check every referenced result
+figure and diagram for natural aspect ratio, readable labels, uncropped axes,
+caption placement, and overlap with text. Record page-level defects in the
+manifest's `qa/layout-review.md`; a clean log is not sufficient for a layout
+pass. Repair the smallest relevant TeX constraint and recompile for at most
+three iterations.
 
 **Proactive overlap prevention** (apply during Phase 3 content generation):
 - For `text-left-image-right`: left text ≤ 150 chars, image height ≤ `3.4cm` per image

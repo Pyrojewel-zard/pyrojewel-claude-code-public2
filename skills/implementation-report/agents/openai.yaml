@@ -1,4 +1,4 @@
 interface:
   display_name: "Implementation Report"
-  short_description: "Plan and code status reports with workflow diagrams"
-  default_prompt: "Read the project plan and code state, then produce a Mermaid workflow and implementation-status Markdown report."
+  short_description: "Plan-driven code, result, theory, visualization, diagram, and Beamer analysis"
+  default_prompt: "Read the plan first, then run or inspect the implementation, analyze evidence, create the required research artifacts, draw a direct diagram, and compile/read back the academic report."

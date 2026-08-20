@@ -43,10 +43,11 @@ Record these alongside the generated HTML/PNG in `manifest.yaml`:
 
 ```yaml
 diagram_skill: diagram-design
+diagram_spec: diagram/diagram-spec.yaml
 profile: paper-reading-workflow
 format: html+png
 size: slide-16x9
 detail: balanced
 audience: mixed
-fidelity_ledger: implementation-report.md#fidelity-ledger
+fidelity_ledger: qa/diagram-review.md#fidelity-ledger
 ```

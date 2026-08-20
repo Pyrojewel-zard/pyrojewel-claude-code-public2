@@ -31,7 +31,7 @@
   （Codex runtime可用，需适配REVIEWER_MODEL+helper脚本路径+shared-refs路径）
 
 轨道B（人驱动）：调研→阅读→汇报→判断（Flow 1）
-  zotero search → pyrojewel-paper × N → pyrojewel-paper-river → pyrojewel-paper-qa → beamer-academic → 组会汇报
+  zotero search → ljg-paper / ljg-read → pyrojewel-paper-river → ljg-qa → beamer-academic → 组会汇报
   输出：我的理解 + QA对齐 + 组会PPT + 我的判断
   （当前自洽，仅需Zotero MCP + 改路径 + xelatex）
 
@@ -69,7 +69,7 @@
   │     可选补充：arxiv（arXiv搜索）+ semantic-scholar（S2搜索）
   │       扩展到Zotero库外的论文检索（Flow 2的skill可复用）
   │
-  ├─ Step 2: 深度阅读（river + paper并行）
+  ├─ Step 2: 阅读（ljg + river 可选）
   │     │
   │     ├─ /pyrojewel-paper-river ──────── 溯源脉络（框架层）
   │     │     输入：最核心的那篇论文
@@ -84,7 +84,7 @@
   │     │     依赖：Zotero MCP + WebSearch（引用链追踪）
   │     │     硬编码路径：/mnt/c/Users/28956/Zotero/storage
   │     │
-  │     ├─ /pyrojewel-paper × N ────────── 每篇论文的精读笔记（细节层）
+  │     ├─ /ljg-paper / /ljg-read ───────── 初读与伴读笔记（细节层）
   │     │     输入：river链上每篇论文（+自己额外关注的论文）
   │     │     输出（每篇）：
   │     │       ├─ 问题体验（具体例子让人亲历困境）
@@ -104,20 +104,20 @@
   │           依赖：零（完全自包含）
   │
   ├─ Step 3: QA对齐（交互式，逐篇）
-  │     /pyrojewel-paper-qa ────── 对每篇paper-report进行拷打对齐
+  │     /ljg-qa ────────────────── 对阅读笔记进行问答校验
   │     输入：paper-report-X.md
   │     输出：qa-report-X.md（差异点 + 逼问 + 对齐结论 + ✅/⚠️/❌状态）
   │     5-10个Q从paper-report的AI分析提取，逐Q与用户理解对齐
   │
   ├─ Step 4: 组会汇报PPT
-  │     /implementation-report ────── 计划、代码现状和实现流程图材料包
-  │       输入：planning 文件 + 当前代码状态
-  │       输出：manifest.yaml + implementation-report.md + workflow.mmd + workflow.html/png
+  │     /implementation-report ────── 计划→代码/结果→理论→可视化→汇报总编排
+  │       输入：planning 文件 + 当前代码 + 运行结果
+  │       输出：manifest + 状态/结果/数据/公式报告 + Python figures + diagram-design图 + Beamer PDF/QA
   │
   │     /beamer-academic ─────────── 生成组会/论文阅读/复现 Beamer PPT
   │     输入：river输出（框架）+ paper输出×N（细节）+ 可选 implementation-report bundle
   │     输出：presentation.tex + presentation.pdf + assets
-  │     答辩变体：需要证据契约和 Obsidian 周会输出时改用 /pyrojewel-beamer-academic
+  │     单篇论文最多4页；implementation-report 按需提供实现状态页
   │
   │     PPT结构设计：
   │       ├─ 开场(1页)：调研方向说明
@@ -136,9 +136,8 @@
   │       │   ├─ 我的判断（方向是否值得继续）
   │       └─ 下一步计划(1页)
   │
-  │     注：beamer-academic当前设计是从论文PDF/阅读笔记生成PPT，
-  │         实现状态和流程图先由 implementation-report 整理，
-  │         再由 beamer-academic 消费其 Markdown/图形材料
+  │     注：implementation-report 负责实现分析、结果分析、数据/公式/图表与流程图材料，
+  │         再由 beamer-academic 消费 manifest 并完成编译后的排版回读修正
   │
   └─ Step 5: idea判断与提炼
         阅读自己产出的笔记 + 组会PPT后的思考
@@ -146,12 +145,12 @@
         交汇点：与轨道A(idea-discovery)的输出对比验证
 ```
 
-**核心设计**：river产出框架，paper产出细节，两者合在一起才是完整的调研。
-  river告诉你"这条线怎么演化的"，paper告诉你"每篇论文具体做了什么"。
+**核心设计**：river产出框架，ljg-paper/ljg-read产出细节，两者合在一起才是完整的调研。
+  river告诉你"这条线怎么演化的"，ljg笔记告诉你"每篇论文具体做了什么"。
   组会PPT是两者的合成——框架页来自river，细节页来自paper。
 
 **自洽条件**：Zotero MCP就绪 + 修改3处硬编码路径 + xelatex就绪
-**降级方案**：不用Zotero MCP时，直接给PDF文件路径或URL，pyrojewel-paper/pyrojewel-paper-river仍可工作
+**降级方案**：不用Zotero MCP时，直接给PDF文件路径或URL，ljg-paper/pyrojewel-paper-river仍可工作
 **并行关系**：此flow与Flow 8(Idea发现)并行独立运行，交汇于Step 4的判断
 
 **主线文档**：[flow-chain-1-paper-to-ppt.md](./flow-chain-1-paper-to-ppt.md)
@@ -244,6 +243,12 @@
   │     输出：DERIVATION_PACKAGE.md（目标/状态/不变量/假设/符号/策略/推导图/主推导/备注/边界/风险）
   │     状态标签：COHERENT AS STATED / COHERENT AFTER REFRAMING / NOT YET COHERENT
   │
+  ├─→ implementation-report ─── full-analysis 总编排
+  │     顺序：读取计划 → 代码映射/授权运行 → 结果分析 → nature-data 审计
+  │           → formula-derivation → nature-figure(Python) → diagram-design
+  │           → beamer-academic → 编译回读/排版修正（最多3轮）
+  │     输出：versioned bundle（状态/结果/数据/公式/图表/diagram/Beamer/QA）
+  │
   ├─→ experiment-log-summarizer ─ 中文实验日志总结
   │     依赖：零（自包含，references/experiment_template.md + error_analysis_template.md）
   │     输出：实验目标/改动/结果变化/可能原因/当前最优配置/失败实验总结/下一步建议/周报摘要
@@ -254,8 +259,10 @@
         两种模式：中文说明版 / 结构化表格版
 ```
 
-**自洽条件**：零外部依赖
-**组合方式**：按需选用，不强制串联
+**自洽条件**：status-only 零外部依赖；full-analysis 需要 Python、XeLaTeX 和
+nature-data/nature-figure 等 runtime specialist skills。
+**组合方式**：`implementation-report` 是 full-analysis 的单一入口；缺少
+结果、数据或环境时保留已完成 artifact 并标记 blocked/unknown，不伪造结果。
 
 ## Flow 5：论文写作流 ⚠️ 半自洽
 
@@ -476,17 +483,13 @@
 ```
 输入：paper/report markdown + images
   │
-  ├─→ implementation-report ── 计划/代码现状/流程图材料包（按需）
-  │     依赖：planning 文件 + 当前代码
-  │     输出：manifest.yaml + implementation-report.md + workflow.mmd + workflow.html/png
+  ├─→ implementation-report ── 计划→代码/运行结果→理论→图表→流程图→Beamer总包（按需）
+  │     依赖：planning 文件 + 当前代码 + 运行结果；full-analysis 需 Python、XeLaTeX 和相关 specialist skills
+  │     输出：manifest + analysis reports + Python figures + diagram/ + slides/ + qa/
   │
-  ├─→ diagram-design ───────── Mermaid/Draw.io → editorial diagram 重绘
-  │     依赖：workflow.mmd + format/size/detail/audience 四个旋钮
-  │     输出：slide-sized workflow.html + workflow.png
-  │
-  ├─→ pyrojewel-academic-ppt ── 论文/调研材料 → Beamer
-  │     依赖：xelatex；本repo `.claude/skills/pyrojewel-academic-ppt`
-  │     输出：presentation.tex + presentation.pdf + assets
+  ├─→ diagram-design ───────── 结构化 diagram brief → editorial diagram
+  │     依赖：diagram/diagram-spec.yaml + format/size/detail/audience 四个旋钮
+  │     输出：slide-sized workflow.html + workflow.png（可选 SVG）
   │
   ├─→ beamer-academic ───────── 组会/论文阅读/复现 Beamer skill
   │     依赖：xelatex；layout registry
@@ -498,7 +501,7 @@
 ```
 
 **自洽条件**：Beamer路径需要xelatex；HTML路径需要浏览器验证。
-**当前状态**：`pyrojewel-academic-ppt` 已在 `.claude/skills/` 新增，但仍需测试和文档完善。
+**当前状态**：`beamer-academic` 是唯一活动的论文/组会 Beamer PDF skill。
 
 ---
 
@@ -544,7 +547,7 @@
 
 | 路径 | 出现位置 | 改为 |
 |------|---------|------|
-| /mnt/c/Users/28956/Zotero/storage | pyrojewel-paper, pyrojewel-paper-river, zotero-semantic-search | 实际Zotero storage路径（已改为$ZOTERO_STORAGE常量） |
+| /mnt/c/Users/28956/Zotero/storage | ljg-paper, pyrojewel-paper-river, zotero-semantic-search | 实际Zotero storage路径（已改为$ZOTERO_STORAGE常量） |
 | /home/holmes/.cc-switch/skills/markerpdf-cli/scripts/markerpdf_convert.py | zotero-pdf-parse | 实际MarkerPDF脚本路径 |
 | /home/DataTransfer/Pyrojewel/01_lab/markerpdf_zotero/.env | zotero-pdf-parse | 实际.env路径 |
 | ~/.claude/PAI/USER/AI_WRITING_PATTERNS.md | pyrojewel-paper (已删除) | 已移除引用 |
@@ -561,11 +564,11 @@
 | survey-writer | academic | 2 | 即用 |
 | zotero-semantic-search | skill_manager | 1 | 轻改(路径) |
 | zotero-pdf-parse | skill_manager | 1 | 轻改(路径) |
-| pyrojewel-paper | ljg | 1 | 轻改(路径+图片管理) |
+| ljg-paper | ljg | 1 | 外部原版，直接使用 |
 | pyrojewel-paper-river | ljg | 1 | 轻改(路径+图片管理) |
 | ljg-plain | ljg | 1(辅助) | 即用 |
-| pyrojewel-paper-qa | ljg-qa改编 | 1(Step 3) | 即用(新skill) |
-| pyrojewel-paper-flow | self-built | 1(编排) | 即用(新skill) |
+| ljg-read | ljg | 1(辅助) | 外部原版，直接使用 |
+| ljg-qa | ljg | 1(Step 3) | 外部原版，直接使用 |
 | dse-loop | ARIS | 3 | 即用 |
 | analyze-results | ARIS | 4 | 即用 |
 | formula-derivation | ARIS | 4 | 即用 |
@@ -652,13 +655,11 @@
 | wiki-research | llm_wiki | 10 | 即用(SKILL.md→skill.md) |
 | baoyu-url-to-markdown | llm-wiki-skill/deps | 10(辅助) | 即用 |
 | youtube-transcript | llm-wiki-skill/deps | 10(辅助) | 即用 |
-| implementation-report | local self-built | 1, 11 | 即用(先产出计划/代码状态/流程图材料包) |
-| pyrojewel-beamer-academic | pyrojewel-beamer-academic | 1, 11 | 即用(答辩/Obsidian证据契约变体) |
-| pyrojewel-academic-ppt | .claude/skills | 11 | 待统一(与pyrojewel-beamer-academic重叠) |
+| implementation-report | local self-built | 1, 4, 11 | 即用(status-only 或 full-analysis；产出计划/代码/结果/数据/公式/图表/流程图/Beamer QA材料包) |
 | beamer-academic | beamer-academic | 1, 11 | active(组会/论文阅读/复现) |
 | guizang-ppt-skill | guizang-ppt-skill | 11 | 即用(需浏览器) |
 | nature-paper2ppt | nature-skills | 11(备选) | 中改(与beamer重叠) |
-| nature-figure | nature-skills | 11(辅助) | 中改(LaTeX+图片) |
+| nature-figure | nature-skills | 4 / 11(辅助) | 中改(Python科研图+LaTeX/图片) |
 | nature-polishing | nature-skills | 5(增强) | 中改(LaTeX) |
 | nature-writing | nature-skills | 5(增强) | 中改(LaTeX) |
 | nature-reader | nature-skills | 1(备选) | 中改 |

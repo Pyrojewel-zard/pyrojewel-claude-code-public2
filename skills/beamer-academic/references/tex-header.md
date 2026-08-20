@@ -33,9 +33,9 @@ Standard preamble for generated Beamer files. Fill placeholders from `config.yam
 % paper-reading: \subtitle stores the paper meta line
 % (venue/year｜topic｜author or group); each content frame may repeat it with
 % \framesubtitle. Do not put the metadata into the body paragraph.
-% implementation-report: workflow-overview consumes the workflow.png named by
-% manifest.yaml; keep workflow.mmd as the semantic source and workflow.html as
-% the editable diagram-design source beside the report.
+% implementation-report: workflow-overview consumes diagram/workflow.png named
+% by manifest.yaml; diagram/diagram-spec.yaml is the semantic brief and
+% diagram/workflow.html is the editable diagram-design source.
 % 内容页默认左40%叙述/右60%证据；代码只展示8--16行关键片段。
 % beamerthemeAcademic 提供 academiccode、\codeentry、\statuslabel、\paperstep。
 \lstset{style=academiccode}

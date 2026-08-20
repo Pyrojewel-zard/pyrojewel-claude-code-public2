@@ -31,23 +31,22 @@ This repository is not a generic framework dump. It is a curated working tree fo
 Core chain:
 
 ```text
-zotero-pdf-parse
--> pyrojewel-paper
--> pyrojewel-paper-river
--> pyrojewel-paper-qa
+ljg-paper / ljg-read
+-> pyrojewel-paper-river (optional)
+-> ljg-qa (optional)
 -> implementation-report (when plan/code status is needed)
 -> beamer-academic
 ```
 
-For implementation or reproduction status, `implementation-report` first reads the planning files and current code, then emits a Markdown report plus editable Mermaid workflow source and a rendered diagram. `beamer-academic` consumes that bundle for the workflow overview page.
+For implementation or reproduction status, `implementation-report` first reads the planning files and current code. In `full-analysis` mode it can also run the approved implementation, analyze results, audit data provenance, align formulas, generate Python figures, draw a direct `diagram-design` workflow, and hand the complete bundle to `beamer-academic`.
 
-The workflow visual is redrawn by the adopted `diagram-design` skill: Mermaid is
-the semantic source, while the slide asset is produced with explicit
-`format/size/detail/audience` settings and a local monochrome paper-reading
-profile.
+The workflow visual is drawn directly by the adopted `diagram-design` skill
+from `diagram/diagram-spec.yaml`, with explicit `format/size/detail/audience`
+settings and a local monochrome paper-reading profile. Mermaid is not part of
+the implementation-report contract.
 
-For thesis-defense decks that require the evidence contract and Obsidian weekly
-output, use `pyrojewel-beamer-academic` as the separate defense variant.
+`beamer-academic` is the only active paper-reading/academic Beamer PDF entry.
+`paper-compile` remains separate for manuscript LaTeX PDFs.
 
 Key docs:
 

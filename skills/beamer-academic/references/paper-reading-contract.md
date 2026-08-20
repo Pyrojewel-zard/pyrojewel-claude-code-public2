@@ -12,7 +12,7 @@ report_type: paper-reading
 paper_meta: "TMTT 2026｜噪声消除 LNA｜某组"
 original_source: "materials/papers/paper.pdf"
 reading_note: "materials/notes/paper-note.md"
-note_source: "ljg-paper + pyrojewel-deep-paper"
+note_source: "ljg-paper + ljg-read / ljg-qa"
 ---
 
 # TMTT 2026｜噪声消除 LNA｜某组

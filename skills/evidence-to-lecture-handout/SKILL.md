@@ -9,7 +9,7 @@ description: Use when Codex must turn timestamped transcripts and visual evidenc
 
 **最终文稿禁止把外部 LLM 输出当成原始讲稿：** `.env` 中的 `OPENAI_MODEL`、vision LLM、翻译 API 只能用于独立实验或候选分析，不能未经 Codex 核验直接写入最终讲演录、问答或技术结论。英文讲演录（仅在 `bilingual` 模式）必须由 Codex 基于原始图片、OCR 和 Whisper 时间戳整理；纯中文（`zh-only`）模式直接整理中文原始讲解，不生成虚假的英文中间稿。Codex 的新增背景知识、解释、类比、假设和推导必须写入独立的 `analysisZh`/`derivations` 字段，不得混入讲演录正文。
 
-**REQUIRED SUB-SKILL:** Use `pyrojewel-beamer-academic` only for academic typography, asset handling, and compile validation. The final document is A4 portrait `ctexart`, not Beamer.
+**REQUIRED SUB-SKILL:** Use the maintained `beamer-academic` theme/asset and compile-validation conventions only where they apply. The final document is A4 portrait `ctexart`, not Beamer.
 
 ## 输入契约
 

@@ -1,96 +1,98 @@
-# Workflow Diagram Contract
+# Direct Workflow Diagram Contract
 
-This contract defines the workflow source and visual artifact consumed by
-`beamer-academic`. Mermaid carries semantics; `diagram-design` owns the final
-editorial redraw. The diagram is an evidence map, not a replacement for the
-status table or the underlying test output.
+This contract defines the diagram brief passed from `implementation-report` to
+`diagram-design`. The brief is the semantic source of truth for a workflow
+visual; no automatic graph renderer or Mermaid source is required.
 
-## Visual target
+## Purpose
 
-Match the supplied reference image:
+The diagram explains the causal research/implementation path:
 
-- white canvas;
-- black or dark-gray serif labels and strokes;
-- rectangular process blocks;
-- dashed outer grouping boxes;
-- orthogonal arrows and compact labels;
-- feedback loops only where they explain iteration;
-- no decorative gradients, icons, or terminal/editor screenshots.
-
-## Mermaid semantic baseline
-
-Start from this structure and adapt labels to the actual project:
-
-```mermaid
-%%{init: {"theme":"base", "flowchart":{"curve":"step", "htmlLabels":false}}}%%
-flowchart LR
-  Q[Research question] --> P[Planned task]
-  P --> C[Code entry]
-  C --> R[Run or test]
-  R --> E[Evidence]
-  E --> B[Boundary]
-  B -. next verification .-> P
-
-  subgraph S[Implementation scope]
-    P
-    C
-    R
-  end
-
-  classDef main fill:#ffffff,stroke:#222222,color:#111111,stroke-width:1px;
-  classDef boundary fill:#ffffff,stroke:#222222,color:#111111,stroke-dasharray:6 4;
-  class Q,P,C,R,E main;
-  class B boundary;
-  style S fill:#ffffff,stroke:#222222,stroke-dasharray:6 4;
+```text
+research question → plan step → code entry → approved run → evidence
+→ result/theory interpretation → current boundary → next verification
 ```
 
-Treat this as a semantic scaffold only. Use concise Chinese labels in the final
-figure when the presentation is in Chinese. Put exact file paths, function
-names, line numbers, and evidence IDs in the accompanying Markdown table rather
-than making boxes unreadable.
+It does not prove that a step is complete. Completion comes from the status
+table, run evidence, data audit, formula package, and figure manifest.
 
-## Diagram-design handoff
+## Brief schema
 
-Invoke the local `diagram-design` skill with:
+Save the direct semantic brief as `diagram/diagram-spec.yaml`:
 
-| Dial | Beamer default |
-|---|---|
-| format | `html+png` |
-| size | `slide-16x9` or configured `slide-4x3` |
-| detail | `balanced` (drop to `simplified` when the slide is crowded) |
-| audience | `engineer` for code review, `mixed` for group meeting |
+```yaml
+schema: implementation-report/diagram-spec/v2
+title: "Implementation and evidence workflow"
+purpose: "Show how the planned task becomes verified evidence"
+visual:
+  type: process
+  semantic_pattern: stage-framework
+  format: html+png
+  size: slide-16x9
+  detail: balanced
+  audience: mixed
+  profile: paper-reading-workflow
+nodes:
+  - id: question
+    label: "研究问题"
+    role: input
+    status: observed
+    source: "plan-analysis.md#question"
+  - id: implementation
+    label: "代码实现"
+    role: process
+    status: partial
+    source: "code-analysis.md#step-1"
+  - id: evidence
+    label: "运行证据"
+    role: evidence
+    status: unknown
+    source: "result-analysis.md#evidence"
+edges:
+  - from: question
+    to: implementation
+    label: "计划约束"
+  - from: implementation
+    to: evidence
+    label: "执行并记录"
+groups:
+  - id: verification
+    label: "验证边界"
+    members: [evidence]
+fidelity_ledger:
+  merged: []
+  dropped: []
+  inferred: []
+```
 
-Choose the nearest semantic type (`flowchart`, `process`, or `data-flow`),
-load its type reference, redraw from the Mermaid meaning rather than copying
-automatic Mermaid coordinates, and record the fidelity ledger when nodes are
-merged or dropped. The diagram-design connector rules require orthogonal,
-independently traceable elbows and disallow connector overlap.
+Visible labels stay concise. Exact file paths, function names, line numbers,
+evidence IDs, and unresolved items belong in `source` metadata and the report,
+not in crowded boxes.
 
-## Representation choice
+## Type and dial selection
 
-| Need | Preferred representation | Reason |
-|---|---|---|
-| Exact plan → code → test topology | Mermaid | Editable, source-aware, easy to review |
-| Dense dependency geometry Mermaid cannot express | Graphviz or TikZ | More control over routing and grouping |
-| Conceptual physical mechanism | `imagegen` as an `AI示意图` | Useful only when exact paths/formulas/evidence are not required |
+Choose one dominant layout after reading the brief:
 
-Do not use `imagegen` to represent exact file names, formulas, code topology,
-measured plots, or completion evidence.
+- `process` for ordered stages with handoffs;
+- `data-flow` for data/source/result movement;
+- `flowchart` for decisions, blockers, and feedback;
+- `architecture` for code components and dependencies.
 
-## Rendering
+Default dials are `html+png`, `slide-16x9`, `balanced`, and `mixed`. If the
+brief exceeds the selected type's complexity budget, split into an overview and
+detail diagram and record the split in the fidelity ledger.
 
-1. Save the semantic source as `workflow.mmd`.
-2. Use `diagram-design` to produce `workflow.html` and export `workflow.png`
-   for the Beamer slide; retain `workflow.svg` only as an optional vector/web
-   preview.
-3. If the local diagram skill is unavailable, use Graphviz or TikZ and record
-   the fallback in the report frontmatter.
-4. Inspect the PNG at slide size. Text must remain readable and the
-   grouping/feedback structure must survive downscaling.
-5. Never use a terminal or editor screenshot as the workflow figure.
+## Required checks
 
-## Evidence boundary
+Before drawing, load the selected `diagram-design` type reference and follow
+its style-guide onboarding gate. After drawing:
 
-The diagram shows relationships and current boundaries. Completion status comes
-from the plan-to-code table, test/run output, figures, or explicit `unknown` /
-`none` evidence—not from the existence of a box or an arrow.
+- confirm all nodes and status labels trace to report evidence;
+- use orthogonal, independently traceable connectors;
+- keep the diagram readable at slide size;
+- preserve accessibility metadata and the selected profile;
+- record every merge, drop, inference, or fallback;
+- run the packaged self-check and any geometry check available in the local
+  diagram skill.
+
+Never use this diagram as a substitute for measured plots or a derivation.

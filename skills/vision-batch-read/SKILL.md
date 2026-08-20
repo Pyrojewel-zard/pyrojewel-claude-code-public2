@@ -108,18 +108,18 @@ python3 "$SCRIPT" --dir imgs/ --out out.jsonl --concurrency 16
 
 ## Prompt 模板
 
-默认 prompt 返回 4 字段 JSON(caption/content/key_data/support),对齐 pyrojewel-paper 的 Key Figures 节。
+默认 prompt 返回 4 字段 JSON(caption/content/key_data/support),对齐 ljg-paper 阅读笔记中的图件证据节。
 其他场景(通用图/只取图注/电路原理图/仿真曲线)的模板见 [`references/prompt-templates.md`](references/prompt-templates.md),`--prompt-from-file` 传入。
 
 所有模板要求**严格 JSON 输出**,脚本内置 `extract_json` 兜底(容忍 ```json 包裹和尾逗号),但别依赖它。
 
-## 和 pyrojewel-paper 怎么配合
+## 和 ljg-paper 怎么配合
 
-pyrojewel-paper 的 SKILL.md 要求「每张引用的图都读图分析,写入 Key Figures」。当一章图很多(>10 张)时,让 Claude 用 Read 工具逐张读会 stall。
+ljg-paper 的阅读笔记需要为引用图保留证据说明。当一章图很多(>10 张)时,让 Claude 用 Read 工具逐张读会 stall。
 
 推荐流程:
 1. 先用本 skill 批量读该章引用的图 → 拿到 JSONL
-2. pyrojewel-paper 精读时,Claude 直接 Read 这个 JSONL 文件(一次读全部分析),不再逐张读图
+2. ljg-paper 整理时,Claude 直接 Read 这个 JSONL 文件(一次读全部分析),不再逐张读图
 3. 笔记的 Key Figures 节直接引用 JSONL 里的 caption/content/analysis
 
 这样把「读图」从 Claude 上下文里搬出去,交给本 skill 的并发 LLM,Claude 只消费结果。

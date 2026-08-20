@@ -10,7 +10,7 @@ batch_read.py 默认用内置 prompt(返回 4 字段 JSON:caption/content/key_da
 
 ## 模板 A:论文图(默认,4 字段)
 
-适合 pyrojewel-paper 的 Key Figures 节。
+适合 ljg-paper 阅读笔记的图件证据节。
 
 ```
 你是 RF/集成电路论文的读图专家。仔细看这张图,返回严格 JSON(不要 markdown 代码块,不要多余文字),字段如下:

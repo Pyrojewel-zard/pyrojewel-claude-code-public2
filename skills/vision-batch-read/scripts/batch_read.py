@@ -3,7 +3,7 @@
 
 为什么存在:用 Claude Read 工具逐张读图会 stall(每张图一次往返,几十张图就
 撞 180s 无进展阈值)。这个脚本用 asyncio+httpx 在单进程内并发,100 张图几秒
-到几十秒搞定,结果落盘成 JSONL,下游(pyrojewel-paper / workflow / 人)直接消费。
+到几十秒搞定,结果落盘成 JSONL,下游(ljg-paper / workflow / 人)直接消费。
 
 配置来源(按优先级):
   1. 显式 --api-key/--api-base/--model 命令行参数
