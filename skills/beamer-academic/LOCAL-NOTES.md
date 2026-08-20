@@ -84,6 +84,39 @@ overview、algorithm-derivation、paper-code-map、reproduction-result；布局�
 bundle/PNG；当涉及代码/复现时，先使用 `workflow-overview`，再进入
 `paper-code-map` 或结果页，避免代码单独占页。
 
+### [P5] 2026-08-20 — ljg-read 语义编译与固定版式轴
+
+0817 组会输出暴露的问题不是主题本身，而是 paper-reading 的中间层过薄：
+`ljg-read` 已经有一句话摘要、结构地图、`[骨]/[肌]/[筋]`、碰撞问题和全文复盘，
+旧契约却只保留 `overview/theory/evidence/discussion + 左/右`，导致内容被压成弱摘要，
+通用 rhythm 规则又可能被误解为左右翻转。
+
+本 patch 把 reading note 到 slide 的流程固定为：
+
+```text
+ljg-read note
+  -> materials/notes/reading-brief.md
+  -> outline.md
+  -> argument-left-evidence-right layouts
+  -> validate_paper_reading_deck.py
+  -> compile / visual QA
+```
+
+新增：
+
+- `references/paper-reading-semantic-brief.md`：显式抽取 argument spine、`[骨]` claim、
+  `[肌]` evidence link、reading tension、reader trace、terminal question；
+- `references/paper-reading-layout-policy.md`：paper-reading 始终左论证、右证据，
+  只允许栏内 composition 变化，禁止 `image-left-text-right` 作为节奏手段；
+- `scripts/validate_paper_reading_deck.py`：检查最多4页、role、provenance、boundary、
+  固定 axis，以及伴读未完成时不得伪造 `我的判断/读后一句话`；
+- `references/paper-reading-contract.md`：升级为两阶段语义门，并要求 TeX provenance/
+  boundary/axis markers。
+
+当前不改 `.sty` 和四个 paper-reading layout skeleton：它们本来就使用左文右图 40/60，
+本次只修语义抽取和编排契约。`1.6+pyrojewel.2` 版本号暂不单独 bump，待下一次
+SKILL.md 正文同步时一起升版，避免只改 metadata 而没有正文同步。
+
 ## upstream 同步流程
 
 上游仓库在 `02_claudeSkill/beamer-academic/`(remote `Faust-Donf/beamer-academic`)。
@@ -134,6 +167,14 @@ for c in statementframe statrow hyporow headrow setcoverlabels setlogo; do
 done
 grep -n "beamer@centeredfalse\|hrule height" assets/beamerthemeAcademic.sty
 ```
+
+Paper-reading 结构检查：
+
+```bash
+python scripts/validate_paper_reading_deck.py --outline outline.md --tex presentation.tex
+```
+
+正向样例必须 PASS；`note_status: in-progress` 且 discussion 写 `我的判断` 的负向样例必须 FAIL。
 
 ## 环境依赖
 

@@ -16,9 +16,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - 新增 `paper-overview`、`algorithm-derivation`、`paper-code-map`、`reproduction-result`、`pole-zero-circuit`、`method-comparison` 版式
 - 新增 `paper-reading` 模式：接收 `ljg-paper` / `ljg-read` / `ljg-qa` 阅读材料，单篇论文最多4页
 - 新增 Markdown-first `outline.md` 确认门槛，以及 `paper-reading-overview`、`paper-reading-theory-figure`、`paper-reading-evidence`、`paper-reading-discussion` 版式
+- 新增 `paper-reading-semantic-brief.md`：将 `ljg-read` 的一句话摘要、结构地图、`[骨]/[肌]/[筋]`、碰撞与复盘显式映射为 slide claims / evidence links / discussion tension
+- 新增 `paper-reading-layout-policy.md`：固定 `argument-left-evidence-right` 空间语法，禁止 paper-reading 为制造节奏而左右翻转
+- 新增 `validate_paper_reading_deck.py`：检查页数、role、provenance、evidence boundary、固定布局轴，以及未完成伴读伪造“我的判断/读后一句话”的回归
 - 将计划/代码现状拆到 `implementation-report`；工作流由 `diagram-design` 根据 `diagram-spec.yaml` 直接绘制，本 skill 通过 `workflow-overview` 消费 manifest 指定的 PNG
 - 增加 `implementation-analysis` profile，消费结果分析、数据审计、公式推导、Python 图表和编译后排版 QA
 - 章节页改为白底紧凑强调线；主题增加 `listings`、`\codeentry`、`\statuslabel`、`\paperstep`
+
+### ♻️ Changed
+- `paper-reading-contract.md` 改为两阶段语义门：`ljg-read note -> reading-brief.md -> outline.md -> LaTeX`，不再允许从阅读笔记直接做弱摘要填栏
+- paper-reading 的通用 rhythm 规则改为栏内 composition 变化；`image-left-text-right` 在该 profile 中明确禁用
 
 ## [1.4.0] - 2026-05-22
 
