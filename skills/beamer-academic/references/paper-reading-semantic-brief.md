@@ -82,13 +82,59 @@ Map evidence to skeleton claims explicitly:
 A result figure without a `supports_claim` link is decorative and should not be
 selected for a paper-reading slide.
 
-### 5. Reading tension
+### 5. Equation and circuit reasoning
+
+When a selected skeleton claim depends on a circuit equation, small-signal model,
+transfer function, noise expression, impedance relation, stability condition,
+linearity relation, oscillator equation, or other RFIC derivation, extract an
+explicit reasoning record. Do not copy a final equation without explaining it.
+
+```yaml
+equation_reasoning:
+  - target_equation: "Eq. (7)"
+    paper_anchor: "paper §III-B / Eq. (7)"
+    circuit_anchor: "Fig. 4, M1-M2 and Ls feedback path"
+    starting_point: "small-signal model / KCL / noise model / impedance relation"
+    derivation_steps:
+      - "starting relation"
+      - "substitution or approximation"
+      - "reduced expression"
+    approximations:
+      - "gm ro >> 1"
+      - "parasitic C ignored below ..."
+    variables:
+      gm1: "M1 transconductance; controlled by bias/current and device size"
+      Ls: "source degeneration inductance; sets real input impedance term"
+    physical_meaning: "what physical RF mechanism the equation exposes"
+    sensitivity_tradeoff: "which variable improves one metric while hurting another"
+    design_implication: "what an RFIC designer would change because of this equation"
+    provenance: "paper-derivation | reader-derived | mixed"
+```
+
+For every equation selected for a slide, the presentation must be able to answer
+all of these questions:
+
+1. **Where does it come from?** State the starting model or governing relation.
+2. **What assumptions make it valid?** List the approximations instead of hiding them.
+3. **What does each important variable correspond to in the circuit?** Map symbols to
+   transistors, passives, bias, impedances, poles/zeros, noise sources, or signal paths.
+4. **What physical mechanism does it reveal?** Explain gain, matching, NF, linearity,
+   stability, phase noise, bandwidth, power, or coupling in circuit language.
+5. **What trade-off/sensitivity does it imply?** Say what moves when a variable changes.
+6. **What design decision follows?** Connect the equation back to sizing, biasing,
+   matching, topology choice, or optimization constraints.
+
+Keep provenance explicit. If the paper jumps from Eq. (3) to Eq. (6) and the
+reading note reconstructs the missing algebra, label those intermediate steps as
+reader-derived rather than pretending they are written in the paper.
+
+### 6. Reading tension
 
 Extract the strongest unresolved tension from `读前张力`, collision questions,
 pressure tests, doubts, or counterarguments. Prefer one sharp tension over many
 weak questions.
 
-### 6. Reader trace
+### 7. Reader trace
 
 Record whether the note contains actual reader responses:
 
@@ -104,7 +150,7 @@ terminal_question: "..."
 
 Never fabricate these fields. A generated summary is not a reader response.
 
-### 7. Terminology
+### 8. Terminology
 
 Reuse the note's terminology table and normalize only inconsistent translations.
 Do not silently rename paper variables, model stages, or RF/EDA terms.
@@ -116,9 +162,26 @@ The brief maps to pages as follows; four pages is a ceiling, not a target.
 | role | semantic source | left argument | right evidence |
 |---|---|---|---|
 | `overview` | one-sentence anchor + argument spine | problem, contribution, scope, compact spine | overview/circuit/system figure |
-| `theory-figure` | highest-value skeleton claim | mechanism, assumptions, <=2 equations | directly matching mechanism/circuit figure |
+| `theory-figure` | skeleton claim + equation/circuit reasoning | circuit context -> derivation chain -> physical meaning -> design implication | directly matching circuit/mechanism figure |
 | `evidence` | evidence links | result interpretation + evidence strength + boundary | one readable result/simulation/measurement figure |
 | `discussion` | reader trace or reading tension | judgment if real; otherwise tension/counterpoint | QA/confusion/boundary panel |
+
+### Formula-priority rule
+
+For RFIC paper reading, a central circuit derivation outranks a generic discussion
+page. If one theory page cannot explain the essential derivation legibly, use two
+`theory-figure` pages and remove the optional `discussion` page first. Keep the
+total at four content pages or fewer.
+
+A formula-heavy theory sequence should usually be split as:
+
+```text
+Theory A: circuit model -> starting equation -> key approximation
+Theory B: reduced equation -> physical meaning -> sensitivity/trade-off -> design choice
+```
+
+Do not shrink equations or circuit figures merely to preserve the default four-role
+sequence. The goal is understanding, not role completeness.
 
 ### Incomplete-note rule
 
@@ -137,6 +200,10 @@ If none of these exist, omit the discussion page.
 
 - Preserve causal links before preserving prose.
 - Prefer one skeleton claim + one evidence chain over three shallow claims.
+- For RFIC papers, preserve the **circuit derivation chain** before preserving AI
+  architecture detail that is not necessary to understand the electrical mechanism.
+- Every selected equation must have a circuit/physical interpretation and a design
+  implication; equations are never decorative typography.
 - Every selected figure must answer the left-column claim; otherwise choose a
   different figure or omit the page.
 - Keep `原文`, `解读`, `QA`, `困惑点` provenance distinct.
