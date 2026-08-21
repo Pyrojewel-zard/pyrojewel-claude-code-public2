@@ -7,8 +7,25 @@
 institution:
   name: "XX大学"              # 显示在 footline 和封面
   department: "XX学院"        # 院系名称
-  logo: ""                    # logo 文件名（放在项目目录下，留空不显示）
+  logo: ""                    # 通用封面 logo 文件名（留空不显示）
   gate_image: ""              # 致谢页的校门/标志建筑图（留空则用纯文字致谢页）
+  brand_profile: "auto"       # auto | bupt | none；识别北邮名称时 auto 自动启用 BUPT 品牌层
+  horizontal_logo: ""         # brand_profile=bupt 时留空即使用历史资产 bupt-logo-white.png
+
+# ============================================================
+# BUPT 品牌层（从历史 pyrojewel-beamer-academic 恢复）
+# ============================================================
+branding:
+  bupt:
+    auto_names:
+      - "北京邮电大学"
+      - "BUPT"
+      - "Beijing University of Posts and Telecommunications"
+    theme_overlay: "beamerthemeAcademicBUPT.sty"
+    horizontal_logo: "bupt-logo-white.png"
+    copy_logo_to: "materials/figures/bupt-logo-white.png"
+    brand_text: "北京邮电大学"
+    preserve_legacy_api: true  # 保留 \sethorizseal{bupt-logo-white.png}
 
 # ============================================================
 # 配色方案
@@ -52,7 +69,6 @@ generation:
   font_size: "10pt"           # 10pt | 11pt | 12pt
 
 # ============================================================
-# ============================================================
 # 单篇论文阅读模式（仅 report_type: paper-reading 使用）
 # ============================================================
 paper_reading:
@@ -66,7 +82,6 @@ paper_reading:
     - ljg-paper
     - ljg-read
     - ljg-qa
-    - ljg-read
   default_roles:
     - overview
     - theory-figure
@@ -74,7 +89,7 @@ paper_reading:
     - discussion
   inputs:
     original_paper: ""        # PDF / DOCX / TEX 路径
-    reading_note: ""           # ljg-paper 笔记；含 ljg-read/ljg-qa 追加时仍是同一文件
+    reading_note: ""          # ljg-paper 笔记；含 ljg-read/ljg-qa 追加时仍是同一文件
   figure_dirs:
     paper_originals: "materials/figures/paper-originals"
     generated: "materials/figures/generated"
