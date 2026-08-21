@@ -17,6 +17,15 @@ VAGUE_EQUATION_INSIGHT = {
     "equation",
     "derivation",
 }
+EQUATION_PROVENANCE = {
+    "paper-equation",
+    "reader-derived",
+    "rf-bridge",
+    "textbook-bridge",
+    "report-abstraction",
+    "n/a",
+    "na",
+}
 
 
 def parse_meta(text):
@@ -86,6 +95,7 @@ def validate_outline(path):
         ("role", "角色"),
         ("title", "标题"),
         ("circuit/equation insight", "equation insight", "公式/电路理解", "公式理解"),
+        ("equation provenance", "equation-provenance", "公式来源", "公式出处"),
         ("provenance", "source", "来源", "笔记来源"),
         ("evidence boundary", "evidence-boundary", "boundary", "证据边界"),
         ("layout_axis", "layout-axis", "axis", "布局轴"),
@@ -113,6 +123,13 @@ def validate_outline(path):
             "公式/电路理解",
             "公式理解",
         )
+        equation_provenance = pick(
+            row,
+            "equation provenance",
+            "equation-provenance",
+            "公式来源",
+            "公式出处",
+        ).strip().lower()
         seen_roles.append(role)
         if role not in ROLES:
             errors.append(f"unknown role: {role}")
@@ -122,6 +139,14 @@ def validate_outline(path):
             errors.append(f"{role}: provenance/source is empty")
         if boundary in EMPTY_VALUES:
             errors.append(f"{role}: evidence boundary is empty")
+        if not equation_provenance:
+            errors.append(f"{role}: equation provenance is empty")
+        elif equation_provenance not in EQUATION_PROVENANCE:
+            errors.append(
+                f"{role}: invalid equation provenance '{equation_provenance}'; "
+                "use paper-equation, reader-derived, rf-bridge, textbook-bridge, "
+                "report-abstraction, or n/a"
+            )
         if role == "theory-figure":
             normalized_insight = equation_insight.strip().lower()
             if equation_insight in EMPTY_VALUES or normalized_insight in VAGUE_EQUATION_INSIGHT:
@@ -129,6 +154,8 @@ def validate_outline(path):
                     "theory-figure: circuit/equation insight must explain derivation, "
                     "physical meaning, trade-off, and design implication"
                 )
+            if equation_provenance in {"n/a", "na"}:
+                errors.append("theory-figure: equation provenance cannot be n/a")
         if role == "discussion" and note_status != "complete":
             joined = " ".join([title, mode, " ".join(row.values())])
             if any(token in joined for token in BAD_JUDGMENT):
@@ -158,6 +185,8 @@ def validate_tex(path, rows):
             errors.append(f"TeX frame {index}: missing source marker")
         if "% paper-reading-boundary:" not in header:
             errors.append(f"TeX frame {index}: missing boundary marker")
+        if "% paper-reading-equation-provenance:" not in header:
+            errors.append(f"TeX frame {index}: missing equation provenance marker")
     return errors
 
 
