@@ -2,11 +2,28 @@
 
 Standard preamble for generated Beamer files. Fill placeholders from `config.yaml`.
 
+Before generating the TeX header, resolve the institution brand profile:
+
+- `institution.brand_profile: none` -> no branding overlay.
+- `institution.brand_profile: bupt` -> activate the BUPT overlay.
+- `institution.brand_profile: auto` -> activate BUPT when `institution.name` is
+  `北京邮电大学`, `BUPT`, or `Beijing University of Posts and Telecommunications`.
+
+When BUPT is active, copy these retained skill assets into the deck:
+
+```text
+assets/beamerthemeAcademicBUPT.sty -> ./beamerthemeAcademicBUPT.sty
+assets/bupt-logo-white.png         -> ./materials/figures/bupt-logo-white.png
+```
+
+The BUPT path and behavior are documented in `references/bupt-branding.md`.
+
 ```latex
 \documentclass[aspectratio={{ASPECT_RATIO}}, {{FONT_SIZE}}, t]{beamer}
 
 % ---------- Theme ----------
 \usepackage{beamerthemeAcademic}
+{{BRANDING_PACKAGE}}
 {{COLOR_COMMAND}}
 
 % ---------- CJK Fonts (macOS) ----------
@@ -36,14 +53,16 @@ Standard preamble for generated Beamer files. Fill placeholders from `config.yam
 % implementation-report: workflow-overview consumes diagram/workflow.png named
 % by manifest.yaml; diagram/diagram-spec.yaml is the semantic brief and
 % diagram/workflow.html is the editable diagram-design source.
-% 内容页默认左40%叙述/右60%证据；代码只展示8--16行关键片段。
-% beamerthemeAcademic 提供 academiccode、\codeentry、\statuslabel、\paperstep。
+% Paper-reading uses argument-left / evidence-right as a semantic axis, but the
+% actual column ratio is evidence-aware rather than mechanically fixed at 40/60.
+% beamerthemeAcademic provides academiccode, \codeentry, \statuslabel, \paperstep.
 \lstset{style=academiccode}
 \newcommand{\reprocaption}[2]{%
   \figcap{#1；来源类型：#2}}
 
 \setlength{\emergencystretch}{2em}
 \graphicspath{{materials/figures/}{./}}
+{{BRANDING_COMMANDS}}
 \AtBeginSection[]{}
 
 % ---------- Accent colors for hypotheses (optional) ----------
@@ -61,6 +80,16 @@ Standard preamble for generated Beamer files. Fill placeholders from `config.yam
 
 \begin{document}
 ```
+
+## Branding Placeholder Mapping
+
+| resolved profile | `BRANDING_PACKAGE` | `BRANDING_COMMANDS` |
+|---|---|---|
+| none / generic | empty | empty |
+| BUPT | `\usepackage{beamerthemeAcademicBUPT}` | `\sethorizseal{bupt-logo-white.png}` |
+
+For BUPT, the historical public API is intentionally retained. Existing TeX
+that already contains `\sethorizseal{bupt-logo-white.png}` remains valid.
 
 ## Color Command Mapping
 
