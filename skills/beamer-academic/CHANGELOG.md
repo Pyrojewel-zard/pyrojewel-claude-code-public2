@@ -22,12 +22,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - 将计划/代码现状拆到 `implementation-report`；工作流由 `diagram-design` 根据 `diagram-spec.yaml` 直接绘制，本 skill 通过 `workflow-overview` 消费 manifest 指定的 PNG
 - 增加 `implementation-analysis` profile，消费结果分析、数据审计、公式推导、Python 图表和编译后排版 QA
 - 章节页改为白底紧凑强调线；主题增加 `listings`、`\codeentry`、`\statuslabel`、`\paperstep`
+- 新增 `references/visual-qa-loop.md`：把 `pdftoppm` 栅格化读回升级为所有 academic Beamer 的最终交付门，而不再只针对 implementation-analysis；同时恢复正文 ≥8pt、表格 ≥7.6pt、图注 ≥7pt、标题 ≤2 行等可读性硬门
+- 新增 `scripts/render_visual_qa.py`：自动生成逐页 PNG、contact sheet、`pdfinfo`、layout text 和 `qa/layout-review.md`，支持“整体节奏 → 逐页可读性”的双尺度视觉检查
+- 新增 equation provenance：`paper-equation`、`reader-derived`、`rf-bridge/textbook-bridge`、`report-abstraction`，避免把 Friis / transducer gain 等解释性桥接公式伪装成原论文公式
+- 新增 asset reproducibility gate：最终交付不得存在 `safeimg`/缺图占位；figure catalog 中选中的图片必须在干净 checkout/deliverable 中真实存在
 
 ### ♻️ Changed
 - `paper-reading-contract.md` 改为两阶段语义门：`ljg-read note -> reading-brief.md -> outline.md -> LaTeX`，不再允许从阅读笔记直接做弱摘要填栏
 - paper-reading 的通用 rhythm 规则改为栏内 composition 变化；`image-left-text-right` 在该 profile 中明确禁用
 - RFIC `theory-figure` 页面新增强制 `circuit/equation insight`：公式必须解释起点模型、假设、变量到电路的映射、物理意义、trade-off 与设计选择，而不是只摘录最终表达式
 - 公式是核心论证时允许使用两个 `theory-figure` 页面；优先移除可选 discussion 页，避免为了固定四角色而压缩关键电路推导
+- paper-reading 双栏从固定约 40/60 改成按证据对象动态分配：结果图优先给右栏 58--65%，推导页只有在右图简单可读时才允许左栏超过 50%；稠密多 panel 原图优先裁切或拆页
+- equation-centric 页面从“最多两条公式”的机械限制改成“一条 derivation spine”：通常 2--3 个 display-math block 可以属于同一推导链，但超过 3 个独立公式块默认拆页
+- 长综述不再靠左右翻转制造节奏；每约 4--6 个内容页插入 section river、full-width source figure、comparison 或 synthesis 作为视觉 reset
+- `compile.sh` 现在使用 `-halt-on-error` 两遍编译、检查常见 overflow/error，并在 Poppler/Python 可用时自动运行 rendered visual QA
+- 最终视觉层级默认压成三层：frame title → main content → 一行 provenance/footer；避免 caption + note + boundary + source 在页底连续堆叠挤压主体
 
 ## [1.4.0] - 2026-05-22
 
