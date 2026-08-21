@@ -2,7 +2,7 @@
 
 **状态:** `active`(维护中的本地 fork,不是原样镜像)
 **Base:** `Faust-Donf/beamer-academic` @ `788e125` (v1.5, 2026-08-17)
-**当前版本:** `1.6+pyrojewel.2`
+**当前版本:** `1.6+pyrojewel.3`
 **迁入 / 转维护:** 2026-08-17
 
 ## 定位与路由
@@ -117,6 +117,39 @@ ljg-read note
 本次只修语义抽取和编排契约。`1.6+pyrojewel.2` 版本号暂不单独 bump，待下一次
 SKILL.md 正文同步时一起升版，避免只改 metadata 而没有正文同步。
 
+### [P6] 2026-08-21 — equation-centric 长综述与 rendered visual QA 闭环
+
+0820 AI4RFIC river survey 的 equation-centric 重写暴露了第二类问题：内容理论化后，
+TeX 结构本身可以非常整齐，但“整齐”不等于投影可读。连续多页 55--60% 左栏公式 +
+35--40% 右栏原论文图会形成视觉单调；dense multi-panel 论文图即使原图分辨率高，压到
+约 3--4 cm 高以后内部坐标、legend、器件标注仍可能失读；两张图上下堆成约 1.5--2 cm
+缩略图时更明显。与此同时，为了塞下 `eqnote/boundary/source`，正文和表格容易被降到
+组会投影临界字号。
+
+这次 patch 把“编译成功”升级为“编译 → 栅格化读回 → contact-sheet 节奏审查 → 逐页可读性审查 → 修复 → 重渲染”：
+
+- 新增 `references/visual-qa-loop.md`，从已删除 `zuhui-beammer` 恢复并泛化
+  `pdftoppm` 视觉 QA 与数字硬门：正文 ≥8pt、equation note ≥8pt、表格 ≥7.6pt、
+  图注 ≥7pt、标题 ≤2 行；
+- 新增 `scripts/render_visual_qa.py`，输出 page PNG、contact sheet、`pdfinfo`、
+  `pdftotext -layout` 和逐页 `qa/layout-review.md`；
+- `scripts/compile.sh` 在 Poppler/Python 可用时自动准备 visual-QA 资产；
+- `paper-reading-layout-policy.md` 不再把 40/60 当固定几何，而是按 page role 动态分配
+  证据空间；dense paper figure 优先 crop / full-width / split，禁止靠缩略图硬塞；
+- equation-centric 页面改成一条 `derivation spine`：通常 2--3 个 display math block
+  可以属于同一推导链，但超过 3 个独立公式块默认拆页；
+- 新增 equation provenance：`paper-equation` / `reader-derived` /
+  `rf-bridge(textbook-bridge)` / `report-abstraction`，防止把 Friis、transducer gain、
+  cascade IIP3 等解释性公式写得像原论文公式；
+- 新增 asset reproducibility gate：最终 deck 不允许 `safeimg`、`待补图` 或缺图占位
+  通过 QA；figure catalog 选中的资产必须在干净 checkout / deliverable 中真实存在；
+- 长 survey 每约 4--6 页允许 section river、full-width source figure、comparison 或
+  synthesis 作为 visual reset，但继续禁止为了“好看”随机左右翻转语义轴。
+
+这次仍没有修改 `.sty`：问题属于内容容量、图件裁切、语义版式和 render QA，而不是
+主题 chrome。universal visual-QA 已正式并入 `SKILL.md` 正文，版本号同步提升到
+`1.6+pyrojewel.3`。
+
 ## upstream 同步流程
 
 上游仓库在 `02_claudeSkill/beamer-academic/`(remote `Faust-Donf/beamer-academic`)。
@@ -174,34 +207,43 @@ Paper-reading 结构检查：
 python scripts/validate_paper_reading_deck.py --outline outline.md --tex presentation.tex
 ```
 
+Rendered visual QA：
+
+```bash
+python scripts/render_visual_qa.py presentation.pdf --out qa
+# 先看 qa/contact-sheet.png，再逐页看 qa/pages/*.png；填写 qa/layout-review.md
+```
+
 正向样例必须 PASS；`note_status: in-progress` 且 discussion 写 `我的判断` 的负向样例必须 FAIL。
 
 ## 环境依赖
 
 VM 内 `xelatex` 可用,但 **`texlive-lang-chinese` 缺失**(`ctexhook.sty` 找不到),所以 `examples/transformer/defense.tex` 在本 VM 编译不过——它依赖 `xeCJK` + `Heiti SC`/`STFangsong`。主题本身 Latin-only 测试通过(6 页,453.54×255.12 pt = 16:9)。
 
+视觉 QA 额外依赖 Poppler：`pdfinfo`、`pdftotext`、`pdftoppm`；contact sheet 可选依赖 Pillow。
+
 出中文片先装:
 
 ```bash
-sudo apt install texlive-xetex texlive-lang-chinese texlive-fonts-recommended
+sudo apt install texlive-xetex texlive-lang-chinese texlive-fonts-recommended poppler-utils
 ```
 
 字体名换成本机可用值(如 `AR PL UMing CN`)。
 
 ## 已删除的 zuhui-beammer(如需取回)
 
-2026-08-17 删除。上游 v1.5 完全没有、随 zuhui 一起放弃的四项能力:
+2026-08-17 删除。上游 v1.5 完全没有、随 zuhui 一起放弃的能力中：
 
-- `page_manifest.tsv` 证据契约(`source_id/location`、`interpretation`、`boundary`、`evidence_status` 四态含 `unknown`)
-- 语义化配色(red=raw/error、green=corrected、blue=ideal,强制配图例)
-- `zuhuicode` 代码块(Verilog-A/MATLAB/Python)
-- `pdftoppm` 栅格化视觉 QA + 数值硬门(正文 ≥8pt、表格 ≥7.6pt、图注 ≥7pt)
+- `page_manifest.tsv` 证据契约(`source_id/location`、`interpretation`、`boundary`、`evidence_status` 四态含 `unknown`)——仍未完整恢复；
+- 语义化配色(red=raw/error、green=corrected、blue=ideal,强制配图例)——仍为 ADC 专属，未恢复；
+- `zuhuicode` 代码块(Verilog-A/MATLAB/Python)——当前通用 skill 使用自身 listings/code components；
+- `pdftoppm` 栅格化视觉 QA + 数值硬门——**已在 P6 以通用形式恢复并增强**。
 
-取回方式:
+取回旧 skill 方式:
 
 ```bash
 git show 0e128a2:skills/zuhui-beammer/SKILL.md
 git checkout 0e128a2 -- skills/zuhui-beammer   # 整目录恢复
 ```
 
-其中前两项若日后要补,可直接在 `beamer-academic` 的证据契约中扩展。
+其中证据 manifest 若日后需要，可直接并入 `beamer-academic` 的现有 evidence contract。

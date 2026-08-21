@@ -7,7 +7,7 @@ description: >
   an implementation-report bundle with code, result, theory, figure, and layout-QA artifacts.
   Also use for 开题/会议/conference talks and paper-reading reports.
 metadata:
-  version: 1.6+pyrojewel.2
+  version: 1.6+pyrojewel.3
   trigger:
   - "beamer-academic"
   - "开题PPT"
@@ -22,10 +22,10 @@ metadata:
   - "上游 beamer"
   - "原版 beamer"
   local_notes: |
-    Local fork of upstream 788e125 (v1.5), with paper-reading and reproduction
-    profiles plus local theme patches. See LOCAL-NOTES.md for patch and sync details.
-    Defense-specific output is outside this skill; this skill owns the paper-reading
-    and academic-report PDF route.
+    Local fork of upstream 788e125 (v1.5), with paper-reading/reproduction
+    profiles, equation-centric RFIC reading rules, and rendered visual-QA patches.
+    See LOCAL-NOTES.md for patch and sync details. Defense-specific output is
+    outside this skill; this skill owns the paper-reading and academic-report PDF route.
 ---
 
 # Beamer Academic
@@ -36,8 +36,11 @@ manifest-backed implementation-analysis bundle in one automated pipeline.
 ## Pipeline Overview
 
 ```
-论文 → 素材提取 → 大纲生成 → [用户确认] → 内容填充 → 编译 → [交互修改循环]
+论文 → 素材提取 → 大纲生成 → [用户确认] → 内容填充 → 编译 → rendered visual QA → [交互修改循环]
 ```
+
+A compiled PDF is not a final deliverable until the rendered pages have been
+read back visually. Read `references/visual-qa-loop.md` before final delivery.
 
 ## Phase 0: Environment Check & Input Clarification
 
@@ -76,10 +79,10 @@ Then provide the command for user's OS and **offer to run it**:
 | OS | Command |
 |----|---------|
 | macOS | `brew install --cask mactex-no-gui` (推荐，约3.5GB，装一次永久可用) |
-| Ubuntu/Debian | `sudo apt install texlive-xetex texlive-lang-chinese texlive-fonts-recommended` |
-| Fedora/RHEL | `sudo dnf install texlive-xetex texlive-xecjk` |
-| Windows (WSL) | `sudo apt install texlive-xetex texlive-lang-chinese` |
-| Arch | `sudo pacman -S texlive-xetex texlive-langchinese` |
+| Ubuntu/Debian | `sudo apt install texlive-xetex texlive-lang-chinese texlive-fonts-recommended poppler-utils` |
+| Fedora/RHEL | `sudo dnf install texlive-xetex texlive-xecjk poppler-utils` |
+| Windows (WSL) | `sudo apt install texlive-xetex texlive-lang-chinese poppler-utils` |
+| Arch | `sudo pacman -S texlive-xetex texlive-langchinese poppler` |
 
 Wait for installation to complete, verify with `which xelatex`, then proceed.
 
@@ -212,10 +215,12 @@ contract is:
 | 3 | `evidence` | result interpretation and evidence strength | result/simulation/measurement figure |
 | 4 | `discussion` | reader's takeaway and claim boundary | QA, confusion, or unresolved question |
 
-Pages 2--3 default to the group's preferred geometry: theory or interpretation
-on the left and one readable paper figure on the right. Page 4 is included only
-when the note contains QA, doubts, or a meaningful boundary; otherwise it is a
-compact conclusion page. Never pad a paper to four pages.
+Pages 2--3 default to the group's preferred semantic axis: theory or
+interpretation on the left and readable paper evidence on the right. The exact
+column ratio is chosen by the evidence object; follow
+`references/paper-reading-layout-policy.md` rather than forcing one 40/60 split.
+Page 4 is included only when the note contains QA, doubts, or a meaningful
+boundary; otherwise it is a compact conclusion page. Never pad a paper to four pages.
 
 When `workflow-overview` is needed inside a paper-reading unit, it consumes one
 of the four slots and must come before code/status content. Use at most three
@@ -332,13 +337,17 @@ After extraction, present a **figure catalog** to user in conversation:
 >
 > **哪些图是你答辩必须展示的？** 可以说：
 > - "1, 3, 5, 8 必须用"
-> - "图7 不用了，跟图5 重复"
+> - "图7 不用了，跟图5重复"
 > - "全部都可能用到"
 
 This ensures:
 - Key figures won't be missed in layout assignment
 - User has a mental model of available materials before the outline phase
 - Low-quality or duplicate figures can be flagged early
+
+The catalog is also an asset manifest. Before final delivery, every selected
+figure path must exist in the clean checkout/deliverable. A `safeimg` or other
+placeholder may be used during drafting only; it fails final visual QA.
 
 ## Phase 2: Brainstorm Outline (Interactive, In-Conversation)
 
@@ -369,6 +378,11 @@ note are the primary structure. Do not build thesis-style chapters. Draft one
 four-row Markdown plan using the roles `overview`, `theory-figure`, `evidence`,
 and `discussion`; remove a row when the note has no material for it. Keep the
 paper metadata in the title/subtitle layer, not inside the body paragraph.
+
+For a multi-paper literature survey, reuse the paper-reading semantic/equation
+rules per selected paper, but treat the talk as one deck: insert a visual reset
+roughly every 4--6 content pages and do not apply the four-page ceiling to the
+whole survey.
 
 ### 2.1 First Pass: Structure Proposal
 
@@ -413,7 +427,9 @@ Markdown proposal and wait for explicit approval:
 
 The plan is the contract for content generation. If a figure is missing, mark
 the right slot as `待补图` in Markdown and ask for it; do not replace it with a
-full-page screenshot or invent a result.
+full-page screenshot or invent a result. For theory pages, also record equation
+provenance (`paper-equation`, `reader-derived`, `rf-bridge/textbook-bridge`, or
+`report-abstraction`) as required by `references/paper-reading-contract.md`.
 
 ### 2.2 Second Pass: Per-Section Detail
 
@@ -500,9 +516,11 @@ If an implementation-report bundle is supplied to a paper-reading deck, put
 workflow page is an integration prelude, not a replacement for the paper's
 theory/evidence pages.
 
-The default content geometry is 38--44% for the left explanation and 56--62%
-for the right evidence. A right-side figure should be one readable figure or
-one structured composite, not a row of tiny decorative thumbnails.
+Use `references/paper-reading-layout-policy.md` for paper-reading geometry.
+The semantic axis remains argument-left/evidence-right, but the column ratio
+must respond to figure/equation legibility rather than a fixed percentage.
+A right-side figure should be one readable figure or one structured composite,
+not a row of tiny decorative thumbnails.
 
 For other report types, retain the generic rules:
 
@@ -519,10 +537,12 @@ For other report types, retain the generic rules:
 
 ### Rhythm Constraints
 
-- No 3 consecutive pages with same layout
-- Each chapter uses at least 3 different layouts
+- No 3 consecutive pages with same layout in generic legacy modes
+- Each chapter uses at least 3 different layouts in generic legacy modes
+- For paper-reading, keep the semantic axis fixed; create rhythm inside the columns and with section/synthesis visual resets, never by arbitrary left/right reversal
+- For long multi-paper surveys, inspect the contact sheet and introduce a visual reset roughly every 4--6 content pages when composition becomes monotonous
 - Total: 35–50 pages (defense), 25–35 (proposal), 15–25 (conference),
-  and at most 4 content pages per paper (paper-reading)
+  and at most 4 content pages per paper (single-paper paper-reading)
 
 ## Phase 3: Content Generation
 
@@ -534,8 +554,8 @@ For other report types, retain the generic rules:
 4. Close with `\end{document}`.
 
 For `paper-reading`, the generation order is strict: read the approved
-`outline.md` → copy the paper figures → fill the four role layouts → compile.
-Do not generate a `.tex` file while the plan is still `status: draft`.
+`outline.md` → copy the paper figures → fill the role layouts → compile → render
+visual QA. Do not generate a `.tex` file while the plan is still `status: draft`.
 
 ### Critical: Section Divider and reproduction units
 
@@ -582,6 +602,15 @@ Keep these separate. A reader's speculation belongs in `我的判断` or
 `困惑点`, not in the paper's contribution. If the note and original disagree,
 show the disagreement in the Markdown plan and preserve the claim boundary.
 
+For equation-heavy RFIC paper-reading pages, also distinguish:
+
+- `paper-equation` — equation appears in the source paper;
+- `reader-derived` — intermediate algebra reconstructed from paper anchors;
+- `rf-bridge` / `textbook-bridge` — standard RF/EM relation introduced to explain the paper;
+- `report-abstraction` — mathematical wrapper created for the presentation.
+
+Do not present a bridge/abstraction as if it were quoted from the paper.
+
 ### Critical: TOC Page Format
 
 The TOC page (P2) must use Chinese numbering with em-dash subtitles:
@@ -612,7 +641,8 @@ The TOC page (P2) must use Chinese numbering with em-dash subtitles:
    - Use Python PIL to crop the figure out of the page image
    - Remove surrounding text, page numbers, captions
 4. **Quality check**: if extracted figure contains visible paper text around it, it's WRONG — re-crop
-5. For well-known papers (Transformer, ResNet, etc.), consider re-drawing key diagrams with tikz
+5. Dense multi-panel paper figures should be cropped to the exact panel(s) supporting the slide claim, or promoted to a full-width evidence page; do not compress unreadable originals into a narrow column
+6. For well-known papers (Transformer, ResNet, etc.), consider re-drawing key diagrams with tikz
 
 ### Critical: Anti-AI Writing Style (NO Bullet List Abuse)
 
@@ -620,7 +650,7 @@ The TOC page (P2) must use Chinese numbering with em-dash subtitles:
 
 Core rules:
 1. Each page COMBINES multiple elements (段落+keybox, 段落+公式+段落, 段落+表格+结论)
-2. Adjacent pages MUST use different composition patterns
+2. Adjacent pages should vary information hierarchy; for paper-reading, do not reverse semantic columns merely to create variation
 3. `\begin{itemize}` is BANNED. Only `\enumerate` with intro paragraph allowed
 4. 80% of pages use paragraph-style writing, not bullet points
 5. Use inline patterns: `$\bullet$ \textbf{term}`, `\alert{keyword}`, `\textbf{title}\,——\,explanation`
@@ -633,10 +663,11 @@ Core rules:
 |-----------|-------|
 | Text per page (text-only) | 150–200 chars |
 | Text per page (with figure) | 100–150 chars |
-| Equations per page | max 2 |
+| Equation-centric page | one derivation spine; normally 2--3 display-math blocks when they are one chain |
+| Independent formula blocks | >3 normally means split the page |
 | Table rows | 3–8 |
 | `\alert{}` keywords per page | 1–2 |
-| Page structure | COMBINE multiple elements (see writing-style.md) |
+| Page structure | one dominant visual object + supporting elements |
 | `\itemize` | BANNED |
 
 For `reproduction`, apply an additional capacity rule: each paper uses 2–5
@@ -646,7 +677,8 @@ replaced by a generic conclusion or transition page.
 For `paper-reading`, apply an additional capacity rule: each paper has at most
 four content pages, each row in `outline.md` has one page role and one primary
 claim, and the fourth page is omitted when there is no QA, confusion, or useful
-boundary to discuss.
+boundary to discuss. A central derivation may use a second theory page; remove
+optional discussion before shrinking equations or source figures.
 
 ### Section Divider (Legacy only)
 
@@ -659,6 +691,10 @@ divider and do not use a transition page merely to separate papers.
 Before finalizing, check all titles and content. **Read `references/writing-style.md`** for the full red-flag list.
 
 Quick check: "这个标题/段落像答辩学生写的还是 AI 写的？" 如果像 AI，改到像人。
+
+For paper surveys, prefer a short mechanism/claim in the frame title and move
+venue/year/paper identity into a kicker/subtitle. One rendered title line is
+preferred; two is the hard limit.
 
 ### Figure & Table Numbering
 
@@ -686,13 +722,24 @@ Numbering must be consistent throughout — do not skip or repeat numbers.
 
 ### 4.1 Compile
 
+Prefer the skill helper so compilation and rendered-QA preparation stay coupled:
+
 ```bash
-xelatex -interaction=nonstopmode defense.tex && xelatex -interaction=nonstopmode defense.tex
+bash scripts/compile.sh defense.tex
+```
+
+Equivalent manual compilation is:
+
+```bash
+xelatex -interaction=nonstopmode -halt-on-error defense.tex
+xelatex -interaction=nonstopmode -halt-on-error defense.tex
 ```
 
 On failure: read `defense.log`, fix common issues (missing image, font, overfull hbox), retry up to 3 times.
 
-If user has no LaTeX environment, skip compilation and deliver `.tex` + `.sty` + `materials/figures/`.
+If user has no LaTeX environment, deliver `.tex` + `.sty` + `materials/figures/`,
+but state that rendered visual QA could not be completed. Do not call that a
+final visual PASS.
 
 ### 4.2 Layout Bug Detection
 
@@ -700,26 +747,44 @@ After compilation, check `defense.log` for these common layout issues:
 
 | Symptom | Cause | Fix |
 |---------|-------|-----|
-| `Overfull \vbox` on frame | Content exceeds page height | Reduce text, split into 2 pages, or shrink font |
-| `Overfull \hbox` with image | Image too wide for column | Add `keepaspectratio`, reduce `width` |
+| `Overfull \vbox` on frame | Content exceeds page height | Reduce text or split into 2 pages; font shrink is last resort |
+| `Overfull \hbox` with image | Image too wide for column | Add `keepaspectratio`, reduce width, or change page role |
 | Image overlaps text in columns | `\column` width sum > `\textwidth` | Ensure left + right column ≤ 1.0 |
 | tikz overlay covers text | `[remember picture, overlay]` node position wrong | Adjust `yshift`/`xshift` values |
-| Text runs below frame | Too many paragraphs | Cut to 150-200 chars or split page |
+| Text runs below frame | Too many paragraphs | Cut secondary prose or split page |
 
-For `implementation-analysis`, also render the compiled PDF pages to a
-temporary QA preview and inspect them visually. Check every referenced result
-figure and diagram for natural aspect ratio, readable labels, uncropped axes,
-caption placement, and overlap with text. Record page-level defects in the
-manifest's `qa/layout-review.md`; a clean log is not sufficient for a layout
-pass. Repair the smallest relevant TeX constraint and recompile for at most
-three iterations.
+A clean log is necessary but not sufficient for **every compiled profile**.
+Run the rendered visual QA loop:
+
+```bash
+python scripts/render_visual_qa.py defense.pdf --out qa
+```
+
+Then:
+
+1. inspect `qa/contact-sheet.png` for deck-level rhythm/hierarchy;
+2. inspect every `qa/pages/page-*.png` at normal presentation scale;
+3. fill `qa/layout-review.md`;
+4. repair the smallest relevant layout/content constraint;
+5. recompile and re-render, up to three repair iterations.
+
+Read `references/visual-qa-loop.md` for the full contract. Default hard gates:
+body text ≥8.0pt, equation notes ≥8.0pt, table text ≥7.6pt, figure captions
+≥7.0pt, source/footer ≥6.8pt on one short line, and frame titles ≤2 rendered
+lines. A source figure whose internal labels cannot be read at rendered size
+fails even if the native image is high resolution.
+
+Final delivery also fails if any referenced image is absent from the clean
+checkout/deliverable or if `safeimg`, `待补图`, or another missing-image
+placeholder remains visible.
 
 **Proactive overlap prevention** (apply during Phase 3 content generation):
-- For `text-left-image-right`: left text ≤ 150 chars, image height ≤ `3.4cm` per image
-- For `image-left-text-right`: right text ≤ 120 chars, image height ≤ `0.60\textheight`
+- For generic `text-left-image-right`: left text ≤ 150 chars; choose image height by rendered label readability rather than a fixed maximum
+- For generic `image-left-text-right`: right text ≤ 120 chars, image height ≤ `0.60\textheight`
 - For `full-image`: use **only** tikz overlay positioning, no surrounding text except `\figcap`
-- For `formula`: max 2 equations, with `\vskip0.1cm` spacing between
+- For equation-centric theory pages: use one derivation spine; normally 2--3 display-math blocks when they are one chain; split when there are >3 independent blocks
 - Never put more than 3 `\vskip` commands in one frame (sign of overstuffing)
+- Two stacked paper figures are allowed only when both remain readable; otherwise crop/composite/split
 
 For a reproduction deck, run the structural validator before visual review:
 
@@ -735,26 +800,31 @@ the presence of a `file:function` code entry and implementation status, result
 figure paths, and the absence of the old full-bleed divider contract. A clean
 LaTeX log is necessary but does not replace this evidence check.
 
-For a `paper-reading` deck, run a structural check before compilation:
+For a `paper-reading` deck, run the structural validator before visual review:
 
 ```bash
-rg -n "status: approved|paper-reading-(overview|theory-figure|evidence|discussion)" outline.md
+python scripts/validate_paper_reading_deck.py \
+  --outline outline.md \
+  --tex presentation.tex
 ```
 
-Confirm that the paper has no more than four role rows, every page has a
-source label, and any QA/confusion page is traceable to the supplied note.
+Confirm that the paper has no more than four role rows in the single-paper
+profile, every page has source/boundary markers, theory pages carry non-empty
+`circuit/equation insight`, and equation provenance is explicit.
 
-**If overlap detected in compiled PDF** (user reports "P7图文重叠了"):
-1. Identify the frame in `.tex`
-2. Check: is text too long? Is image too tall? Are column widths correct?
-3. Apply fix: reduce text / shrink image / split into 2 pages
-4. Recompile and verify
+**If overlap or unreadability is detected in compiled PDF**:
+1. Identify the frame in `.tex`.
+2. Check whether the dominant object is clear, whether source-figure labels are readable, and whether bottom annotations are stacking.
+3. Repair in order: remove secondary prose/duplicate captions → split claim/derivation → crop/re-extract figure → change column ratio/page role → adjust spacing → reduce font last.
+4. Recompile, re-render, and update `qa/layout-review.md`.
+
+Final `content QA`, `theory/evidence QA`, and `visual QA` must all be `PASS`.
 
 ## Phase 5: Interactive Editing (Guided Choices)
 
-Present result:
+Present result only after the rendered-QA pass:
 
-> ✅ PDF 已生成：./defense.pdf（共 XX 页，预计答辩时长 XX 分钟）
+> ✅ PDF 已生成并完成视觉读回：./defense.pdf（共 XX 页，预计答辩时长 XX 分钟）
 > 说修改意见，或说"满意"结束。
 
 ### 5.1 Guided Modification (Never Let User Struggle to Express)
@@ -779,7 +849,7 @@ When user gives vague feedback, **offer concrete choices** instead of asking the
 | Global style change | Modify .sty or header |
 | Layout switch | Replace frame with different layout skeleton |
 
-After each edit, recompile and present again. Loop until user says done.
+After each edit, recompile and re-render the affected pages. Loop until user says done.
 
 ## Phase 6: Speaker Notes & Rehearsal Support (Optional)
 
@@ -836,10 +906,14 @@ Add `\note{}` blocks to each frame in `.tex` with the speaker notes content.
 - `references/tex-header.md` — Standard .tex file preamble template
 - `references/layout-registry.yaml` — Layout selection rules in structured format
 - `references/reproduction-contract.md` — Paper-unit metadata, page roles, source labels, and claim boundaries
-- `references/paper-reading-contract.md` — Markdown-first plan and approval gate for single-paper reading decks
+- `references/paper-reading-contract.md` — Markdown-first plan, RFIC equation provenance, and approval gate for paper reading
+- `references/paper-reading-layout-policy.md` — Fixed semantic axis with evidence-aware column ratios and equation/figure readability rules
+- `references/visual-qa-loop.md` — Universal rasterized PDF read-back, readability hard gates, asset reproducibility, and page-level QA contract
 
 ## Assets
 
 - `assets/beamerthemeAcademic.sty` — Beamer theme file (copied to user project)
 - `assets/config.yaml` — Configuration template (copied to user project)
 - `scripts/validate_reproduction_deck.py` — Structural and source checks for reproduction decks
+- `scripts/validate_paper_reading_deck.py` — Paper-reading role/source/boundary/equation-provenance validator
+- `scripts/render_visual_qa.py` — PDF page rasterization, contact sheet, and visual-QA checklist generator
