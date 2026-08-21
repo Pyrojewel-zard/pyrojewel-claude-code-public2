@@ -26,6 +26,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - 新增 `scripts/render_visual_qa.py`：自动生成逐页 PNG、contact sheet、`pdfinfo`、layout text 和 `qa/layout-review.md`，支持“整体节奏 → 逐页可读性”的双尺度视觉检查
 - 新增 equation provenance：`paper-equation`、`reader-derived`、`rf-bridge/textbook-bridge`、`report-abstraction`，避免把 Friis / transducer gain 等解释性桥接公式伪装成原论文公式
 - 新增 asset reproducibility gate：最终交付不得存在 `safeimg`/缺图占位；figure catalog 中选中的图片必须在干净 checkout/deliverable 中真实存在
+- 从历史 `pyrojewel-beamer-academic` 恢复北邮横版白色校名资产 `bupt-logo-white.png`，并新增可选 `beamerthemeAcademicBUPT.sty` 品牌层；保留旧接口 `\sethorizseal{bupt-logo-white.png}`
+- 新增 `references/bupt-branding.md` 与 `examples/bupt/minimal.tex`，规定北邮机构名自动激活、Logo 复制路径、兼容接口与编译/视觉 QA 边界
 
 ### ♻️ Changed
 - `paper-reading-contract.md` 改为两阶段语义门：`ljg-read note -> reading-brief.md -> outline.md -> LaTeX`，不再允许从阅读笔记直接做弱摘要填栏
@@ -37,6 +39,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - 长综述不再靠左右翻转制造节奏；每约 4--6 个内容页插入 section river、full-width source figure、comparison 或 synthesis 作为视觉 reset
 - `compile.sh` 现在使用 `-halt-on-error` 两遍编译、检查常见 overflow/error，并在 Poppler/Python 可用时自动运行 rendered visual QA
 - 最终视觉层级默认压成三层：frame title → main content → 一行 provenance/footer；避免 caption + note + boundary + source 在页底连续堆叠挤压主体
+- `config.yaml` 新增 `institution.brand_profile` 与 BUPT branding 配置；`tex-header.md` 在识别北邮时复制 overlay + 历史 Logo，并加载 `\sethorizseal`，同时保持主 white academic/equation-centric 布局不变
 
 ## [1.4.0] - 2026-05-22
 
