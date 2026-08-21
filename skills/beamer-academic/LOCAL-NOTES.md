@@ -2,7 +2,7 @@
 
 **状态:** `active`(维护中的本地 fork,不是原样镜像)
 **Base:** `Faust-Donf/beamer-academic` @ `788e125` (v1.5, 2026-08-17)
-**当前版本:** `1.6+pyrojewel.2`
+**当前版本:** `1.6+pyrojewel.3`
 **迁入 / 转维护:** 2026-08-17
 
 ## 定位与路由
@@ -146,9 +146,9 @@ TeX 结构本身可以非常整齐，但“整齐”不等于投影可读。连�
 - 长 survey 每约 4--6 页允许 section river、full-width source figure、comparison 或
   synthesis 作为 visual reset，但继续禁止为了“好看”随机左右翻转语义轴。
 
-这次没有修改 `.sty`：问题属于内容容量、图件裁切、语义版式和 render QA，而不是
-主题 chrome。版本号仍保持 `1.6+pyrojewel.2`；后续若把 universal visual-QA 正文
-直接并入 `SKILL.md` frontmatter/body，再统一 bump。
+这次仍没有修改 `.sty`：问题属于内容容量、图件裁切、语义版式和 render QA，而不是
+主题 chrome。universal visual-QA 已正式并入 `SKILL.md` 正文，版本号同步提升到
+`1.6+pyrojewel.3`。
 
 ## upstream 同步流程
 
