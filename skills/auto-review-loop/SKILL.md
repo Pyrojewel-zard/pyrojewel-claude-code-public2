@@ -10,10 +10,6 @@ trigger:
 argument-hint: [topic-or-scope]
 allowed-tools: Bash(*), Read, Grep, Glob, Write, Edit, Skill, mcp__codex__codex, mcp__codex__codex-reply, mcp__manual_review__review, mcp__manual_review__review_reply
 ---
-name: auto-review-loop
-description: Autonomous multi-round research review loop. In Copilot CLI it defaults to the native complementary rubber-duck subagent with host-event model evidence; elsewhere it uses Codex, while explicit external reviewer overrides remain available. Implements fixes and re-reviews until a policy-approved positive assessment or max rounds is reached.
-argument-hint: "[topic-or-scope]"
-allowed-tools: Bash(*), Read, Grep, Glob, Write, Edit, Skill, Task, mcp__codex__codex, mcp__codex__codex-reply, mcp__manual_review__review, mcp__manual_review__review_reply
 
 # Auto Review Loop: Autonomous Research Improvement
 
@@ -406,8 +402,12 @@ mcp__codex__codex:
        machine — a malicious local user is NOT in the threat model.
     2. Do NOT propose SHA / hash / content-fingerprint / digest-binding schemes.
        Reporting a real defect in hashing code that already exists is fine.
-    3. NO defensive scaffolding: no feature flags, migration frameworks, compat
-       layers, or wrappers added for cases that do not occur in practice.
+    3. NO speculative machinery: do not add feature flags, migration frameworks,
+       compat layers, wrappers, pins, or similar mechanisms unless evidence shows
+       a current repo defect they fix or an explicit existing invariant they must
+       preserve. "Load-bearing", "compatibility", and "not scaffolding" are labels,
+       not evidence. Point to the failing path/artifact or invariant, and check the
+       proposal's factual premises, such as whether a named package version exists.
     4. NO corner-case obsession: exotic encodings, symlink races, RTL text and
        millisecond races are out of scope unless you can show the case arises here.
     5. Where a rubric or checklist is genuinely needed, do not over-mechanize
@@ -467,8 +467,12 @@ mcp__codex__codex:
        machine — a malicious local user is NOT in the threat model.
     2. Do NOT propose SHA / hash / content-fingerprint / digest-binding schemes.
        Reporting a real defect in hashing code that already exists is fine.
-    3. NO defensive scaffolding: no feature flags, migration frameworks, compat
-       layers, or wrappers added for cases that do not occur in practice.
+    3. NO speculative machinery: do not add feature flags, migration frameworks,
+       compat layers, wrappers, pins, or similar mechanisms unless evidence shows
+       a current repo defect they fix or an explicit existing invariant they must
+       preserve. "Load-bearing", "compatibility", and "not scaffolding" are labels,
+       not evidence. Point to the failing path/artifact or invariant, and check the
+       proposal's factual premises, such as whether a named package version exists.
     4. NO corner-case obsession: exotic encodings, symlink races, RTL text and
        millisecond races are out of scope unless you can show the case arises here.
     5. Where a rubric or checklist is genuinely needed, do not over-mechanize
@@ -522,8 +526,12 @@ this repo actually produces it. Then keep the fix in scope:
    machine — a malicious local user is NOT in the threat model.
 2. Do NOT propose SHA / hash / content-fingerprint / digest-binding schemes.
    Reporting a real defect in hashing code that already exists is fine.
-3. NO defensive scaffolding: no feature flags, migration frameworks, compat
-   layers, or wrappers added for cases that do not occur in practice.
+3. NO speculative machinery: do not add feature flags, migration frameworks,
+   compat layers, wrappers, pins, or similar mechanisms unless evidence shows
+   a current repo defect they fix or an explicit existing invariant they must
+   preserve. "Load-bearing", "compatibility", and "not scaffolding" are labels,
+   not evidence. Point to the failing path/artifact or invariant, and check the
+   proposal's factual premises, such as whether a named package version exists.
 4. NO corner-case obsession: exotic encodings, symlink races, RTL text and
    millisecond races are out of scope unless you can show the case arises here.
 5. Where a rubric or checklist is genuinely needed, do not over-mechanize
@@ -566,6 +574,7 @@ After parsing the assessment, append to the canonical memory artifact at `review
 - **Unresolved**: [concerns not yet addressed]
 - **Patterns**: [recurring issues the reviewer noticed]
 
+---
 
 ## Round 2 — Score: X/10
 
@@ -577,6 +586,7 @@ After parsing the assessment, append to the canonical memory artifact at `review
 - **New suspicions**: [...]
 - **Unresolved**: [carried forward + new]
 
+---
 ```
 
 **Rules**:
@@ -1031,8 +1041,12 @@ this repo actually produces it. Then keep the fix in scope:
    machine — a malicious local user is NOT in the threat model.
 2. Do NOT propose SHA / hash / content-fingerprint / digest-binding schemes.
    Reporting a real defect in hashing code that already exists is fine.
-3. NO defensive scaffolding: no feature flags, migration frameworks, compat
-   layers, or wrappers added for cases that do not occur in practice.
+3. NO speculative machinery: do not add feature flags, migration frameworks,
+   compat layers, wrappers, pins, or similar mechanisms unless evidence shows
+   a current repo defect they fix or an explicit existing invariant they must
+   preserve. "Load-bearing", "compatibility", and "not scaffolding" are labels,
+   not evidence. Point to the failing path/artifact or invariant, and check the
+   proposal's factual premises, such as whether a named package version exists.
 4. NO corner-case obsession: exotic encodings, symlink races, RTL text and
    millisecond races are out of scope unless you can show the case arises here.
 5. Where a rubric or checklist is genuinely needed, do not over-mechanize
@@ -1074,8 +1088,12 @@ copilot --agent "$REVIEWER_PROFILE" --model "$REVIEWER_MODEL" \
        machine — a malicious local user is NOT in the threat model.
     2. Do NOT propose SHA / hash / content-fingerprint / digest-binding schemes.
        Reporting a real defect in hashing code that already exists is fine.
-    3. NO defensive scaffolding: no feature flags, migration frameworks, compat
-       layers, or wrappers added for cases that do not occur in practice.
+    3. NO speculative machinery: do not add feature flags, migration frameworks,
+       compat layers, wrappers, pins, or similar mechanisms unless evidence shows
+       a current repo defect they fix or an explicit existing invariant they must
+       preserve. "Load-bearing", "compatibility", and "not scaffolding" are labels,
+       not evidence. Point to the failing path/artifact or invariant, and check the
+       proposal's factual premises, such as whether a named package version exists.
     4. NO corner-case obsession: exotic encodings, symlink races, RTL text and
        millisecond races are out of scope unless you can show the case arises here.
     5. Where a rubric or checklist is genuinely needed, do not over-mechanize

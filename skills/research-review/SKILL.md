@@ -10,10 +10,6 @@ trigger:
 argument-hint: [topic-or-scope]
 allowed-tools: Bash(*), Read, Grep, Glob, Write, Edit, mcp__codex__codex, mcp__codex__codex-reply, mcp__manual_review__review, mcp__manual_review__review_reply
 ---
-name: research-review
-description: Get a deep critical review of research from an external reviewer backend (Codex or manual). Use when user says "review my research", "help me review", "get external review", or wants critical feedback on research ideas, papers, or experimental results.
-argument-hint: "[topic-or-scope]"
-allowed-tools: Bash(*), Read, Grep, Glob, Write, Edit, mcp__codex__codex, mcp__codex__codex-reply, mcp__manual_review__review, mcp__manual_review__review_reply
 
 # Research Review via External Reviewer Backend (ultra reasoning)
 
@@ -83,7 +79,7 @@ the `codex` backend, keep the MCP payload short: write the full briefing to
 
 ```
 mcp__codex__codex:
-  model: gpt-5.6-sol
+  model: o3
   config: {"model_reasoning_effort": "ultra"}
   prompt: |
     Read the review brief at <absolute path to RESEARCH_REVIEW_REQUEST.md>.
@@ -97,7 +93,32 @@ mcp__codex__codex:
     2. Missing experiments that would strengthen the story
     3. Narrative weaknesses
     4. Whether the contribution is sufficient for a top venue
-    Please be brutally honest.
+
+    === SCOPE LIMITS (these bound what you PROPOSE, never what you look for) ===
+    Report anything that is actually wrong here — including a rare-looking case, if
+    this repo actually produces it. Then keep the fix in scope:
+    1. This is a RESEARCH-WORKFLOW tool, not a security paper. Verification is
+       welcome; over-defense is not. Assume a cooperating operator on their own
+       machine — a malicious local user is NOT in the threat model.
+    2. Do NOT propose SHA / hash / content-fingerprint / digest-binding schemes.
+       Reporting a real defect in hashing code that already exists is fine.
+    3. NO speculative machinery: do not add feature flags, migration frameworks,
+       compat layers, wrappers, pins, or similar mechanisms unless evidence shows
+       a current repo defect they fix or an explicit existing invariant they must
+       preserve. "Load-bearing", "compatibility", and "not scaffolding" are labels,
+       not evidence. Point to the failing path/artifact or invariant, and check the
+       proposal's factual premises, such as whether a named package version exists.
+    4. NO corner-case obsession: exotic encodings, symlink races, RTL text and
+       millisecond races are out of scope unless you can show the case arises here.
+    5. Where a rubric or checklist is genuinely needed, do not over-mechanize
+       judgement. A clear sentence a human reads beats a scored table nobody
+       maintains.
+    Exception: code that runs remote commands, starts a network service, or installs
+    an MCP server runs on the user's machine with their credentials — trust-boundary
+    findings there are in scope and the default is strict.
+    Say plainly when something is correct. Do not manufacture findings.
+    Be brutally honest. If, after genuinely trying to break it, the work
+    holds up and is ready, say so clearly.
 ```
 
 The review brief should contain the full research context, the specific
@@ -169,7 +190,7 @@ Update project memory/notes with key review conclusions.
 
 ## Key Rules
 
-- ALWAYS pin `model: gpt-5.6-sol` + `config: {"model_reasoning_effort": "ultra"}` for reviews (deep-audit tier; capability fallback per `reviewer-routing.md`, never below `xhigh`)
+- ALWAYS pin `model: o3` + `config: {"model_reasoning_effort": "ultra"}` for reviews (deep-audit tier; capability fallback per `reviewer-routing.md`, never below `xhigh`)
 - That pin is the **Codex** backend's. For `manual`, use the identity-bearing config from the Reviewer Calling Convention above; `model`, `sandbox` and `cwd` are Codex-only
 - Put comprehensive context in the review brief. Codex can read local files
   when you pass an absolute path; manual reviewers usually cannot, so attach or
