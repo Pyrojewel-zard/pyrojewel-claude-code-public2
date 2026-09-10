@@ -357,3 +357,30 @@
 **push 状态：** 无需 push（pyrojewel_claude_code 无变更）。
 
 **备注：** 本次会话 VM 无 SSH key（`~/.ssh/` 不存在），仅 HTTPS fetch 可用。挂载盘 git merge/reset 均因 `Operation not permitted` 失败，改用 `git diff --name-only HEAD..<ref>` 分析变更范围，确认无 adopted skill 需同步。lock file 残留（`index.lock`、`ORIG_HEAD.lock`）无法手动清理，不影响后续会话（下次 fetch 会自动恢复）。
+
+### 2026-09-11 — 日常同步（virtuoso skill 更新）
+
+**上游仓库更新：**
+
+| 仓库 | 同步方式 | 结果 | 新 commit |
+|------|---------|------|----------|
+| `Auto-claude-code-research-in-sleep` | HTTPS fetch（SSH key 缺失，remote 已改为 HTTPS） | ✅ 已最新（HEAD = `d3c7033`，本地领先上游 6 个本地 commit） | 0 |
+| `ljg-skills` | `git fetch upstream` + merge（workaround：独立 index + 直接写 ref，挂载盘 lock 文件无法删除）→ `190fa0b` | ✅ | 4 |
+| `beamer-academic` | HTTPS fetch | ✅ 已最新（HEAD = `788e125`） | 0 |
+| `virtuoso-bridge-lite` | `git fetch upstream` + merge（同样 workaround）→ `1b10220` | ✅ | 8 |
+
+**新 commit 内容分析：**
+- `ljg-skills`：v1.17.109–v1.17.111，变更集中在 ljg-book/ljg-card/ljg-classic/ljg-is/ljg-push/ljg-teach；ljg-paper 仅新增 `evals/`、`references/paper-map.md`、`scripts/validate_note*.ts`（未触及 SKILL.md 与方法论），ljg-read/ljg-qa 无变更 → 项目内 `pyrojewel-paper-river` 无需同步
+- `virtuoso-bridge-lite`：#147 split bridge hosts + safe bootstrap、#148 deterministic schematic constraint planner、#149 maestro 输出转义 + run timeout；`skills/virtuoso/` 有实质更新（SKILL.md 连接序列/模拟流程重写 + 8 个 references 更新）
+- `beamer-academic`：无新 commit
+- `Auto-claude-code-research-in-sleep`：无新 commit（本地 6 个 commit 领先上游，未推送）
+
+**同步到当前项目的 skill：**
+
+| Skill | 变更类型 | 操作方式 |
+|-------|---------|---------|
+| `virtuoso` (SKILL.md + 8 references) | split-hosts 连接序列、maestro run_and_wait/read_results 新 API、schematic planner 示例、references 更新 | 覆盖 SKILL.md + 回插本地 `### Profile 配置` 与 `## 详情阅读 / Deep Dives` 段落；8 个 references 直接复制；本地独有 `digital-import-flow.md` 与 `netlist.md`（本地 `edit()` 适配）保留 |
+
+**push 状态：** 待 push（VM 无 SSH key 且无 HTTPS 凭据；本地 commit `25be4c9` 已生成，待用户环境 push `origin master`）。
+
+**备注：** VM 无 SSH key（`~/.ssh/` 不存在），HTTPS 匿名 fetch 可用；ljg-skills/virtuoso 的 merge commit 因挂载盘无法删除 `.git/*.lock`，采用独立 `GIT_INDEX_FILE` + `git commit-tree` + 直接写 loose ref 的 workaround；工作区保留本地 markdown 适配（与 2026-08-20 记录一致，属预期状态）。
