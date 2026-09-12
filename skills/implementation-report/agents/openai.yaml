@@ -1,4 +1,0 @@
-interface:
-  display_name: "Implementation Report"
-  short_description: "Plan-driven code, result, theory, visualization, diagram, and Beamer analysis"
-  default_prompt: "Read the plan first, then run or inspect the implementation, analyze evidence, create the required research artifacts, draw a direct diagram, and compile/read back the academic report."

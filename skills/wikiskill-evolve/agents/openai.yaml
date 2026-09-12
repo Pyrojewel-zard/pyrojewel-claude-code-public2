@@ -1,0 +1,6 @@
+interface:
+  display_name: "WikiSkill Evolve"
+  short_description: "Evolve skills and resolve Codex/CCB transcripts"
+  default_prompt: "Use $wikiskill-evolve to resolve a Codex or CCB session ID, summarize its troubleshooting flow, or evolve reusable skills from agent traces."
+policy:
+  allow_implicit_invocation: true

@@ -381,6 +381,6 @@
 |-------|---------|---------|
 | `virtuoso` (SKILL.md + 8 references) | split-hosts 连接序列、maestro run_and_wait/read_results 新 API、schematic planner 示例、references 更新 | 覆盖 SKILL.md + 回插本地 `### Profile 配置` 与 `## 详情阅读 / Deep Dives` 段落；8 个 references 直接复制；本地独有 `digital-import-flow.md` 与 `netlist.md`（本地 `edit()` 适配）保留 |
 
-**push 状态：** 待 push（VM 无 SSH key 且无 HTTPS 凭据；本地 commit `25be4c9` 已生成，待用户环境 push `origin master`）。
+**push 状态：** 见下条记录。
 
 **备注：** VM 无 SSH key（`~/.ssh/` 不存在），HTTPS 匿名 fetch 可用；ljg-skills/virtuoso 的 merge commit 因挂载盘无法删除 `.git/*.lock`，采用独立 `GIT_INDEX_FILE` + `git commit-tree` + 直接写 loose ref 的 workaround；工作区保留本地 markdown 适配（与 2026-08-20 记录一致，属预期状态）。
