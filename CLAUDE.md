@@ -114,7 +114,7 @@ Protected files: `.env`, credentials, `pyproject.toml`, `setup.cfg`, `conda-lock
 - `diagram-design`, `evidence-to-lecture-handout` — 图表、讲义和视觉交付
 - `md-to-word-fidelity` — Markdown 到 Word 模板的保真转换
 - `natural-fund-research-status-writing` — 自然基金研究现状写作
-- `paper-to-wiki`, `wikiskill-evolve` — 论文材料和 Wiki 维护
+- `wikiskill-evolve` — Wiki 维护
 - `vision-batch-read` — 批量并发读图
 - `workshop-talks-s5-lecture-pipeline` — 讲座材料流水线
 - `zotero-lookup`, `zotero-manager` — Zotero 文献定位和管理

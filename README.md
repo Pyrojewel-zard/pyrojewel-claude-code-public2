@@ -5,7 +5,7 @@ Personal Claude Code skill workspace, cleaned for public release.
 This repository is not a generic framework dump. It is a curated working tree for recurring paper, knowledge, visualization, and EDA workflows.
 
 1. Paper reading -> notes -> QA -> PPT
-2. Academic figures, lectures, and paper-to-wiki handoffs
+2. Academic figures and lectures
 3. Zotero paper lookup and research-status writing
 4. Cadence Virtuoso remote workflows
 
@@ -48,8 +48,8 @@ Key docs:
 
 The repository also contains focused skills for `diagram-design`,
 `evidence-to-lecture-handout`, `md-to-word-fidelity`,
-`natural-fund-research-status-writing`, `paper-to-wiki`,
-`vision-batch-read`, `workshop-talks-s5-lecture-pipeline`,
+`natural-fund-research-status-writing`, `vision-batch-read`,
+`workshop-talks-s5-lecture-pipeline`,
 `wikiskill-evolve`, `zotero-lookup`, `zotero-manager`, and `virtuoso`.
 
 The former research/experiment and Wiki bundles were intentionally removed

@@ -32,7 +32,6 @@
 | `beamer-academic` | `skills/beamer-academic/SKILL.md` | Paper / Lecture | `active` | `Faust-Donf/beamer-academic` | 本地 fork，含版式和视觉 QA 适配 | lead | 从上游 commit 对象同步，再保留本地适配 |
 | `diagram-design` | `skills/diagram-design/SKILL.md` | Visualization | `active` | `cathrynlavery/diagram-design` | 本地适配副本 | lead | 上游更新后人工判断是否吸收 |
 | `evidence-to-lecture-handout` | `skills/evidence-to-lecture-handout/SKILL.md` | Lecture | `active` | local maintenance | 当前仓库版本；原始来源待盘点 | lead | 不自动覆盖，纳入日常来源盘点 |
-| `paper-to-wiki` | `skills/paper-to-wiki/SKILL.md` | Wiki handoff | `active` | local maintenance | 当前仓库版本 | lead | 仅维护本地适配 |
 | `pyrojewel-paper-river` | `skills/pyrojewel-paper-river/SKILL.md` | Paper | `active` | `Pyrojewel-zard/ljg-skills` | 本地维护副本，源自 `lijigang/ljg-skills` | lead | 上游更新后人工二次消化 |
 | `virtuoso` | `skills/virtuoso/SKILL.md` | RF / EDA | `active` | `Pyrojewel-zard/virtuoso-bridge-lite` | fork of `Arcadia-1/virtuoso-bridge-lite` | lead | 跟踪 upstream bridge API，保留本地 profile |
 | `vision-batch-read` | `skills/vision-batch-read/SKILL.md` | Visualization | `active` | local maintenance | 当前仓库版本 | lead | 仅维护本地适配 |
