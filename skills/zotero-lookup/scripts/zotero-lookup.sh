@@ -15,7 +15,11 @@
 
 set -euo pipefail
 
-BASE="${ZOTERO_MARKDOWN_PATH:-/home/DataTransfer/Pyrojewel/synologySync/zotero_pdf}"
+BASE="${ZOTERO_MARKDOWN_PATH:-}"
+if [[ -z "$BASE" ]]; then
+    echo "请先设置 ZOTERO_MARKDOWN_PATH 为 Zotero markdown export 目录" >&2
+    exit 2
+fi
 INDEX_FILE="$BASE/.zotero_lookup_index.json"
 LF=$'\n'
 

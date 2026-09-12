@@ -2,12 +2,12 @@
 
 Personal Claude Code skill workspace, cleaned for public release.
 
-This repository is not a generic framework dump. It is a curated working tree for a few recurring research flows:
+This repository is not a generic framework dump. It is a curated working tree for recurring paper, knowledge, visualization, and EDA workflows.
 
 1. Paper reading -> notes -> QA -> PPT
-2. Idea discovery and literature review
-3. Experiment planning and result analysis
-4. ECC-style local hook/runtime support
+2. Academic figures, lectures, and paper-to-wiki handoffs
+3. Zotero paper lookup and research-status writing
+4. Cadence Virtuoso remote workflows
 
 ## What Is In This Repo
 
@@ -34,44 +34,30 @@ Core chain:
 ljg-paper / ljg-read
 -> pyrojewel-paper-river (optional)
 -> ljg-qa (optional)
--> implementation-report (when plan/code status is needed)
 -> beamer-academic
 ```
 
-For implementation or reproduction status, `implementation-report` first reads the planning files and current code. In `full-analysis` mode it can also run the approved implementation, analyze results, audit data provenance, align formulas, generate Python figures, draw a direct `diagram-design` workflow, and hand the complete bundle to `beamer-academic`.
-
-The workflow visual is drawn directly by the adopted `diagram-design` skill
-from `diagram/diagram-spec.yaml`, with explicit `format/size/detail/audience`
-settings and a local monochrome paper-reading profile. Mermaid is not part of
-the implementation-report contract.
-
-`beamer-academic` is the only active paper-reading/academic Beamer PDF entry.
-`paper-compile` remains separate for manuscript LaTeX PDFs.
+`beamer-academic` is the active paper-reading and academic Beamer PDF entry.
 
 Key docs:
 
 - `references/flow-chain-1-paper-to-ppt.md`
 - `references/flow-map.md`
 
-### Idea / Experiment Flow
+### Other Maintained Skills
 
-Core chain:
+The repository also contains focused skills for `diagram-design`,
+`evidence-to-lecture-handout`, `md-to-word-fidelity`,
+`natural-fund-research-status-writing`, `paper-to-wiki`,
+`vision-batch-read`, `workshop-talks-s5-lecture-pipeline`,
+`wikiskill-evolve`, `zotero-lookup`, `zotero-manager`, and `virtuoso`.
 
-```text
-idea-discovery
--> research-lit
--> idea-creator
--> novelty-check
--> research-review
--> research-refine-pipeline
--> experiment-plan
-```
-
-Supporting skills already migrated include `auto-review-loop`, `experiment-bridge`, `experiment-audit`, `analyze-results`, `dse-loop`, and `paper-compile`.
+The former research/experiment and Wiki bundles were intentionally removed
+from this repository; their source repositories remain separate candidates for
+future review rather than active local dependencies.
 
 Key docs:
 
-- `references/idea-experiment-audit.md`
 - `references/current-status-and-next-steps.md`
 
 ## Source Tracking

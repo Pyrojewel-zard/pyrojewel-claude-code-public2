@@ -244,12 +244,14 @@ and the evidence boundary for each claim. Generate LaTeX only after the user
 explicitly approves the plan. A vague approval such as “继续” is sufficient
 only after the complete plan has been shown; do not silently skip the gate.
 
-### Implementation-report handoff
+### Implementation-analysis handoff
 
 When the requested deck includes code status, an implementation plan, result
-analysis, or a reproduction workflow, use the `implementation-report` skill
-first. It owns plan intake, code/run/evidence analysis, specialist handoffs,
-direct diagram rendering, and the compile/read-back contract.
+analysis, or a reproduction workflow, start from a prepared
+implementation-analysis bundle when one is available. The bundle may be
+produced by any approved local workflow or supplied by the caller; this skill
+only consumes its declared artifacts and does not require a separate producer
+skill to be installed.
 
 Expected bundle:
 
@@ -273,8 +275,8 @@ materials/implementation-report/
 PNG plus the figure manifest. `diagram-spec.yaml` is the semantic source for
 the direct `diagram-design` drawing. It must not independently reinterpret
 planning files or replace the workflow with a code dump. If the bundle or
-manifest is missing, ask for it or route the task to `implementation-report`
-before drafting the slide outline.
+manifest is missing, ask for it or establish the required implementation
+evidence before drafting the slide outline.
 
 ### 0.5 Language Strategy
 

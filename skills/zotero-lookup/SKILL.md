@@ -11,9 +11,9 @@ version: "1.0.0"
 
 ## Constants
 
-- **BASE** = `$ZOTERO_MARKDOWN_PATH` (fallback: `/home/DataTransfer/Pyrojewel/synologySync/zotero_pdf`)
-- **INDEX** = `$BASE/.zotero_lookup_index.json` (4527 papers, 792KB)
-- **SCRIPT** = `$BASE/zotero-lookup.sh`
+- **BASE** = `$ZOTERO_MARKDOWN_PATH` (required; set it to the Zotero markdown export directory)
+- **INDEX** = `$BASE/.zotero_lookup_index.json`
+- **SCRIPT** = `scripts/zotero-lookup.sh`, bundled with this skill
 
 ## Flow
 
@@ -30,8 +30,10 @@ meta:        $BASE/<key>/*_meta.json
 
 ### 给定关键词（非8位key，如 "GCN"、"Circuit Designer"）
 
+以下命令从 `zotero-lookup` skill 目录（包含本文件的目录）执行。
+
 ```bash
-bash $BASE/zotero-lookup.sh "<keyword>"
+bash scripts/zotero-lookup.sh "<keyword>"
 ```
 
 返回 `key<TAB>pdf_name<TAB>title` 的匹配行。拿到 key 后按上节拼路径。
@@ -39,7 +41,7 @@ bash $BASE/zotero-lookup.sh "<keyword>"
 ### 重建索引（新增论文后）
 
 ```bash
-bash $BASE/zotero-lookup.sh build
+bash scripts/zotero-lookup.sh build
 ```
 
 ## Reference

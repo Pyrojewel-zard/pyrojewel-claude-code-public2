@@ -39,7 +39,7 @@ Paper reading skills (`ljg-paper`, `ljg-read`, `ljg-qa`, `pyrojewel-paper-river`
 
 | # | 上游仓库 | 本地磁盘路径 | 实际 remote | 依赖的本地 skill | 同步方式 |
 |---|---------|-------------|-------------|-----------------|---------|
-| 1 | `wanshuiyin/Auto-claude-code-research-in-sleep` | `02_claudeSkill/Auto-claude-code-research-in-sleep/` | `git@github.com:wanshuiyin/Auto-claude-code-research-in-sleep.git`（直连上游，无 fork） | `analyze-results`, `experiment-plan`, `paper-compile`, `dse-loop`, `formula-derivation`, `novelty-check`, `idea-discovery`, `idea-creator`, `research-review`, `research-refine-pipeline`, `research-lit`, `auto-review-loop`, `experiment-bridge`, `experiment-audit`, `experiment-queue`, `run-experiment`, `monitor-experiment`, `ablation-planner`, `result-to-claim`, `research-pipeline`, `vast-gpu`, `training-check`, `serverless-modal`, `arxiv`, `render-html` | `git fetch` + 手动适配 |
+| 1 | `wanshuiyin/Auto-claude-code-research-in-sleep` | `02_claudeSkill/Auto-claude-code-research-in-sleep/` | `git@github.com:wanshuiyin/Auto-claude-code-research-in-sleep.git`（直连上游，无 fork） | 当前仓库未纳入其 skill；保留为候选源扫描 | 仅做来源更新分析；重新纳入前先完成二次消化 |
 | 2 | `lijigang/ljg-skills` | `02_claudeSkill/ljg-skills/` | origin `git@github.com:Pyrojewel-zard/ljg-skills.git` + upstream `https://github.com/lijigang/ljg-skills.git` | `ljg-paper`, `ljg-read`, `ljg-qa`, `pyrojewel-paper-river` | `git fetch upstream && git merge upstream/main` → push origin |
 | 3 | `Faust-Donf/beamer-academic` | `02_claudeSkill/beamer-academic/` | `git@github.com:Faust-Donf/beamer-academic.git`（直连上游） | `beamer-academic`（本地 fork，有 patch） | `git fetch` + **从 commit 对象提取**（`git archive`）——详见 `skills/beamer-academic/LOCAL-NOTES.md` |
 | 4 | `Arcadia-1/virtuoso-bridge-lite` | `02_claudeSkill/virtuoso/` | origin `git@github.com:Pyrojewel-zard/virtuoso-bridge-lite.git` + upstream `https://github.com/Arcadia-1/virtuoso-bridge-lite.git` | `virtuoso` | `git fetch upstream` → merge |
@@ -104,44 +104,28 @@ Protected files: `.env`, credentials, `pyproject.toml`, `setup.cfg`, `conda-lock
 - `ljg-read`
 - `ljg-qa`
 - `pyrojewel-paper-river`
-- `zotero-pdf-parse`
-- `implementation-report` — 计划→代码/运行结果→数据审计→公式→Python图表→diagram-design→Beamer编译回读；为 Beamer 提供实现汇报材料包
-- `diagram-design` — 直接根据结构化 diagram brief 绘制 editorial HTML/SVG/PNG；由 `implementation-report` 调用
-- `beamer-academic` — 论文阅读、组会/会议汇报、复现报告和 Beamer PDF 编译；本地 fork（`1.6+pyrojewel.2`）；实现状态页消费 `implementation-report` bundle
+- `diagram-design` — 直接根据结构化 diagram brief 绘制 editorial HTML/SVG/PNG
+- `beamer-academic` — 论文阅读、组会/会议汇报、复现报告和 Beamer PDF 编译；本地 fork（`1.6+pyrojewel.2`）；有实现材料包时消费 supplied implementation-analysis bundle
 
 > `zuhui-beammer`（ADC/电路组会线）已于 2026-08-17 删除，场景并入 `beamer-academic`。取回：`git checkout 0e128a2 -- skills/zuhui-beammer`
 
-### Idea / Experiment Flow
+### Other Maintained Skills
 
-- `research-pipeline` — 全流程编排（idea → experiment → review → paper）
-- `idea-discovery`
-- `research-lit`
-- `idea-creator`
-- `novelty-check`
-- `research-review`
-- `research-refine-pipeline`
-- `experiment-plan`
-- `experiment-bridge`
-- `experiment-queue` — 批量实验队列编排（OOM 重试、wave 过渡、crash-safe）
-- `run-experiment` — 单次实验部署（local/SSH/Vast.ai/Modal）
-- `monitor-experiment` — 实验进度监控
-- `ablation-planner` — 消融实验规划
-- `result-to-claim` — 结果→claim 门控
-- `experiment-audit` — 实验诚信审计
-- `auto-review-loop`
-- `analyze-results`
-- `dse-loop`
-- `training-check` — 训练健康检查
-- `vast-gpu` — Vast.ai GPU 管理
-- `serverless-modal` — Modal serverless GPU
-- `formula-derivation`
-- `nature-data` — full-analysis 数据、source data、FAIR 与 provenance 审计（runtime specialist）
-- `nature-figure` — full-analysis Python 科研图、导出与视觉 QA（runtime specialist）
-- `paper-compile`
+- `diagram-design`, `evidence-to-lecture-handout` — 图表、讲义和视觉交付
+- `md-to-word-fidelity` — Markdown 到 Word 模板的保真转换
+- `natural-fund-research-status-writing` — 自然基金研究现状写作
+- `paper-to-wiki`, `wikiskill-evolve` — 论文材料和 Wiki 维护
+- `vision-batch-read` — 批量并发读图
+- `workshop-talks-s5-lecture-pipeline` — 讲座材料流水线
+- `zotero-lookup`, `zotero-manager` — Zotero 文献定位和管理
+- `virtuoso` — Cadence Virtuoso 远程控制
+
+研究/实验与 Wiki bundle 已从本仓库移除；相关上游只作为候选来源，纳入
+前需要重新分析并转化为本地维护版本。
 
 ### Meta / Maintenance
 
-- `darwin-skill`
+- `darwin-skill` — 候选维护工具，当前位于仓库外的候选源目录，尚未纳入本仓库
 
 ### EDA / Virtuoso
 

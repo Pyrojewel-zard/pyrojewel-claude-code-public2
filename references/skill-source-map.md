@@ -1,7 +1,7 @@
 # Skill Source Map
 
 **Project:** `pyrojewel_claude_code`
-**Last Updated:** 2026-08-19T00:00:00+08:00
+**Last Updated:** 2026-09-12T00:00:00+08:00
 **Purpose:** 维护当前项目内 skill 的来源、所属 flow、当前状态、同步策略，作为后续 upstream 更新分析的唯一总表。
 
 ---
@@ -24,6 +24,32 @@
 ---
 
 ## 2. 当前项目 Skill 总表
+
+本表只列当前工作树中实际存在的 skill；历史迁移记录保留在 2.1 节。
+
+| Skill | Local Path | Flow | Status | Source Repo | Source Path / Basis | Current Owner | Sync Strategy |
+|------|------------|------|--------|-------------|---------------------|---------------|---------------|
+| `beamer-academic` | `skills/beamer-academic/SKILL.md` | Paper / Lecture | `active` | `Faust-Donf/beamer-academic` | 本地 fork，含版式和视觉 QA 适配 | lead | 从上游 commit 对象同步，再保留本地适配 |
+| `diagram-design` | `skills/diagram-design/SKILL.md` | Visualization | `active` | `cathrynlavery/diagram-design` | 本地适配副本 | lead | 上游更新后人工判断是否吸收 |
+| `evidence-to-lecture-handout` | `skills/evidence-to-lecture-handout/SKILL.md` | Lecture | `active` | local maintenance | 当前仓库版本；原始来源待盘点 | lead | 不自动覆盖，纳入日常来源盘点 |
+| `paper-to-wiki` | `skills/paper-to-wiki/SKILL.md` | Wiki handoff | `active` | local maintenance | 当前仓库版本 | lead | 仅维护本地适配 |
+| `pyrojewel-paper-river` | `skills/pyrojewel-paper-river/SKILL.md` | Paper | `active` | `Pyrojewel-zard/ljg-skills` | 本地维护副本，源自 `lijigang/ljg-skills` | lead | 上游更新后人工二次消化 |
+| `virtuoso` | `skills/virtuoso/SKILL.md` | RF / EDA | `active` | `Pyrojewel-zard/virtuoso-bridge-lite` | fork of `Arcadia-1/virtuoso-bridge-lite` | lead | 跟踪 upstream bridge API，保留本地 profile |
+| `vision-batch-read` | `skills/vision-batch-read/SKILL.md` | Visualization | `active` | local maintenance | 当前仓库版本 | lead | 仅维护本地适配 |
+| `workshop-talks-s5-lecture-pipeline` | `skills/workshop-talks-s5-lecture-pipeline/SKILL.md` | Lecture | `active` | local maintenance | 当前仓库版本 | lead | 仅维护本地适配 |
+| `zotero-manager` | `skills/zotero-manager/SKILL.md` | Zotero | `active` | local maintenance | 当前仓库版本 | lead | 仅维护本地适配 |
+| `md-to-word-fidelity` | `skills/md-to-word-fidelity/SKILL.md` | Document | `adopted` | cc-switch local install | 数据库无来源仓库记录 | lead | 日常扫描来源后人工吸收，不自动覆盖 |
+| `natural-fund-research-status-writing` | `skills/natural-fund-research-status-writing/SKILL.md` | Academic writing | `adopted` | cc-switch local install | 数据库无来源仓库记录 | lead | 日常扫描来源后人工吸收，不自动覆盖 |
+| `wikiskill-evolve` | `skills/wikiskill-evolve/SKILL.md` | Wiki maintenance | `adopted` | cc-switch local install | 数据库无来源仓库记录 | lead | 日常扫描来源后人工吸收，不自动覆盖 |
+| `zotero-lookup` | `skills/zotero-lookup/SKILL.md` | Zotero | `adopted` | cc-switch local install | 数据库无来源仓库记录 | lead | 日常扫描来源后人工吸收，不自动覆盖 |
+| `ljg-paper`, `ljg-read`, `ljg-qa` | external runtime skills | Paper | `external-active` | `lijigang/ljg-skills` | 运行时外部 skill | lead | 跟踪本地 fork/upstream |
+| `nature-data`, `nature-figure` | external runtime skills | Academic | `external-active` | `Yuan1z0825/nature-skills` | 运行时外部 skill | lead | 来源更新后再判断是否纳入本仓库 |
+
+### 已从当前仓库移除
+
+2026-09-12 按用户确认移除了 27 个研究/实验 skill 和 10 个 Wiki/知识库 skill；这些名称只在后文历史记录中保留，不属于当前清单。
+
+## 2.1 历史迁移记录（非当前清单）
 
 | Skill | Local Path | Flow | Status | Source Repo | Source Path / Basis | Current Owner | Sync Strategy |
 |------|------------|------|--------|-------------|---------------------|---------------|---------------|
@@ -86,6 +112,23 @@
 ---
 
 ## 3. Source Repo Watch List
+
+当前日常扫描优先关注以下来源；候选仓库只做分析，不自动覆盖本地维护版本。
+
+| Source Repo | Primary Flows | What To Watch | Check Trigger | Decision Output |
+|------------|---------------|---------------|---------------|-----------------|
+| `lijigang/ljg-skills` | Paper | `pyrojewel-paper-river` 方法论变化 | 上游有显著更新或阅读质量问题 | 是否人工吸收更新 |
+| `Faust-Donf/beamer-academic` | Paper / Lecture | LaTeX 模板、编译脚本、字体/布局修复 | 上游新增关键版式或 QA 能力 | 更新本地适配副本 |
+| `Arcadia-1/virtuoso-bridge-lite` | RF / EDA | bridge API、profiles、examples、references | upstream 发布新 API 或 release | 是否同步 `skills/virtuoso/` |
+| `Yuan1z0825/nature-skills` | Academic | `nature-data`, `nature-figure` 等 runtime skill | 写作、科研图或数据审计线需要增强 | 是否二次消化并纳入 |
+| `cc-switch` skill catalog | All | 无仓库 skill 的归属与新增记录 | 每日扫描数据库与安装目录差异 | 建立来源、复制后人工适配 |
+| `mattpocock/skills` | Candidate | 通用开发/代理 skill | 候选源出现可复用能力 | 是否迁入并本地改写 |
+| `obra/superpowers` | Candidate | 开发流程与质量门 | 候选源出现可复用能力 | 是否迁入并本地改写 |
+| `njzjz/nsfc-agent-skills` | Candidate | NSFC 写作/文献 skill | 候选源出现可复用能力 | 是否迁入并本地改写 |
+| `OthmanAdi/planning-with-files` | Candidate | 文件化规划工作流 | 候选源出现可复用能力 | 是否迁入并本地改写 |
+| `alchaincyf/darwin-skill` | Candidate | skill 评估与优化方法 | 候选源出现可复用能力 | 是否作为维护工具接入 |
+
+## 3.1 历史 source watch 记录
 
 | Source Repo | Primary Flows | What To Watch | Check Trigger | Decision Output |
 |------------|---------------|---------------|---------------|-----------------|
@@ -381,6 +424,6 @@
 |-------|---------|---------|
 | `virtuoso` (SKILL.md + 8 references) | split-hosts 连接序列、maestro run_and_wait/read_results 新 API、schematic planner 示例、references 更新 | 覆盖 SKILL.md + 回插本地 `### Profile 配置` 与 `## 详情阅读 / Deep Dives` 段落；8 个 references 直接复制；本地独有 `digital-import-flow.md` 与 `netlist.md`（本地 `edit()` 适配）保留 |
 
-**push 状态：** 见下条记录。
+**push 状态：** 待 push（VM 无 SSH key 且无 HTTPS 凭据；本地 commit `25be4c9` 已生成，待用户环境 push `origin master`）。
 
 **备注：** VM 无 SSH key（`~/.ssh/` 不存在），HTTPS 匿名 fetch 可用；ljg-skills/virtuoso 的 merge commit 因挂载盘无法删除 `.git/*.lock`，采用独立 `GIT_INDEX_FILE` + `git commit-tree` + 直接写 loose ref 的 workaround；工作区保留本地 markdown 适配（与 2026-08-20 记录一致，属预期状态）。
