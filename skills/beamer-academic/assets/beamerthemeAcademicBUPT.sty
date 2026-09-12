@@ -1,0 +1,40 @@
+% Optional BUPT branding overlay for the maintained beamer-academic theme.
+% Recovered from the historical pyrojewel-beamer-academic lineage, but adapted
+% to the current white academic layout instead of restoring the old defense skin.
+\ProvidesPackage{beamerthemeAcademicBUPT}[2026/08/21 BUPT branding overlay]
+
+\RequirePackage{beamerthemeAcademic}
+\RequirePackage{graphicx}
+\RequirePackage{etoolbox}
+
+\newcommand{\horizsealimage}{bupt-logo-white.png}
+\newcommand{\sethorizseal}[1]{\renewcommand{\horizsealimage}{#1}}
+\newcommand{\buptbrandtext}{北京邮电大学}
+\newcommand{\setbuptbrandtext}[1]{\renewcommand{\buptbrandtext}{#1}}
+
+\newcommand{\printbuptseal}{%
+  \ifdefempty{\horizsealimage}{}{%
+    \IfFileExists{\horizsealimage}{%
+      \includegraphics[height=0.32cm,keepaspectratio]{\horizsealimage}%
+    }{%
+      \PackageError{beamerthemeAcademicBUPT}
+        {BUPT logo file `\horizsealimage' not found}
+        {Copy bupt-logo-white.png into the deck's materials/figures directory,\MessageBreak
+         keep \\graphicspath{{materials/figures/}{./}}, or disable with \\sethorizseal{}.}%
+    }%
+  }%
+}
+
+% Thin identity strip only; all content-area composition remains owned by
+% beamerthemeAcademic. Plain frames (cover/statement pages) remain unaffected.
+\setbeamertemplate{headline}{%
+  \leavevmode%
+  \begin{beamercolorbox}[wd=\paperwidth,ht=0.43cm,dp=0.08cm,leftskip=0.42cm,rightskip=0.42cm]{section in head/foot}%
+    {\fontsize{6.8pt}{8pt}\selectfont\bfseries\color{white}\buptbrandtext}%
+    \hfill
+    \raisebox{-0.02cm}{\printbuptseal}%
+  \end{beamercolorbox}%
+}
+
+% Historical compatibility: the old skill used this exact public API.
+% Existing decks can therefore keep `\sethorizseal{bupt-logo-white.png}`.
