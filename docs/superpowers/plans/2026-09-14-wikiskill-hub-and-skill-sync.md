@@ -1,7 +1,8 @@
 ---
 title: WikiSkill Hub and Skill Sync
 date: 2026-09-14
-status: active
+status: completed
+completed-date: 2026-09-14
 ---
 
 # WikiSkill Hub and Skill Sync Implementation Plan

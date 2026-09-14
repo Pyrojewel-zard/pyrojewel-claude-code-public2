@@ -17,7 +17,7 @@ docs/superpowers/
 |------|------|--------|------|
 | zuhui-beammer implementation | 2026-08-15 | completed | [plans/2026-08-15-zuhui-beammer.md](plans/2026-08-15-zuhui-beammer.md) |
 | Implementation Report Research Pipeline | 2026-08-19 | completed | [plans/2026-08-19-implementation-report-pipeline.md](plans/2026-08-19-implementation-report-pipeline.md) |
-| WikiSkill Hub and Skill Sync | 2026-09-14 | active | [plans/2026-09-14-wikiskill-hub-and-skill-sync.md](plans/2026-09-14-wikiskill-hub-and-skill-sync.md) |
+| WikiSkill Hub and Skill Sync | 2026-09-14 | completed | [plans/2026-09-14-wikiskill-hub-and-skill-sync.md](plans/2026-09-14-wikiskill-hub-and-skill-sync.md) |
 
 ### Active Specs
 
