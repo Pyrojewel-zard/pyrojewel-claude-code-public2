@@ -1,9 +1,9 @@
 ---
 name: wikiskill-evolve
-description: "Use when evolving WikiSkill from agent traces, resolving Codex/CCB session identifiers to chat transcripts, or turning complete AI troubleshooting conversations into reusable knowledge and skills."
+description: "Use when evolving WikiSkill from agent traces, routing findings through a project map, resolving Codex/CCB session identifiers to chat transcripts, or turning complete AI troubleshooting conversations into reusable knowledge and skills."
 license: MIT
 metadata:
-  version: "1.0.0"
+  version: "1.1.0"
   platforms: [linux, macos, windows]
   hermes:
     tags: [wikiskill, evolution, skills, paper-implementation, hermes]
@@ -51,6 +51,41 @@ wikiskill transfer src dst                 # copy accepted skills to another ws
 - `wiki/skill-impact.md` — rejected proposals stay visible (paper requirement)
 - Gate verdicts: `ACCEPTED` (R_val > R_best, git commit), `REJECTED`
   (rolled back), `no_action` (proposer declined — a valid outcome)
+
+## Project-routed WikiSkill Hub
+
+Use one local Hub for discovery, but keep project evidence and accepted knowledge isolated. Set the Hub explicitly in each environment:
+
+```bash
+export WIKISKILL_HUB_ROOT=/path/to/wikiskill-hub
+export WIKISKILL_PROJECT_ID=nfsc-eda       # optional when Git-root matching is unambiguous
+```
+
+The Hub contains a `map.yaml`, `shared/patterns/`, `shared/skills/`, `projects/<project-id>/`, and `inbox/`. A project workspace contains its own `project.yaml`, `wiki/`, `raw/traces/`, `runs/`, benchmark metadata, and `skills/{candidates,accepted,rejected}/`. Keep the actual machine-specific root in the local map, not in this portable skill.
+
+The minimum `map.yaml` contract is:
+
+```yaml
+version: 1
+default_project: inbox
+shared: {patterns: shared/patterns, skills: shared/skills}
+projects:
+  <project-id>:
+    root: /canonical/path/to/git/root
+    workspace: projects/<project-id>
+    aliases: [unique-alias]
+```
+
+All paths except `root` are relative to the Hub and must not escape it with `..`. Normalize `root` and the current Git top-level directory before matching. A project ID or alias must be unique and present in the map; an exact root match wins, and if multiple roots match a nested worktree, the longest canonical match wins. Missing roots, duplicate aliases, invalid paths, or ties are ambiguous: report the reason and route to `inbox/` rather than guessing.
+
+Resolve the destination in this order:
+
+1. An explicit `WIKISKILL_PROJECT_ID` or command argument.
+2. A unique current Git root match in `map.yaml`.
+3. A declared repository alias.
+4. `inbox/` when no unique project can be established.
+
+Never infer a project from a filename alone. Read project-local patterns before shared patterns. Raw transcripts and traces are immutable evidence. A candidate is accepted only through the project's validation gate (`R_val > R_best`); promote it to `shared/` only after evidence from more than one project supports the generalization. A standalone chat summary may write a project pattern, but it is not a benchmark score and must not fabricate `tasks.json`, graders, or run results.
 
 ## Backends
 

@@ -1,7 +1,7 @@
 # Skill Source Map
 
 **Project:** `pyrojewel_claude_code`
-**Last Updated:** 2026-09-12T00:00:00+08:00
+**Last Updated:** 2026-09-14T00:00:00+08:00
 **Purpose:** 维护当前项目内 skill 的来源、所属 flow、当前状态、同步策略，作为后续 upstream 更新分析的唯一总表。
 
 ---
@@ -176,6 +176,13 @@
 ---
 
 ## 6. Sync Log
+
+### 2026-09-14 — WikiSkill Hub and DOCX fidelity adaptation
+
+- Added a local project-routed Hub under the configured `WIKISKILL_HUB_ROOT`; the machine-specific path is intentionally kept out of portable skills.
+- Registered `nfsc-eda` with a map entry, isolated wiki/traces/runs/skill layers, and an explicit not-configured benchmark state.
+- Updated `md-to-word-fidelity` to document the successful original-DOCX parse → in-place content replacement → structure/text/render verification path.
+- Updated `wikiskill-evolve` to resolve project-local knowledge before shared knowledge and to require cross-project evidence before shared promotion.
 
 ### 2026-08-11 — 四仓库批量同步
 
