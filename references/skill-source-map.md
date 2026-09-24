@@ -1,7 +1,7 @@
 # Skill Source Map
 
 **Project:** `pyrojewel_claude_code`
-**Last Updated:** 2026-09-14T00:00:00+08:00
+**Last Updated:** 2026-09-24T13:43:00+08:00
 **Purpose:** 维护当前项目内 skill 的来源、所属 flow、当前状态、同步策略，作为后续 upstream 更新分析的唯一总表。
 
 ---
@@ -31,6 +31,7 @@
 |------|------------|------|--------|-------------|---------------------|---------------|---------------|
 | `beamer-academic` | `skills/beamer-academic/SKILL.md` | Paper / Lecture | `active` | `Faust-Donf/beamer-academic` | 本地 fork，含版式和视觉 QA 适配 | lead | 从上游 commit 对象同步，再保留本地适配 |
 | `diagram-design` | `skills/diagram-design/SKILL.md` | Visualization | `active` | `cathrynlavery/diagram-design` | 本地适配副本 | lead | 上游更新后人工判断是否吸收 |
+| `visual-report` | `skills/visual-report/SKILL.md` | Visualization | `active` | local self-built | 通用上下文/Plan/进度/结果 → self-contained HTML report；兼容 Luna、DeepSeek、Claude、Codex 等通用模型 | lead | 本地维护；与 planning-with-files、diagram-design 保持松耦合 |
 | `evidence-to-lecture-handout` | `skills/evidence-to-lecture-handout/SKILL.md` | Lecture | `active` | local maintenance | 当前仓库版本；原始来源待盘点 | lead | 不自动覆盖，纳入日常来源盘点 |
 | `pyrojewel-paper-river` | `skills/pyrojewel-paper-river/SKILL.md` | Paper | `active` | `Pyrojewel-zard/ljg-skills` | 本地维护副本，源自 `lijigang/ljg-skills` | lead | 上游更新后人工二次消化 |
 | `virtuoso` | `skills/virtuoso/SKILL.md` | RF / EDA | `active` | `Pyrojewel-zard/virtuoso-bridge-lite` | fork of `Arcadia-1/virtuoso-bridge-lite` | lead | 跟踪 upstream bridge API，保留本地 profile |
