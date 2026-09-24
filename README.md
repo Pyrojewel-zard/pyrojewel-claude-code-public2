@@ -48,7 +48,7 @@ Key docs:
 
 The repository also contains focused skills for `diagram-design`,
 `evidence-to-lecture-handout`, `md-to-word-fidelity`,
-`natural-fund-research-status-writing`, `vision-batch-read`,
+`natural-fund-research-status-writing`, `vision-batch-read`, `visual-report`,
 `workshop-talks-s5-lecture-pipeline`,
 `wikiskill-evolve`, `zotero-lookup`, `zotero-manager`, and `virtuoso`.
 
